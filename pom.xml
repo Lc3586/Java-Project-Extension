@@ -25,7 +25,7 @@
     <modules>
         <module>project-extension-common</module>
         <module>project-extension-openapi</module>
-        <module>project-extension-mybatis</module>
+        <module>project-extension-mybatis-edge</module>
     </modules>
     <packaging>pom</packaging>
 
