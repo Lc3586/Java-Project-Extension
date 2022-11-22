@@ -1,0 +1,152 @@
+package project.extension.mybatis.core.provider.sqlserver;
+
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
+import project.extension.collections.CollectionsExtension;
+import project.extension.mybatis.config.BaseConfig;
+import project.extension.mybatis.core.provider.normal.Select;
+import project.extension.mybatis.core.provider.standard.IAop;
+import project.extension.mybatis.extention.RepositoryExtension;
+import project.extension.mybatis.model.OrderMethod;
+
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * SqlServer数据查询对象
+ *
+ * @param <T> 实体类型
+ * @author LCTR
+ * @date 2022-07-15
+ */
+public class SqlServerSelect<T>
+        extends Select<T> {
+    public SqlServerSelect(BaseConfig config,
+                           IAop aop,
+                           Class<T> entityType,
+                           boolean withTransactional) {
+        super(config,
+              new SqlServerSqlProvider(config),
+              aop,
+              entityType,
+              withTransactional);
+        this.config = config;
+    }
+
+    private final BaseConfig config;
+
+    /**
+     * 如果没有设置排序条件则设置个默认的排序条件
+     */
+    private void checkAndSetDefaultOrderBy(
+            @Nullable
+                    String fieldName) {
+        if (!StringUtils.hasText(orderBy.getDynamicOrder()
+                                        .getFieldName())
+                && orderBy.getDynamicOrder()
+                          .getAdvancedOrder()
+                          .size() == 0) {
+
+            if (fieldName != null) {
+                //使用自定义查询字段作为默认的排序条件
+                orderBy.getDynamicOrder()
+                       .setFieldName(fieldName);
+                orderBy.getDynamicOrder()
+                       .setMethod(OrderMethod.ASC);
+            } else if (executor.getCustomFieldNames()
+                               .size() > 0) {
+                //使用自定义查询字段作为默认的排序条件
+                orderBy.getDynamicOrder()
+                       .setFieldName(executor.getCustomFieldNames()
+                                             .get(0));
+                orderBy.getDynamicOrder()
+                       .setMethod(OrderMethod.ASC);
+            } else {
+                Map<String, String> primaryKey = RepositoryExtension.getPrimaryKeyFieldNameWithColumns(entityType,
+                                                                                                       config.getNameConvertType());
+                if (primaryKey.size() > 0) {
+                    //使用主键作为默认的排序条件
+                    orderBy.getDynamicOrder()
+                           .setFieldName(CollectionsExtension.firstKey(primaryKey));
+                    orderBy.getDynamicOrder()
+                           .setMethod(OrderMethod.ASC);
+                } else {
+                    //使用任意一个列作为默认的排序条件
+                    List<Field> fields = RepositoryExtension.getColumnFieldsByEntityType(entityType,
+                                                                                         false);
+                    orderBy.getDynamicOrder()
+                           .setFieldName(fields.get(0)
+                                               .getName());
+                    orderBy.getDynamicOrder()
+                           .setMethod(OrderMethod.ASC);
+                }
+            }
+        }
+    }
+
+    @Override
+    public List<T> toList()
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.toList();
+    }
+
+    @Override
+    public <T2> List<T2> toList(Class<T2> dtoType)
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.toList(dtoType);
+    }
+
+    @Override
+    public List<Map<String, Object>> toMapList()
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.toMapList();
+    }
+
+    @Override
+    public T first()
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.first();
+    }
+
+    @Override
+    public <T2> T2 first(Class<T2> dtoType)
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.first(dtoType);
+    }
+
+    @Override
+    public <C> C first(String fieldName,
+                       Class<C> memberType)
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(fieldName);
+
+        return super.first(fieldName,
+                           memberType);
+    }
+
+    @Override
+    public Map<String, Object> firstMap()
+            throws
+            Exception {
+        checkAndSetDefaultOrderBy(null);
+
+        return super.firstMap();
+    }
+}
