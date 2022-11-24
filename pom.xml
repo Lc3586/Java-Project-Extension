@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.lctr</groupId>
-    <artifactId>project-extension-all</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>project-extension</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>1.8</java.version>
+        <maven.version>0.0.1-SNAPSHOT</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -23,6 +24,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>project-extension-all</module>
         <module>project-extension-common</module>
         <module>project-extension-openapi</module>
         <module>project-extension-mybatis-edge</module>
@@ -47,14 +49,6 @@
             </plugin>
         </plugins>
         <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <excludes>
-                    <exclude>application-dev.yml</exclude>
-                    <exclude>application-prod.yml</exclude>
-                </excludes>
-            </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
