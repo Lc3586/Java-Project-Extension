@@ -34,7 +34,10 @@ public class WordHelper {
         SpireDoc,
         /**
          * 通过调用系统中安装的MS Office程序来转换文件
+         * <p>只支持Windows系统</p>
          * <p>需在系统中安装MS Office 2007或以上版本</p>
+         * <p>Win2008以下需要创建目录C:\Windows\System32\config\systemprofile\Desktop</p>
+         * <p>Win2008及以上需要创建目录C:\Windows\SysWOW64\config\systemprofile\Desktop</p>
          */
         Jacob
     }
