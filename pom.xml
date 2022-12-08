@@ -76,6 +76,7 @@
         <module>project-extension-common</module>
         <module>project-extension-openapi</module>
         <module>project-extension-mybatis-edge</module>
+        <module>project-extension-standard</module>
     </modules>
     <packaging>pom</packaging>
 

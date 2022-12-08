@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>project-extension-openapi</artifactId>
+    <artifactId>project-extension-standard</artifactId>
     <version>${maven.version}</version>
 
-    <name>top.lctr:project-extension-openapi</name>
+    <name>top.lctr:project-extension-standard</name>
     <description>
-        项目拓展 接口架构拓展工具
+        项目拓展 标准定义
     </description>
 
     <licenses>
@@ -40,35 +40,25 @@
         <!--        <tag>project-extension-0.0.1</tag>-->
     </scm>
 
+    <properties>
+
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>top.lctr</groupId>
-            <artifactId>project-extension-common</artifactId>
+            <artifactId>project-extension-mybatis-edge</artifactId>
             <version>${maven.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>5.3.23</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>5.6.2</version>
         </dependency>
-        <dependency>
-            <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-models</artifactId>
-            <version>2.2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>2.0.20</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
+
+
     </dependencies>
 
     <repositories>
@@ -79,6 +69,12 @@
             <releases>
                 <enabled>true</enabled>
             </releases>
+        </repository>
+
+        <repository>
+            <id>com.e-iceblue</id>
+            <name>e-iceblue</name>
+            <url>https://repo.e-iceblue.cn/repository/maven-public/</url>
         </repository>
     </repositories>
 </project>
