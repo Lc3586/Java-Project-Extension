@@ -43,7 +43,7 @@
         <dependency>
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-openapi</artifactId>
-            <version>${maven.version}</version>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 
@@ -80,11 +80,6 @@
             <artifactId>mybatis-spring</artifactId>
             <version>3.0.0</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>5.3.23</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
