@@ -1,0 +1,4 @@
+spring:
+  datasource:
+    # 切换Druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource

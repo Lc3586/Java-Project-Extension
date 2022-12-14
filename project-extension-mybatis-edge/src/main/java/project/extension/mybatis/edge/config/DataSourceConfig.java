@@ -26,7 +26,7 @@ public class DataSourceConfig {
     private NameConvertType nameConvertType;
 
     /**
-     * mybatis配置文件路径
+     * 默认的mybatis配置文件路径
      */
     private String configLocation;
 
@@ -34,6 +34,13 @@ public class DataSourceConfig {
      * 连接字符串
      */
     private String connectionString;
+
+    /**
+     * 启用
+     *
+     * @默认值 true
+     */
+    private boolean enable = true;
 
     /**
      * 名称
@@ -69,7 +76,7 @@ public class DataSourceConfig {
     }
 
     /**
-     * mybatis配置文件路径
+     * 默认的mybatis配置文件路径
      */
     public String getConfigLocation() {
         return configLocation;
@@ -88,5 +95,18 @@ public class DataSourceConfig {
 
     public void setConnectionString(String connectionString) {
         this.connectionString = connectionString;
+    }
+
+    /**
+     * 启用
+     *
+     * @默认值 true
+     */
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

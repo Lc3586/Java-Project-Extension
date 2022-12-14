@@ -21,13 +21,11 @@ import project.extension.mybatis.edge.core.repository.ITransactionAction;
 @Component("NaiveSqlSession")
 public class NaiveSqlSession {
     public NaiveSqlSession(BaseConfig config,
-//                           SqlSessionFactory sqlSessionFactory,
                            DataSourceTransactionManager dataSourceTransactionManager,
                            TransactionDefinition transactionDefinition)
             throws
             Exception {
         NaiveSqlSession.build(config,
-//                              sqlSessionFactory,
                               dataSourceTransactionManager,
                               transactionDefinition);
     }
@@ -51,12 +49,10 @@ public class NaiveSqlSession {
      * 构建Sql会话工厂
      *
      * @param config                       配置
-     *                                     //     * @param defaultSqlSessionFactory     Sql会话工厂
      * @param dataSourceTransactionManager 事务管理器
      * @param transactionDefinition        事务定义
      */
     private static void build(BaseConfig config,
-//                              SqlSessionFactory defaultSqlSessionFactory,
                               DataSourceTransactionManager dataSourceTransactionManager,
                               TransactionDefinition transactionDefinition)
             throws
@@ -65,7 +61,6 @@ public class NaiveSqlSession {
         sessionFactory.setDataSource(dataSourceTransactionManager.getDataSource());
         sessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(config.getConfigLocation()));
         sqlSessionFactory = sessionFactory.getObject();
-//        sqlSessionFactory = defaultSqlSessionFactory;
         NaiveSqlSession.dataSourceTransactionManager = dataSourceTransactionManager;
         NaiveSqlSession.transactionDefinition = transactionDefinition;
     }
