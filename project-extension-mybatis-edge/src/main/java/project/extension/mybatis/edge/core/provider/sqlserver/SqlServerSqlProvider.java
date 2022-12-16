@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.core.provider.sqlserver;
 
 import org.springframework.util.StringUtils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
 import project.extension.mybatis.edge.model.DbType;
 
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
  */
 public class SqlServerSqlProvider
         extends SqlProvider {
-    public SqlServerSqlProvider(BaseConfig config) {
+    public SqlServerSqlProvider(DataSourceConfig config) {
         super(config,
               new char[]{'[',
                          ']'});

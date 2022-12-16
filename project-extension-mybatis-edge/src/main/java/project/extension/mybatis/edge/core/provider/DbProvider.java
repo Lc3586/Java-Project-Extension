@@ -1,13 +1,12 @@
 package project.extension.mybatis.edge.core.provider;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.dameng.DamengProvider;
 import project.extension.mybatis.edge.core.provider.mysql.MySqlProvider;
 import project.extension.mybatis.edge.core.provider.sqlserver.SqlServerProvider;
 import project.extension.mybatis.edge.core.provider.standard.IAop;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
-
-import javax.naming.OperationNotSupportedException;
+import project.extension.standard.exception.ApplicationException;
 
 /**
  * 数据库对象构造器
@@ -16,10 +15,10 @@ import javax.naming.OperationNotSupportedException;
  * @date 2022-03-30
  */
 public class DbProvider {
-    public static <T> IBaseDbProvider<T> getDbProvider(BaseConfig config,
+    public static <T> IBaseDbProvider<T> getDbProvider(DataSourceConfig config,
                                                        IAop aop)
             throws
-            OperationNotSupportedException {
+            ApplicationException {
         switch (config.getDbType()) {
             case JdbcMySql:
                 return new MySqlProvider<>(config,
@@ -32,8 +31,8 @@ public class DbProvider {
                 return new SqlServerProvider<>(config,
                                                aop);
             default:
-                throw new OperationNotSupportedException(String.format("暂不支持%s数据库",
-                                                                       config.getDbType()));
+                throw new ApplicationException(String.format("暂不支持%s数据库",
+                                                             config.getDbType()));
         }
     }
 }

@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 import org.apache.ibatis.session.SqlSession;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.SetProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Update<T>
         implements IUpdate<T> {
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     private final SqlProvider sqlProvider;
 
@@ -42,7 +42,7 @@ public abstract class Update<T>
 
     private final IWhere<T, IWhereSource<T>> where;
 
-    public Update(BaseConfig config,
+    public Update(DataSourceConfig config,
                   SqlProvider sqlProvider,
                   IAop aop,
                   Class<T> entityType,
@@ -373,7 +373,7 @@ public abstract class Update<T>
                                                             updater.getParameter(),
                                                             config.getNameConvertType()),
                                                     CurdType.更新,
-                                                    config.getDataSource(),
+                                                    config.getName(),
                                                     script,
                                                     updater.getParameter(),
                                                     updater.getEntityType(),
@@ -404,7 +404,7 @@ public abstract class Update<T>
                                                         updater.getParameter(),
                                                         config.getNameConvertType()),
                                                 CurdType.更新,
-                                                config.getDataSource(),
+                                                config.getName(),
                                                 script,
                                                 updater.getParameter(),
                                                 updater.getEntityType(),

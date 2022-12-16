@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.core.provider.mysql;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.standard.*;
 
 /**
@@ -11,13 +11,13 @@ import project.extension.mybatis.edge.core.provider.standard.*;
  */
 public class MySqlProvider<T>
         implements IBaseDbProvider<T> {
-    public MySqlProvider(BaseConfig config,
+    public MySqlProvider(DataSourceConfig config,
                          IAop aop) {
         this.config = config;
         this.aop = aop;
     }
 
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     private final IAop aop;
 

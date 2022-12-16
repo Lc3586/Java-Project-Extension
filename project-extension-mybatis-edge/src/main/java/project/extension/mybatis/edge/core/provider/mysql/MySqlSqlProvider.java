@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.core.provider.mysql;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
 
 /**
@@ -11,7 +11,7 @@ import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
  */
 public class MySqlSqlProvider
         extends SqlProvider {
-    public MySqlSqlProvider(BaseConfig config) {
+    public MySqlSqlProvider(DataSourceConfig config) {
         super(config,
               new char[]{'`',
                          '`'});

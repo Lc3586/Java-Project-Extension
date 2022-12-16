@@ -4,7 +4,7 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
 import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.*;
@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  */
 public class SqlServerDbFirst
         extends DbFirst {
-    public SqlServerDbFirst(BaseConfig config) {
+    public SqlServerDbFirst(DataSourceConfig config) {
         super(config,
               "SqlServerDbFirst");
         initialization();

@@ -1,4 +1,4 @@
-package project.extension.standard.datasearch;
+package project.extension.mybatis.edge.extention.datasearch;
 
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.model.FilterGroupRelation;

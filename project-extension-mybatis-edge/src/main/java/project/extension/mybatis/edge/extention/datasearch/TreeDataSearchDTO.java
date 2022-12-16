@@ -1,9 +1,8 @@
-package project.extension.standard.datasearch;
+package project.extension.mybatis.edge.extention.datasearch;
 
 import project.extension.openapi.annotations.OpenApiDescription;
 import project.extension.openapi.annotations.OpenApiSchema;
 import project.extension.openapi.annotations.OpenApiSchemaStrictMode;
-import project.extension.standard.datasearch.DataSearchDTO;
 
 /**
  * 树状数据搜索参数

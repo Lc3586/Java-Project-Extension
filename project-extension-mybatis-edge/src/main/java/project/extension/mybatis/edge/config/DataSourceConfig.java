@@ -1,7 +1,17 @@
 package project.extension.mybatis.edge.config;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import com.microsoft.sqlserver.jdbc.SQLServerDriver;
+import dm.jdbc.driver.DmDriver;
+import oracle.jdbc.driver.OracleDriver;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.mybatis.edge.model.DbType;
+import project.extension.standard.exception.ApplicationException;
+
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * 数据源配置
@@ -21,6 +31,11 @@ public class DataSourceConfig {
     private DbType dbType;
 
     /**
+     * 驱动
+     */
+    private Driver driver;
+
+    /**
      * 实体类表名/列名命名规则
      */
     private NameConvertType nameConvertType;
@@ -34,6 +49,16 @@ public class DataSourceConfig {
      * 连接字符串
      */
     private String connectionString;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 密码
+     */
+    private String password;
 
     /**
      * 启用
@@ -62,6 +87,17 @@ public class DataSourceConfig {
 
     public void setDbType(DbType dbType) {
         this.dbType = dbType;
+    }
+
+    /**
+     * 驱动
+     */
+    public Driver getDriver() {
+        return driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
     }
 
     /**
@@ -98,6 +134,28 @@ public class DataSourceConfig {
     }
 
     /**
+     * 用户名
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * 密码
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
      * 启用
      *
      * @默认值 true
@@ -108,5 +166,24 @@ public class DataSourceConfig {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    /**
+     * 应用配置到数据源
+     *
+     * @param datasource 数据源
+     * @return 数据源
+     */
+    public DruidDataSource applyConfig(DruidDataSource datasource) {
+        datasource.setName(this.getName());
+        datasource.setUrl(this.getConnectionString());
+        datasource.setUsername(this.getUsername());
+        datasource.setPassword(this.getPassword());
+        datasource.setEnable(this.isEnable());
+        datasource.setDbType(CommonUtils.convertToAlibabaDbType(this.getDbType()));
+        if (this.getDriver() == null)
+            this.setDriver(CommonUtils.getDriver(this.getDbType()));
+        datasource.setDriver(this.getDriver());
+        return datasource;
     }
 }

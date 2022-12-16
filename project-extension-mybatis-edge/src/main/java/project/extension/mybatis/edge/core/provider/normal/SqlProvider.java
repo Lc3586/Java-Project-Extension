@@ -3,11 +3,12 @@ package project.extension.mybatis.edge.core.provider.normal;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.EntityMapping;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.extention.CacheExtension;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.extention.SqlExtension;
 import project.extension.mybatis.edge.model.*;
+import project.extension.mybatis.edge.model.OrderMethod;
 import project.extension.tuple.Tuple2;
 
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
  * @date 2022-03-31
  */
 public abstract class SqlProvider {
-    public SqlProvider(BaseConfig config,
+    public SqlProvider(DataSourceConfig config,
                        char[] character) {
         this.config = config;
         this.character = character;
@@ -37,7 +38,7 @@ public abstract class SqlProvider {
     /**
      * 配置
      */
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     /**
      * 标识符

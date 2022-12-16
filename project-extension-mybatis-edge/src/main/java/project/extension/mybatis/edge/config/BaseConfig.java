@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * 基础配置
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author LCTR
  * @date 2022-03-28
  */
-@Component("MybatisBaseConfig")
+@Component
 @ConfigurationProperties("project.extension.mybatis")
 public class BaseConfig {
     /**
@@ -50,6 +51,16 @@ public class BaseConfig {
      * 默认的连接字符串
      */
     private String connectionString;
+
+    /**
+     * 用户名
+     */
+    private String username;
+
+    /**
+     * 密码
+     */
+    private String password;
 
     /**
      * 多数据源配置
@@ -123,6 +134,28 @@ public class BaseConfig {
     }
 
     /**
+     * 用户名
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * 密码
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
      * 多库配置
      */
     public List<DataSourceConfig> getMultiDataSource() {
@@ -140,8 +173,16 @@ public class BaseConfig {
         return multiDataSource != null && multiDataSource.size() > 1;
     }
 
+    public List<String> getAllDataSource() {
+        this.getDataSourceConfig();
+        return this.getMultiDataSource()
+                   .stream()
+                   .map(DataSourceConfig::getName)
+                   .collect(Collectors.toList());
+    }
+
     /**
-     * 获取数据源配置
+     * 获取默认的数据源配置
      */
     public DataSourceConfig getDataSourceConfig() {
         if (!StringUtils.hasText(this.getDataSource())) {
@@ -156,6 +197,10 @@ public class BaseConfig {
                                        .getName());
 
                 if (!StringUtils.hasText(this.getDataSource())) {
+                    if (this.getMultiDataSource()
+                            .size() > 1)
+                        throw new ApplicationException("在配置文件的project.extension.mybatis.multiDataSource中没有为数据源配置名称");
+
                     //设置默认数据源为master
                     this.setDataSource("master");
                     this.getMultiDataSource()
@@ -170,7 +215,7 @@ public class BaseConfig {
     }
 
     /**
-     * 获取数据源配置
+     * 获取指定的数据源配置
      *
      * @param dataSource 数据源名称
      */
@@ -185,6 +230,8 @@ public class BaseConfig {
             masterConfig.setName(dataSource);
             masterConfig.setDbType(this.getDbType());
             masterConfig.setConnectionString(this.getConnectionString());
+            masterConfig.setUsername(this.getUsername());
+            masterConfig.setPassword(this.getPassword());
             masterConfig.setNameConvertType(this.getNameConvertType());
             masterConfig.setConfigLocation(this.getConfigLocation());
             masterConfig.setEnable(true);
@@ -203,30 +250,60 @@ public class BaseConfig {
                                                                 })
                                                                 .findAny();
         if (!matchConfig.isPresent())
-            throw new ApplicationException(String.format("在配置文件的project.extension.mybatis.multiDataSource中未找到名称为%s的数据源配置",
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource中未找到名称为%s的数据源配置",
                                                          dataSource));
 
         if (count.get() > 1)
-            throw new ApplicationException(String.format("在配置文件project.extension.mybatis.multiDataSource中存在多个名称为%s的数据源",
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource中存在多个名称为%s的数据源",
                                                          dataSource));
 
         DataSourceConfig config = matchConfig.get();
 
-        if (!config.isEnable())
-            throw new ApplicationException(String.format("未启用配置文件的project.extension.mybatis.multiDataSource.%s数据源",
-                                                         dataSource));
+//        if (!config.isEnable())
+//            throw new ApplicationException(String.format("未启用配置文件的project.extension.mybatis.multiDataSource.%s数据源",
+//                                                         dataSource));
 
         if (config.getDbType() == null)
             config.setDbType(this.getDbType());
 
+        if (config.getDbType() == null)
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失dbType设置，并且也没有设置默认的dbType",
+                                                         dataSource));
+
         if (config.getNameConvertType() == null)
             config.setNameConvertType(this.getNameConvertType());
+
+        if (config.getNameConvertType() == null)
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失nameConvertType设置，并且也没有设置默认的nameConvertType",
+                                                         dataSource));
 
         if (!StringUtils.hasText(config.getConfigLocation()))
             config.setConfigLocation(this.getConfigLocation());
 
+        if (!StringUtils.hasText(config.getConfigLocation()))
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失configLocation设置，并且也没有设置默认的configLocation",
+                                                         dataSource));
+
+        if (!StringUtils.hasText(config.getUsername()))
+            config.setUsername(this.getUsername());
+
+        if (!StringUtils.hasText(config.getUsername()))
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失username设置，并且也没有设置默认的username",
+                                                         dataSource));
+
+        if (!StringUtils.hasText(config.getPassword()))
+            config.setPassword(this.getPassword());
+
+        if (!StringUtils.hasText(config.getPassword()))
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失password设置，并且也没有设置默认的password",
+                                                         dataSource));
+
         if (!StringUtils.hasText(config.getConnectionString()))
             config.setConnectionString(this.getConnectionString());
+
+        if (!StringUtils.hasText(config.getConnectionString()))
+            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失connectionString设置，并且也没有设置默认的connectionString",
+                                                         dataSource));
 
         return config;
     }

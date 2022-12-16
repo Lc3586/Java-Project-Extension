@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
 import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.*;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class MySqlDbFirst
         extends DbFirst {
-    public MySqlDbFirst(BaseConfig config) {
+    public MySqlDbFirst(DataSourceConfig config) {
         super(config,
               "MySqlDbFirst");
         initialization();

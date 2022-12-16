@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.core.provider.sqlserver;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Update;
 import project.extension.mybatis.edge.core.provider.standard.IAop;
 
@@ -13,7 +13,7 @@ import project.extension.mybatis.edge.core.provider.standard.IAop;
  */
 public class SqlServerUpdate<T>
         extends Update<T> {
-    public SqlServerUpdate(BaseConfig config,
+    public SqlServerUpdate(DataSourceConfig config,
                            IAop aop,
                            Class<T> entityType,
                            boolean withTransactional) {

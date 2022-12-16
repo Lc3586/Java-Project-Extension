@@ -49,7 +49,6 @@
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-openapi</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>

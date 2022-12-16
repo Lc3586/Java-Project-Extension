@@ -1,10 +1,12 @@
-package project.extension.standard.entity;
+package project.extension.mybatis.edge.extention;
 
 import org.springframework.core.annotation.AnnotationUtils;
 import project.extension.Identity.SnowFlake;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.standard.authentication.IAuthenticationService;
+import project.extension.standard.entity.Base_Fields;
+import project.extension.standard.entity.IEntityExtension;
 import project.extension.standard.exception.ApplicationException;
 
 import java.lang.reflect.Field;
@@ -18,9 +20,9 @@ import java.util.Date;
  * @author LCTR
  * @date 2022-12-08
  */
-public class DefaultEntityExtension
+public class EntityExtension
         implements IEntityExtension {
-    public DefaultEntityExtension(IAuthenticationService authenticationService) {
+    public EntityExtension(IAuthenticationService authenticationService) {
         this(authenticationService,
              new String[]{Base_Fields.createBy},
              new String[]{Base_Fields.createTime},
@@ -34,11 +36,11 @@ public class DefaultEntityExtension
      * @param updateByFields   修改者字段
      * @param updateTimeFields 修改时间字段
      */
-    public DefaultEntityExtension(IAuthenticationService authenticationService,
-                                  String[] createByFields,
-                                  String[] createTimeFields,
-                                  String[] updateByFields,
-                                  String[] updateTimeFields) {
+    public EntityExtension(IAuthenticationService authenticationService,
+                           String[] createByFields,
+                           String[] createTimeFields,
+                           String[] updateByFields,
+                           String[] updateTimeFields) {
         this.authenticationService = authenticationService;
         this.createByFields = createByFields;
         this.createTimeFields = createTimeFields;

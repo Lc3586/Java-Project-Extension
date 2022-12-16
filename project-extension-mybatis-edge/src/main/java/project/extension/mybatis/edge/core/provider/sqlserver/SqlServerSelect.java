@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.core.provider.sqlserver;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Select;
 import project.extension.mybatis.edge.core.provider.standard.IAop;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class SqlServerSelect<T>
         extends Select<T> {
-    public SqlServerSelect(BaseConfig config,
+    public SqlServerSelect(DataSourceConfig config,
                            IAop aop,
                            Class<T> entityType,
                            boolean withTransactional) {
@@ -34,7 +34,7 @@ public class SqlServerSelect<T>
         this.config = config;
     }
 
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     /**
      * 如果没有设置排序条件则设置个默认的排序条件

@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.standard.IAop;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Insert<T>
         implements IInsert<T> {
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     private final SqlProvider sqlProvider;
 
@@ -38,7 +38,7 @@ public abstract class Insert<T>
 
     private final String msIdPrefix;
 
-    public Insert(BaseConfig config,
+    public Insert(DataSourceConfig config,
                   SqlProvider sqlProvider,
                   IAop aop,
                   Class<T> entityType,
@@ -226,7 +226,7 @@ public abstract class Insert<T>
                                                         inserter.getParameter(),
                                                         config.getNameConvertType()),
                                                 CurdType.插入,
-                                                config.getDataSource(),
+                                                config.getName(),
                                                 script,
                                                 inserter.getParameter(),
                                                 inserter.getEntityType(),

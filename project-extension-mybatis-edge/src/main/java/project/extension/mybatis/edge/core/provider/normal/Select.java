@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.OrderByProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Select<T>
         implements ISelect<T> {
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     protected final SqlProvider sqlProvider;
 
@@ -45,7 +45,7 @@ public abstract class Select<T>
 
     protected final IOrderBy<T, IOrderBySource<T>> orderBy;
 
-    public Select(BaseConfig config,
+    public Select(DataSourceConfig config,
                   SqlProvider sqlProvider,
                   IAop aop,
                   Class<T> entityType,
@@ -462,7 +462,7 @@ public abstract class Select<T>
                                          Boolean.class,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -498,7 +498,7 @@ public abstract class Select<T>
                                                                       entityType,
                                                                       config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -524,7 +524,7 @@ public abstract class Select<T>
                                                                       executor.getCustomTags(),
                                                                       config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -546,7 +546,7 @@ public abstract class Select<T>
                                                                          executor.getParameter(),
                                                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -573,7 +573,7 @@ public abstract class Select<T>
                                                                      entityType,
                                                                      config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -603,7 +603,7 @@ public abstract class Select<T>
                                                                      executor.getCustomTags(),
                                                                      config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -636,7 +636,7 @@ public abstract class Select<T>
                                          memberType,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -662,7 +662,7 @@ public abstract class Select<T>
                                                                      executor.getParameter(),
                                                                      config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -690,7 +690,7 @@ public abstract class Select<T>
                                          Long.class,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -724,7 +724,7 @@ public abstract class Select<T>
                                          memberType,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -758,7 +758,7 @@ public abstract class Select<T>
                                          memberType,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -791,7 +791,7 @@ public abstract class Select<T>
                                          memberType,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),
@@ -824,7 +824,7 @@ public abstract class Select<T>
                                          memberType,
                                          config.getNameConvertType()),
                                  CurdType.查询,
-                                 config.getDataSource(),
+                                 config.getName(),
                                  sql,
                                  executor.getParameter(),
                                  executor.getEntityType(),

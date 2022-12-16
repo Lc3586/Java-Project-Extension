@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
 
 /**
@@ -11,7 +11,7 @@ import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
  */
 public class DamengSqlProvider
         extends SqlProvider {
-    public DamengSqlProvider(BaseConfig config) {
+    public DamengSqlProvider(DataSourceConfig config) {
         super(config,
               new char[]{'"',
                          '"'});

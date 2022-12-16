@@ -1,4 +1,4 @@
-package project.extension.standard.datasearch;
+package project.extension.mybatis.edge.extention.datasearch;
 
 import org.springframework.util.StringUtils;
 import project.extension.mybatis.edge.model.AdvancedOrder;

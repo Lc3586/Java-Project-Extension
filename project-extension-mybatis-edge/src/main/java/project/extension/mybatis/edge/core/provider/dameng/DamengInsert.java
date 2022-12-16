@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Insert;
 import project.extension.mybatis.edge.core.provider.standard.IAop;
 
@@ -13,7 +13,7 @@ import project.extension.mybatis.edge.core.provider.standard.IAop;
  */
 public class DamengInsert<T>
         extends Insert<T> {
-    public DamengInsert(BaseConfig config,
+    public DamengInsert(DataSourceConfig config,
                         IAop aop,
                         Class<T> entityType,
                         boolean withTransactional) {

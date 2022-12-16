@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.util.StringUtils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.model.DbTypeToJavaType;
@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public abstract class DbFirst
         implements IDbFirst {
-    public DbFirst(BaseConfig config,
+    public DbFirst(DataSourceConfig config,
                    String msIdPrefix) {
         this.config = config;
         this.msIdPrefix = msIdPrefix;
@@ -36,7 +36,7 @@ public abstract class DbFirst
 
     protected boolean withTransactional = false;
 
-    protected final BaseConfig config;
+    protected final DataSourceConfig config;
 
     private final String msIdPrefix;
 

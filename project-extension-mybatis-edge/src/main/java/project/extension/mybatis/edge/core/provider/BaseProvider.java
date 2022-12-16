@@ -39,7 +39,7 @@ public class BaseProvider
             Exception {
         return new DefaultRepository<>(config,
                                        entityType,
-                                       DbProvider.getDbProvider(config,
+                                       DbProvider.getDbProvider(config.getDataSourceConfig(),
                                                                 aop));
     }
 
@@ -50,7 +50,7 @@ public class BaseProvider
             Exception {
         return new DefaultRepository<>(config,
                                        entityType,
-                                       DbProvider.getDbProvider(config.getMultiConfig(dataSource),
+                                       DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
                                                                 aop));
     }
 
@@ -62,7 +62,7 @@ public class BaseProvider
         return new DefaultRepository_Key<>(config,
                                            entityType,
                                            keyType,
-                                           DbProvider.getDbProvider(config,
+                                           DbProvider.getDbProvider(config.getDataSourceConfig(),
                                                                     aop));
     }
 
@@ -75,7 +75,7 @@ public class BaseProvider
         return new DefaultRepository_Key<>(config,
                                            entityType,
                                            keyType,
-                                           DbProvider.getDbProvider(config.getMultiConfig(dataSource),
+                                           DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
                                                                     aop));
     }
 
@@ -83,7 +83,7 @@ public class BaseProvider
     public IDbFirst getDbFirst()
             throws
             Exception {
-        return DbProvider.getDbProvider(config,
+        return DbProvider.getDbProvider(config.getDataSourceConfig(),
                                         aop)
                          .createDbFirst();
     }
@@ -92,7 +92,7 @@ public class BaseProvider
     public IDbFirst getDbFirst(String dataSource)
             throws
             Exception {
-        return DbProvider.getDbProvider(config.getMultiConfig(dataSource),
+        return DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
                                         aop)
                          .createDbFirst();
     }
@@ -101,7 +101,7 @@ public class BaseProvider
     public ICodeFirst getCodeFirst()
             throws
             Exception {
-        return DbProvider.getDbProvider(config,
+        return DbProvider.getDbProvider(config.getDataSourceConfig(),
                                         aop)
                          .createCodeFirst();
     }
@@ -110,7 +110,7 @@ public class BaseProvider
     public ICodeFirst getCodeFirst(String dataSource)
             throws
             Exception {
-        return DbProvider.getDbProvider(config.getMultiConfig(dataSource),
+        return DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
                                         aop)
                          .createCodeFirst();
     }

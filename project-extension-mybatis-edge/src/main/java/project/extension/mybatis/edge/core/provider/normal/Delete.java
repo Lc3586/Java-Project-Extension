@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public abstract class Delete<T>
         implements IDelete<T> {
-    private final BaseConfig config;
+    private final DataSourceConfig config;
 
     private final SqlProvider sqlProvider;
 
@@ -40,7 +40,7 @@ public abstract class Delete<T>
 
     private final IWhere<T, IWhereSource<T>> where;
 
-    public Delete(BaseConfig config,
+    public Delete(DataSourceConfig config,
                   SqlProvider sqlProvider,
                   IAop aop,
                   Class<T> entityType,
@@ -270,7 +270,7 @@ public abstract class Delete<T>
                                                                                      deleter.getParameter(),
                                                                                      config.getNameConvertType()),
                                                     CurdType.删除,
-                                                    config.getDataSource(),
+                                                    config.getName(),
                                                     script,
                                                     deleter.getParameter(),
                                                     deleter.getEntityType(),
@@ -300,7 +300,7 @@ public abstract class Delete<T>
                                                                                  deleter.getParameter(),
                                                                                  config.getNameConvertType()),
                                                 CurdType.删除,
-                                                config.getDataSource(),
+                                                config.getName(),
                                                 script,
                                                 deleter.getParameter(),
                                                 deleter.getEntityType(),
