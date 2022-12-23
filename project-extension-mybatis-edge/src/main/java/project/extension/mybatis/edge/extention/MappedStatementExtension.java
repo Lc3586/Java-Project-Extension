@@ -3,9 +3,9 @@ package project.extension.mybatis.edge.extention;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
-import project.extension.mybatis.edge.core.provider.normal.AopProvider;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
-import project.extension.mybatis.edge.model.MappedStatementArg;
+import project.extension.mybatis.edge.core.provider.normal.NaiveAopProvider;
+import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.aop.MappedStatementArgs;
 import project.extension.mybatis.edge.model.NameConvertType;
 
 import java.util.*;
@@ -18,11 +18,11 @@ import java.util.*;
  */
 @org.springframework.context.annotation.Configuration
 public class MappedStatementExtension {
-    public MappedStatementExtension(IAop aop) {
-        MappedStatementExtension.aop = (AopProvider) aop;
+    public MappedStatementExtension(INaiveAop aop) {
+        MappedStatementExtension.aop = (NaiveAopProvider) aop;
     }
 
-    private static AopProvider aop;
+    private static NaiveAopProvider aop;
 
     /**
      * 是否存在
@@ -48,8 +48,8 @@ public class MappedStatementExtension {
 
         if (exist(configuration,
                   msId)) {
-            return aop.mappedStatement(new MappedStatementArg(true,
-                                                              configuration.getMappedStatement(msId)))
+            return aop.mappedStatement(new MappedStatementArgs(true,
+                                                               configuration.getMappedStatement(msId)))
                       .getMappedStatement();
         } else return null;
     }
@@ -576,8 +576,8 @@ public class MappedStatementExtension {
         //返回结果映射
         if (resultMap != null) builder.resultMaps(new ArrayList<>(Arrays.asList(resultMap)));
 
-        return aop.mappedStatement(new MappedStatementArg(false,
-                                                          builder.build()))
+        return aop.mappedStatement(new MappedStatementArgs(false,
+                                                           builder.build()))
                   .getMappedStatement();
 
 //        MappedStatement.Builder builder = new MappedStatement.Builder(configuration, newMSId, sqlSource, sqlCommandType);

@@ -4,8 +4,9 @@ import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.dameng.DamengProvider;
 import project.extension.mybatis.edge.core.provider.mysql.MySqlProvider;
 import project.extension.mybatis.edge.core.provider.sqlserver.SqlServerProvider;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.exception.ApplicationException;
 
 /**
@@ -16,7 +17,7 @@ import project.extension.standard.exception.ApplicationException;
  */
 public class DbProvider {
     public static <T> IBaseDbProvider<T> getDbProvider(DataSourceConfig config,
-                                                       IAop aop)
+                                                       INaiveAop aop)
             throws
             ApplicationException {
         switch (config.getDbType()) {
@@ -31,8 +32,8 @@ public class DbProvider {
                 return new SqlServerProvider<>(config,
                                                aop);
             default:
-                throw new ApplicationException(String.format("暂不支持%s数据库",
-                                                             config.getDbType()));
+                throw new ApplicationException(DbContextStrings.getUnsupportedDbType(config.getDbType()
+                                                                                           .toString()));
         }
     }
 }

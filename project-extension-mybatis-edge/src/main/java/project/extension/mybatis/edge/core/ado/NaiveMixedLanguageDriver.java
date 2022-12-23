@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.driver;
+package project.extension.mybatis.edge.core.ado;
 
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.executor.parameter.ParameterHandler;

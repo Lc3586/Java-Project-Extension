@@ -1,7 +1,9 @@
-package project.extension.mybatis.edge.model;
+package project.extension.mybatis.edge.aop;
 
 import org.apache.commons.lang3.time.StopWatch;
+import project.extension.mybatis.edge.model.CurdType;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,16 +13,33 @@ import java.util.UUID;
  * @author LCTR
  * @date 2022-07-14
  */
-public class CurdBeforeEventArg {
-    public CurdBeforeEventArg(UUID identifier,
-                              StopWatch watch,
-                              CurdType curdType,
-                              Class<?> entityType,
-                              Class<?> dtoType,
-                              String dataSource,
-                              String sql,
-                              Map<String, Object> parameter,
-                              Map<String, Object> states) {
+public class CurdBeforeEventArgs {
+    public CurdBeforeEventArgs(CurdType curdType,
+                               Class<?> entityType,
+                               Class<?> dtoType,
+                               String dataSource,
+                               String sql,
+                               Map<String, Object> parameter) {
+        this(UUID.randomUUID(),
+             new StopWatch(),
+             curdType,
+             entityType,
+             dtoType,
+             dataSource,
+             sql,
+             parameter,
+             new HashMap<>());
+    }
+
+    protected CurdBeforeEventArgs(UUID identifier,
+                                  StopWatch watch,
+                                  CurdType curdType,
+                                  Class<?> entityType,
+                                  Class<?> dtoType,
+                                  String dataSource,
+                                  String sql,
+                                  Map<String, Object> parameter,
+                                  Map<String, Object> states) {
         this.identifier = identifier;
         this.watch = watch;
         if (!this.watch.isStarted())
@@ -36,6 +55,7 @@ public class CurdBeforeEventArg {
 
     /**
      * 标识
+     * <p>可将 TraceBeforeEventArgs 与 TraceAfterEventArgs 进行匹配</p>
      */
     private final UUID identifier;
 
@@ -89,7 +109,7 @@ public class CurdBeforeEventArg {
     /**
      * 计时器
      */
-    public StopWatch getWatch() {
+    protected StopWatch getWatch() {
         return watch;
     }
 

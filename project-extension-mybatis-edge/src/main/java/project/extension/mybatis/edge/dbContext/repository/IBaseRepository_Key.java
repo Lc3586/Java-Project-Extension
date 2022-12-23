@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.repository;
+package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.mybatis.edge.model.NullResultException;
 

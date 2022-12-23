@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.util.StringUtils;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.model.DbTypeToJavaType;
 import project.extension.mybatis.edge.model.DbColumnInfo;

@@ -2,8 +2,9 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.OrderByProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
@@ -31,7 +32,7 @@ public abstract class Select<T>
 
     protected final SqlProvider sqlProvider;
 
-    protected final AopProvider aop;
+    protected final NaiveAopProvider aop;
 
     protected final boolean withTransactional;
 
@@ -47,12 +48,12 @@ public abstract class Select<T>
 
     public Select(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  IAop aop,
+                  INaiveAop aop,
                   Class<T> entityType,
                   boolean withTransactional) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (AopProvider) aop;
+        this.aop = (NaiveAopProvider) aop;
         this.withTransactional = withTransactional;
         this.executor = new ExecutorDTO();
         this.entityType = entityType;

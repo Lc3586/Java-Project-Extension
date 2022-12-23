@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Select;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.model.OrderMethod;
 
@@ -23,7 +23,7 @@ import java.util.Map;
 public class SqlServerSelect<T>
         extends Select<T> {
     public SqlServerSelect(DataSourceConfig config,
-                           IAop aop,
+                           INaiveAop aop,
                            Class<T> entityType,
                            boolean withTransactional) {
         super(config,

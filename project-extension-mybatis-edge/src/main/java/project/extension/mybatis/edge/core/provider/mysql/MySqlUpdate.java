@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.mysql;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Update;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.aop.INaiveAop;
 
 /**
  * MySql数据更新对象
@@ -14,7 +14,7 @@ import project.extension.mybatis.edge.core.provider.standard.IAop;
 public class MySqlUpdate<T>
         extends Update<T> {
     public MySqlUpdate(DataSourceConfig config,
-                       IAop aop,
+                       INaiveAop aop,
                        Class<T> entityType,
                        boolean withTransactional) {
         super(config,

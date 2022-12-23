@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.model;
+package project.extension.mybatis.edge.aop;
 
 /**
  * 执行增删改查操作的命令之后触发的事件的参数
@@ -6,11 +6,11 @@ package project.extension.mybatis.edge.model;
  * @author LCTR
  * @date 2022-07-14
  */
-public class CurdAfterEventArg
-        extends CurdBeforeEventArg {
-    public CurdAfterEventArg(CurdBeforeEventArg beforeEventData,
-                             Exception exception,
-                             Object executeResult) {
+public class CurdAfterEventArgs
+        extends CurdBeforeEventArgs {
+    public CurdAfterEventArgs(CurdBeforeEventArgs beforeEventData,
+                              Exception exception,
+                              Object executeResult) {
         super(beforeEventData.getIdentifier(),
               beforeEventData.getWatch(),
               beforeEventData.getCurdType(),

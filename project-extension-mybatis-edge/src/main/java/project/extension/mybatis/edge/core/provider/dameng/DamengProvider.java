@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.standard.*;
 
@@ -12,14 +13,14 @@ import project.extension.mybatis.edge.core.provider.standard.*;
 public class DamengProvider<T>
         implements IBaseDbProvider<T> {
     public DamengProvider(DataSourceConfig config,
-                          IAop aop) {
+                          INaiveAop aop) {
         this.config = config;
         this.aop = aop;
     }
 
     private final DataSourceConfig config;
 
-    private final IAop aop;
+    private final INaiveAop aop;
 
     @Override
     public ISelect<T> createSelect(Class<T> entityType,

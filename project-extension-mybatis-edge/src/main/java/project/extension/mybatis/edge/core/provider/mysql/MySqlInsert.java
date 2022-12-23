@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.provider.mysql;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.Insert;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.aop.INaiveAop;
 
 /**
  * MySql数据插入对象
@@ -14,7 +14,7 @@ import project.extension.mybatis.edge.core.provider.standard.IAop;
 public class MySqlInsert<T>
         extends Insert<T> {
     public MySqlInsert(DataSourceConfig config,
-                       IAop aop,
+                       INaiveAop aop,
                        Class<T> entityType,
                        boolean withTransactional) {
         super(config,

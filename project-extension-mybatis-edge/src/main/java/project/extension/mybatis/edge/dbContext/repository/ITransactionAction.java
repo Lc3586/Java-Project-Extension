@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.repository;
+package project.extension.mybatis.edge.dbContext.repository;
 
 /**
  * 事务操作

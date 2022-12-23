@@ -1,7 +1,8 @@
-package project.extension.mybatis.edge.core.repository;
+package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
+import project.extension.standard.exception.ApplicationException;
 
 /**
  * 默认数据仓储
@@ -18,7 +19,7 @@ public class DefaultRepository_Key<T, TKey>
                                  Class<TKey> keyType,
                                  IBaseDbProvider<T> dbProvider)
             throws
-            Exception {
+            ApplicationException {
         super(config,
               type,
               keyType,

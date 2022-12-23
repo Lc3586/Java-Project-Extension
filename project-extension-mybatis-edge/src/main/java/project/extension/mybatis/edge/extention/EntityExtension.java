@@ -4,6 +4,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import project.extension.Identity.SnowFlake;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.authentication.IAuthenticationService;
 import project.extension.standard.entity.Base_Fields;
 import project.extension.standard.entity.IEntityExtension;
@@ -106,8 +107,8 @@ public class EntityExtension
         else if (fieldType.equals(String.class)) {
             return DateExtension.format(field,
                                         date);
-        } else throw new ApplicationException(String.format("暂不支持设置此数据类型的日期%s",
-                                                            fieldType.getTypeName()));
+        } else
+            throw new ApplicationException(DbContextStrings.getUnsupportedDateType(fieldType.getTypeName()));
     }
 
     /**
@@ -132,7 +133,7 @@ public class EntityExtension
                             field.set(entity,
                                       newLongId());
                         } catch (IllegalAccessException ex) {
-                            throw new ApplicationException("初始化数据失败",
+                            throw new ApplicationException(DbContextStrings.getEntityInitializationFailed(),
                                                            ex);
                         }
                     } else if (fieldType.equals(String.class)) {
@@ -142,11 +143,11 @@ public class EntityExtension
                                       ? newStringId()
                                       : newStringId("O"));
                         } catch (Throwable ex) {
-                            throw new ApplicationException("初始化数据失败",
+                            throw new ApplicationException(DbContextStrings.getEntityInitializationFailed(),
                                                            ex);
                         }
-                    } else throw new ApplicationException(String.format("暂不支持设置此数据类型的主键%s",
-                                                                        fieldType.getTypeName()));
+                    } else
+                        throw new ApplicationException(DbContextStrings.getUnsupportedDataType4PrimaryKey(fieldType.getTypeName()));
                 }
             }
 
@@ -193,7 +194,7 @@ public class EntityExtension
                                   getDateValue(field,
                                                new Date()));
                     } catch (IllegalAccessException ex) {
-                        throw new ApplicationException("设置操作时间信息失败",
+                        throw new ApplicationException(DbContextStrings.getSetupOperatorTimeFailed(),
                                                        ex);
                     }
                 }

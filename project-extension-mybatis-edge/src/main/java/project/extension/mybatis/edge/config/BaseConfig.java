@@ -1,17 +1,18 @@
 package project.extension.mybatis.edge.config;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import project.extension.collections.CollectionsExtension;
+import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.standard.exception.ApplicationException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * 基础配置
@@ -50,22 +51,22 @@ public class BaseConfig {
     /**
      * 默认的连接字符串
      */
-    private String connectionString;
+    private String url;
 
     /**
-     * 用户名
+     * 默认的用户名
      */
     private String username;
 
     /**
-     * 密码
+     * 默认的密码
      */
     private String password;
 
     /**
      * 多数据源配置
      */
-    private List<DataSourceConfig> multiDataSource;
+    private Map<String, DataSourceConfig> multiDataSource;
 
     /**
      * 需要扫描的存放实体类的包
@@ -125,16 +126,16 @@ public class BaseConfig {
     /**
      * 默认的连接字符串
      */
-    public String getConnectionString() {
-        return connectionString;
+    public String getUrl() {
+        return url;
     }
 
-    public void setConnectionString(String connectionString) {
-        this.connectionString = connectionString;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     /**
-     * 用户名
+     * 默认的用户名
      */
     public String getUsername() {
         return username;
@@ -145,7 +146,7 @@ public class BaseConfig {
     }
 
     /**
-     * 密码
+     * 默认的密码
      */
     public String getPassword() {
         return password;
@@ -158,11 +159,11 @@ public class BaseConfig {
     /**
      * 多库配置
      */
-    public List<DataSourceConfig> getMultiDataSource() {
+    public Map<String, DataSourceConfig> getMultiDataSource() {
         return multiDataSource;
     }
 
-    public void setMultiDataSource(List<DataSourceConfig> multi) {
+    public void setMultiDataSource(Map<String, DataSourceConfig> multi) {
         this.multiDataSource = multi;
     }
 
@@ -173,12 +174,13 @@ public class BaseConfig {
         return multiDataSource != null && multiDataSource.size() > 1;
     }
 
+    /**
+     * 获取所有数据源名称
+     */
     public List<String> getAllDataSource() {
         this.getDataSourceConfig();
-        return this.getMultiDataSource()
-                   .stream()
-                   .map(DataSourceConfig::getName)
-                   .collect(Collectors.toList());
+        return new ArrayList<>(this.getMultiDataSource()
+                                   .keySet());
     }
 
     /**
@@ -189,25 +191,22 @@ public class BaseConfig {
             if (this.getMultiDataSource() == null || this.getMultiDataSource()
                                                          .size() == 0) {
                 //设置默认数据源为master
-                this.setDataSource("master");
+                this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATASOURCE);
             } else {
                 //设置默认数据源为多库中的第一个
-                this.setDataSource(this.getMultiDataSource()
-                                       .get(0)
-                                       .getName());
+                DataSourceConfig firstDataSource = CollectionsExtension.firstValue(this.getMultiDataSource());
+                assert firstDataSource != null;
+                this.setDataSource(firstDataSource.getName());
 
                 if (!StringUtils.hasText(this.getDataSource())) {
                     if (this.getMultiDataSource()
                             .size() > 1)
-                        throw new ApplicationException("在配置文件的project.extension.mybatis.multiDataSource中没有为数据源配置名称");
+                        throw new ApplicationException(DbContextStrings.getConfigDataSourceNameUndefined());
 
                     //设置默认数据源为master
-                    this.setDataSource("master");
-                    this.getMultiDataSource()
-                        .get(0)
-                        .setName(this.getDataSource());
+                    this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATASOURCE);
+                    firstDataSource.setName(this.getDataSource());
                 }
-
             }
         }
 
@@ -223,87 +222,95 @@ public class BaseConfig {
             throws
             ApplicationException {
         if (multiDataSource == null)
-            multiDataSource = new ArrayList<>();
+            multiDataSource = new HashMap<>();
 
         if (multiDataSource.size() == 0) {
-            DataSourceConfig masterConfig = new DataSourceConfig();
-            masterConfig.setName(dataSource);
-            masterConfig.setDbType(this.getDbType());
-            masterConfig.setConnectionString(this.getConnectionString());
-            masterConfig.setUsername(this.getUsername());
-            masterConfig.setPassword(this.getPassword());
-            masterConfig.setNameConvertType(this.getNameConvertType());
-            masterConfig.setConfigLocation(this.getConfigLocation());
-            masterConfig.setEnable(true);
-            multiDataSource.add(masterConfig);
-            return masterConfig;
+            DataSourceConfig defaultConfig = new DataSourceConfig();
+            defaultConfig.setName(dataSource);
+            defaultConfig.setDbType(this.getDbType());
+            defaultConfig.getProperties()
+                         .put(DruidDataSourceFactory.PROP_URL,
+                              this.getUrl());
+            defaultConfig.getProperties()
+                         .put(DruidDataSourceFactory.PROP_USERNAME,
+                              this.getUsername());
+            defaultConfig.getProperties()
+                         .put(DruidDataSourceFactory.PROP_PASSWORD,
+                              this.getPassword());
+            defaultConfig.setNameConvertType(this.getNameConvertType());
+            defaultConfig.setConfigLocation(this.getConfigLocation());
+            defaultConfig.setEnable(true);
+            multiDataSource.put(dataSource,
+                                defaultConfig);
+            return defaultConfig;
         }
 
         AtomicInteger count = new AtomicInteger();
-        Optional<DataSourceConfig> matchConfig = multiDataSource.stream()
-                                                                .filter(x -> {
-                                                                    if (dataSource.equals(x.getName())) {
-                                                                        count.getAndIncrement();
-                                                                        return true;
-                                                                    } else
-                                                                        return false;
-                                                                })
-                                                                .findAny();
+        Optional<String> matchConfig = multiDataSource.keySet()
+                                                      .stream()
+                                                      .filter(x -> {
+                                                          if (dataSource.equals(x)) {
+                                                              count.getAndIncrement();
+                                                              return true;
+                                                          } else
+                                                              return false;
+                                                      })
+                                                      .findAny();
         if (!matchConfig.isPresent())
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource中未找到名称为%s的数据源配置",
-                                                         dataSource));
+            throw new ApplicationException(DbContextStrings.getConfigDataSourceUndefined(dataSource));
 
         if (count.get() > 1)
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource中存在多个名称为%s的数据源",
-                                                         dataSource));
+            throw new ApplicationException(DbContextStrings.getConfigDataSourceRepeat(dataSource));
 
-        DataSourceConfig config = matchConfig.get();
+        DataSourceConfig config = multiDataSource.get(matchConfig.get());
+
+        config.setName(matchConfig.get());
 
 //        if (!config.isEnable())
-//            throw new ApplicationException(String.format("未启用配置文件的project.extension.mybatis.multiDataSource.%s数据源",
-//                                                         dataSource));
+//            throw new ApplicationException(DbContextStrings.getConfigDataSourceNotActive(dataSource));
 
         if (config.getDbType() == null)
             config.setDbType(this.getDbType());
 
         if (config.getDbType() == null)
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失dbType设置，并且也没有设置默认的dbType",
-                                                         dataSource));
+            throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                               "dbType"));
 
         if (config.getNameConvertType() == null)
             config.setNameConvertType(this.getNameConvertType());
-
-        if (config.getNameConvertType() == null)
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失nameConvertType设置，并且也没有设置默认的nameConvertType",
-                                                         dataSource));
 
         if (!StringUtils.hasText(config.getConfigLocation()))
             config.setConfigLocation(this.getConfigLocation());
 
         if (!StringUtils.hasText(config.getConfigLocation()))
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失configLocation设置，并且也没有设置默认的configLocation",
-                                                         dataSource));
+            throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                               "configLocation"));
 
-        if (!StringUtils.hasText(config.getUsername()))
-            config.setUsername(this.getUsername());
+        config.getProperties()
+              .computeIfAbsent(DruidDataSourceFactory.PROP_URL,
+                               k -> this.getUrl());
 
-        if (!StringUtils.hasText(config.getUsername()))
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失username设置，并且也没有设置默认的username",
-                                                         dataSource));
+        config.getProperties()
+              .computeIfAbsent(DruidDataSourceFactory.PROP_USERNAME,
+                               k -> this.getUsername());
 
-        if (!StringUtils.hasText(config.getPassword()))
-            config.setPassword(this.getPassword());
+        config.getProperties()
+              .computeIfAbsent(DruidDataSourceFactory.PROP_PASSWORD,
+                               k -> this.getPassword());
 
-        if (!StringUtils.hasText(config.getPassword()))
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失password设置，并且也没有设置默认的password",
-                                                         dataSource));
 
-        if (!StringUtils.hasText(config.getConnectionString()))
-            config.setConnectionString(this.getConnectionString());
-
-        if (!StringUtils.hasText(config.getConnectionString()))
-            throw new ApplicationException(String.format("配置文件project.extension.mybatis.multiDataSource - name为%s的数据源缺失connectionString设置，并且也没有设置默认的connectionString",
-                                                         dataSource));
+        //检查必须要有的的属性
+        List<String> requiredProperties = Arrays.asList(DruidDataSourceFactory.PROP_URL,
+                                                        DruidDataSourceFactory.PROP_USERNAME,
+                                                        DruidDataSourceFactory.PROP_PASSWORD);
+        for (String property : requiredProperties) {
+            if (config.getProperties()
+                      .get(property) == null
+                    || !StringUtils.hasText((String) config.getProperties()
+                                                           .get(property)))
+                throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                                   property));
+        }
 
         return config;
     }

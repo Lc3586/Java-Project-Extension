@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.repository;
+package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.collections.TupleExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
@@ -6,6 +6,7 @@ import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.model.NullResultException;
+import project.extension.standard.exception.ApplicationException;
 import project.extension.tuple.ITuple;
 
 import java.lang.reflect.Field;
@@ -36,7 +37,7 @@ public class BaseRepository_Key<T, TKey>
                               Class<TKey> keyType,
                               IBaseDbProvider<T> dbProvider)
             throws
-            Exception {
+            ApplicationException {
         super(config,
               entityType,
               dbProvider);

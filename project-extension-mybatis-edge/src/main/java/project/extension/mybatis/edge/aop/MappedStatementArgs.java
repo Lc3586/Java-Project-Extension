@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.model;
+package project.extension.mybatis.edge.aop;
 
 import org.apache.ibatis.mapping.MappedStatement;
 
@@ -8,9 +8,9 @@ import org.apache.ibatis.mapping.MappedStatement;
  * @author LCTR
  * @date 2022-07-14
  */
-public class MappedStatementArg {
-    public MappedStatementArg(Boolean preexisting,
-                              MappedStatement mappedStatement) {
+public class MappedStatementArgs {
+    public MappedStatementArgs(Boolean preexisting,
+                               MappedStatement mappedStatement) {
         this.preexisting = preexisting;
         this.mappedStatement = mappedStatement;
     }

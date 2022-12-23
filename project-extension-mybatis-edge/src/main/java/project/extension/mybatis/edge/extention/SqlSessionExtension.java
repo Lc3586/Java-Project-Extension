@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.extention;
 
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.SqlSession;
-import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
 import project.extension.mybatis.edge.model.NameConvertType;
 
 import java.util.Collection;

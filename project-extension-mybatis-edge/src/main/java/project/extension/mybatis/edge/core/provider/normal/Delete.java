@@ -2,8 +2,9 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
@@ -28,7 +29,7 @@ public abstract class Delete<T>
 
     private final SqlProvider sqlProvider;
 
-    private final AopProvider aop;
+    private final NaiveAopProvider aop;
 
     private final boolean withTransactional;
 
@@ -42,12 +43,12 @@ public abstract class Delete<T>
 
     public Delete(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  IAop aop,
+                  INaiveAop aop,
                   Class<T> entityType,
                   boolean withTransactional) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (AopProvider) aop;
+        this.aop = (NaiveAopProvider) aop;
         this.withTransactional = withTransactional;
         this.deleter = new DeleterDTO();
         this.entityType = entityType;

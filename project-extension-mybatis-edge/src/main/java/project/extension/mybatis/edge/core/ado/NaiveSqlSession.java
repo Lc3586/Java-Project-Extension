@@ -1,8 +1,9 @@
-package project.extension.mybatis.edge.core.driver;
+package project.extension.mybatis.edge.core.ado;
 
 import org.apache.ibatis.session.*;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionUtils;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Component;
@@ -10,7 +11,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import project.extension.mybatis.edge.config.BaseConfig;
-import project.extension.mybatis.edge.core.repository.ITransactionAction;
+import project.extension.mybatis.edge.dbContext.repository.ITransactionAction;
 
 /**
  * 初级Sql会话
@@ -19,6 +20,7 @@ import project.extension.mybatis.edge.core.repository.ITransactionAction;
  * @date 2022-04-06
  */
 @Component("NaiveSqlSession")
+@DependsOn("NaiveDataSourceProvider")
 public class NaiveSqlSession {
     public NaiveSqlSession(BaseConfig config,
                            DataSourceTransactionManager dataSourceTransactionManager,

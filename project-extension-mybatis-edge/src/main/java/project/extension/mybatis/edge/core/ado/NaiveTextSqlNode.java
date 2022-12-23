@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.driver;
+package project.extension.mybatis.edge.core.ado;
 
 import org.apache.ibatis.parsing.GenericTokenParser;
 import org.apache.ibatis.parsing.TokenHandler;

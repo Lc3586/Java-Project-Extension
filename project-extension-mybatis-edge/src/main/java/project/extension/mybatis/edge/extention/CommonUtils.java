@@ -3,6 +3,7 @@ package project.extension.mybatis.edge.extention;
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import dm.jdbc.driver.DmDriver;
 import oracle.jdbc.driver.OracleDriver;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.standard.exception.ApplicationException;
 
@@ -57,7 +58,8 @@ public class CommonUtils {
                 try {
                     return new com.mysql.cj.jdbc.Driver();
                 } catch (Exception ex) {
-                    throw new ApplicationException("创建com.mysql.cj.jdbc.Driver实例失败");
+                    throw new ApplicationException(DbContextStrings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
+                                                   ex);
                 }
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
@@ -75,8 +77,7 @@ public class CommonUtils {
             case JdbcPostgreSQL:
                 return new org.postgresql.Driver();
             default:
-                throw new ApplicationException(String.format("暂不支持%s数据库",
-                                                             dbType));
+                throw new ApplicationException(DbContextStrings.getUnsupportedDbType(dbType.toString()));
         }
     }
 }

@@ -16,23 +16,24 @@ project:
       # 默认的实体类表明/列名命名规则
       nameConvertType: PascalCaseToUnderscoreWithUpper
       # 默认的连接字符串
-      connectionString: ENC(G4fMAaqhzJFnRF8Zcdzyv4A3YikVTm4g+FOjKdnfd8eMJFqyz+/2ZcWZT6izBFlFIrXS2m0e1UAf364h2/upJbzAeCFAaPzav0ebN0/85aHcRELTqIpK/4Md6TgqysgHrJK3WWNC4PedmPbYtevkNJ10r1iAb/64rORV3wvjRMZ+gAenTCSJQOSAkvkbmrKFADnZesf2IoJBlxMs3wK0a3fKoybwQAOClaNgOCegbilFlFE3o2NP+A==)
-      # 用户名
+      url: ENC(G4fMAaqhzJFnRF8Zcdzyv4A3YikVTm4g+FOjKdnfd8eMJFqyz+/2ZcWZT6izBFlFIrXS2m0e1UAf364h2/upJbzAeCFAaPzav0ebN0/85aHcRELTqIpK/4Md6TgqysgHrJK3WWNC4PedmPbYtevkNJ10r1iAb/64rORV3wvjRMZ+gAenTCSJQOSAkvkbmrKFADnZesf2IoJBlxMs3wK0a3fKoybwQAOClaNgOCegbilFlFE3o2NP+A==)
+      # 默认的用户名
       username: ENC(9WjPQynJyuYGTspUecTKAw==)
-      # 密码
+      # 默认的密码
       password: ENC(gWzvDGisJ96VsD6fmqhOQm/4ORkbiEF9UYaYGeWNWB4=)
       # 多数据源配置（单数据库时无需配置此项）
       multiDataSource:
         #主库
-        - name: master
+        master:
         #从库
-        - name: slave
+        slave:
           enable: false
           dbType: JdbcSqlServer
           nameConvertType: None
-          connectionString: ENC(Dg5XaaG9MyBD1Fj+y1hXkw+QNZB5NW0ictc8sx/ZggR0Fm6ny9g2vKFsMfSr66KUKgid1m3p5L8pcpMFcsEcQ/BqCyXsEce+JOrdqRxBRTE=)
-          username: ENC(vogwRMBEJysjDVFfeLjF2w==)
-          password: ENC(GSCsnpZpPvaRHdxHF07wfwGJvJmmco2l)
+          properties:
+            url: ENC(Dg5XaaG9MyBD1Fj+y1hXkw+QNZB5NW0ictc8sx/ZggR0Fm6ny9g2vKFsMfSr66KUKgid1m3p5L8pcpMFcsEcQ/BqCyXsEce+JOrdqRxBRTE=)
+            username: ENC(vogwRMBEJysjDVFfeLjF2w==)
+            password: ENC(GSCsnpZpPvaRHdxHF07wfwGJvJmmco2l)
 
 jasypt:
   encryptor:

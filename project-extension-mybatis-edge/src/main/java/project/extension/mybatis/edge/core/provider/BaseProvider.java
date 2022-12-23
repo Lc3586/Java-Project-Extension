@@ -1,16 +1,24 @@
 package project.extension.mybatis.edge.core.provider;
 
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.config.BaseConfig;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
+import project.extension.mybatis.edge.core.ado.NaiveDataSource;
+import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
-import project.extension.mybatis.edge.core.repository.DefaultRepository;
-import project.extension.mybatis.edge.core.repository.DefaultRepository_Key;
-import project.extension.mybatis.edge.core.repository.IBaseRepository;
-import project.extension.mybatis.edge.core.repository.IBaseRepository_Key;
+import project.extension.mybatis.edge.dbContext.repository.DefaultRepository;
+import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key;
+import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
+import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
+import project.extension.standard.exception.ApplicationException;
+
+import javax.sql.DataSource;
 
 /**
  * 数据仓储构造器
@@ -19,99 +27,82 @@ import project.extension.mybatis.edge.core.repository.IBaseRepository_Key;
  * @date 2022-03-28
  */
 @Component
-@DependsOn({"NaiveSqlSession",
-            "RepositoryExtension"})
+@DependsOn({"RepositoryExtension"})
 public class BaseProvider
         implements INaiveSql {
     public BaseProvider(BaseConfig config,
-                        IAop aop) {
+                        NaiveDataSource naiveDataSource,
+                        INaiveAop aop) {
         this.config = config;
+        this.ado = new NaiveAdoProvider(this.config,
+                                        naiveDataSource.getResolvedDataSources()
+                                                       .get(this.config.getDataSource()));
         this.aop = aop;
     }
 
     private final BaseConfig config;
 
-    private final IAop aop;
+    private final INaiveAdo ado;
+
+    private final INaiveAop aop;
 
     @Override
     public <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
-            Exception {
-        return new DefaultRepository<>(config,
+            ApplicationException {
+        return new DefaultRepository<>(this.config,
                                        entityType,
-                                       DbProvider.getDbProvider(config.getDataSourceConfig(),
-                                                                aop));
-    }
-
-    @Override
-    public <T> IBaseRepository<T> getRepository(Class<T> entityType,
-                                                String dataSource)
-            throws
-            Exception {
-        return new DefaultRepository<>(config,
-                                       entityType,
-                                       DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
-                                                                aop));
+                                       DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+                                                                this.aop));
     }
 
     @Override
     public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
                                                                     Class<TKey> keyType)
             throws
-            Exception {
-        return new DefaultRepository_Key<>(config,
+            ApplicationException {
+        return new DefaultRepository_Key<>(this.config,
                                            entityType,
                                            keyType,
-                                           DbProvider.getDbProvider(config.getDataSourceConfig(),
-                                                                    aop));
+                                           DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+                                                                    this.aop));
     }
 
+    /**
+     * 获取数据库访问对象
+     */
     @Override
-    public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
-                                                                    Class<TKey> keyType,
-                                                                    String dataSource)
+    public INaiveAdo getAdo()
             throws
-            Exception {
-        return new DefaultRepository_Key<>(config,
-                                           entityType,
-                                           keyType,
-                                           DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
-                                                                    aop));
+            ApplicationException {
+        return this.ado;
+    }
+
+    /**
+     * 获取数据库访问对象
+     */
+    @Override
+    public INaiveAop getAop()
+            throws
+            ApplicationException {
+        return this.aop;
     }
 
     @Override
     public IDbFirst getDbFirst()
             throws
-            Exception {
-        return DbProvider.getDbProvider(config.getDataSourceConfig(),
-                                        aop)
-                         .createDbFirst();
-    }
-
-    @Override
-    public IDbFirst getDbFirst(String dataSource)
-            throws
-            Exception {
-        return DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
-                                        aop)
+            ApplicationException {
+        return DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+                                        this.aop)
                          .createDbFirst();
     }
 
     @Override
     public ICodeFirst getCodeFirst()
             throws
-            Exception {
-        return DbProvider.getDbProvider(config.getDataSourceConfig(),
-                                        aop)
-                         .createCodeFirst();
-    }
-
-    @Override
-    public ICodeFirst getCodeFirst(String dataSource)
-            throws
-            Exception {
-        return DbProvider.getDbProvider(config.getDataSourceConfig(dataSource),
-                                        aop)
+            ApplicationException {
+        return DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+                                        this.aop)
                          .createCodeFirst();
     }
 }

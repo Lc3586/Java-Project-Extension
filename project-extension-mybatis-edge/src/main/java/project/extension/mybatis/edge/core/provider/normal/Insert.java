@@ -3,8 +3,8 @@ package project.extension.mybatis.edge.core.provider.normal;
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.driver.NaiveSqlSession;
-import project.extension.mybatis.edge.core.provider.standard.IAop;
+import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
+import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.extention.SqlSessionExtension;
@@ -28,7 +28,7 @@ public abstract class Insert<T>
 
     private final SqlProvider sqlProvider;
 
-    private final AopProvider aop;
+    private final NaiveAopProvider aop;
 
     private final boolean withTransactional;
 
@@ -40,12 +40,12 @@ public abstract class Insert<T>
 
     public Insert(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  IAop aop,
+                  INaiveAop aop,
                   Class<T> entityType,
                   boolean withTransactional) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (AopProvider) aop;
+        this.aop = (NaiveAopProvider) aop;
         this.withTransactional = withTransactional;
         this.inserter = new InserterDTO();
         this.entityType = entityType;

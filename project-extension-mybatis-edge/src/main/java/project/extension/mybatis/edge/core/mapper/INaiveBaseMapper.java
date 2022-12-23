@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.core.mapper;
 
 import org.apache.ibatis.annotations.Lang;
 import org.apache.ibatis.annotations.Select;
-import project.extension.mybatis.edge.core.driver.NaiveMixedLanguageDriver;
+import project.extension.mybatis.edge.core.ado.NaiveMixedLanguageDriver;
 import project.extension.mybatis.edge.model.DynamicMethod;
 import project.extension.mybatis.edge.model.DynamicSqlSetting;
 
