@@ -9,9 +9,10 @@ import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.dao.TransientDataAccessResourceException;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import project.extension.func.IFunc2;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.exception.ApplicationException;
 import project.extension.tuple.Tuple2;
@@ -27,17 +28,16 @@ import javax.sql.DataSource;
 public class NaiveAdoProvider
         implements INaiveAdo {
     /**
-     * @param config     基础配置
      * @param dataSource 数据源
      */
-    public NaiveAdoProvider(BaseConfig config,
-                            DataSource dataSource)
+    public NaiveAdoProvider(DataSource dataSource)
             throws
             ApplicationException {
         this.dataSource = dataSource;
         final SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
-        sqlSessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(config.getConfigLocation()));
+        sqlSessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
+                                                                                               .getConfigLocation()));
         try {
             this.sqlSessionFactory = sqlSessionFactory.getObject();
         } catch (Exception ex) {
@@ -58,7 +58,7 @@ public class NaiveAdoProvider
     /**
      * 解析事务的方法
      */
-    private IFunc2<SqlSessionFactory, ExecutorType, SqlSession> resolveTransaction;
+    private IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction;
 
     /**
      * 获取执行器类型
@@ -138,7 +138,7 @@ public class NaiveAdoProvider
      *
      * @return 解析事务的方法
      */
-    protected IFunc2<SqlSessionFactory, ExecutorType, SqlSession> getResolveTransaction() {
+    protected IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> getResolveTransaction() {
         return this.resolveTransaction;
     }
 
@@ -147,7 +147,7 @@ public class NaiveAdoProvider
      *
      * @param resolveTransaction 解析事务的方法
      */
-    protected void setResolveTransaction(IFunc2<SqlSessionFactory, ExecutorType, SqlSession> resolveTransaction) {
+    protected void setResolveTransaction(IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction) {
         this.resolveTransaction = resolveTransaction;
     }
 
@@ -171,8 +171,7 @@ public class NaiveAdoProvider
             session = sqlSessionFactory.openSession();
         } else {
             try {
-                session = getResolveTransaction().invoke(this.sqlSessionFactory,
-                                                         executorType);
+                session = getResolveTransaction().invoke().;
             } catch (Exception ex) {
                 throw new ApplicationException(DbContextStrings.getResolveTransactionFailed(),
                                                ex);

@@ -3,8 +3,8 @@ package project.extension.mybatis.edge.dbContext;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.transaction.TransactionStatus;
 import project.extension.func.IFunc2;
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
 import project.extension.standard.exception.ApplicationException;
 
@@ -19,16 +19,13 @@ import javax.sql.DataSource;
 public class ScopeTransactionAdo
         extends NaiveAdoProvider {
     /**
-     * @param baseConfig 基础配置
      * @param dataSource 数据源
      */
-    protected ScopeTransactionAdo(BaseConfig baseConfig,
-                                  DataSource dataSource,
-                                  IFunc2<SqlSessionFactory, ExecutorType, SqlSession> resolveTransaction)
+    protected ScopeTransactionAdo(DataSource dataSource,
+                                  IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction)
             throws
             ApplicationException {
-        super(baseConfig,
-              dataSource);
+        super(dataSource);
         super.setResolveTransaction(resolveTransaction);
     }
 }

@@ -3,6 +3,8 @@ package project.extension.mybatis.edge.extention;
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import dm.jdbc.driver.DmDriver;
 import oracle.jdbc.driver.OracleDriver;
+import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.standard.exception.ApplicationException;
@@ -18,6 +20,17 @@ import java.sql.SQLException;
  * @date 2022-12-15
  */
 public class CommonUtils {
+    private static BaseConfig config;
+
+    /**
+     * 配置
+     */
+    public static BaseConfig getConfig() {
+        if (config == null)
+            config = IOCExtension.applicationContext.getBean(BaseConfig.class);
+        return config;
+    }
+
     /**
      * 转换为阿里巴巴数据库类型
      *

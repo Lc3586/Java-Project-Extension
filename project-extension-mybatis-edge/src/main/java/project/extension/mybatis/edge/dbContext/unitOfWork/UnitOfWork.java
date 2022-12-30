@@ -1,6 +1,9 @@
 package project.extension.mybatis.edge.dbContext.unitOfWork;
 
+import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.TransactionIsolationLevel;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.StringUtils;
 import project.extension.mybatis.edge.INaiveSql;
@@ -29,6 +32,8 @@ public class UnitOfWork
         this.orm = orm;
         if (orm == null)
             throw new ApplicationException(DbContextStrings.getInstanceParamsUndefined("project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork",
+
+
                                                                                        "INaiveSql orm"));
         this.aop = (NaiveAopProvider) aop;
         this.uowBefore = new TraceBeforeEventArgs(Operation.UnitOfWork,
@@ -86,6 +91,15 @@ public class UnitOfWork
      * AOP编程对象
      */
     protected final NaiveAopProvider aop;
+
+    protected final DataSourceTransactionManager dataSourceTransactionManager;
+
+    protected final TransactionDefinition transactionDefinition;
+
+    /**
+     * Sql会话
+     */
+    protected SqlSession sqlSession;
 
     /**
      * 事务对象
@@ -242,12 +256,15 @@ public class UnitOfWork
     }
 
     @Override
-    public TransactionStatus getOrBeginTransaction() {
+    public SqlSession getOrBeginTransaction() {
         return this.getOrBeginTransaction(true);
     }
 
     @Override
-    public TransactionStatus getOrBeginTransaction(boolean isCreate) {
+    public SqlSession getOrBeginTransaction(boolean isCreate) {
+        if (this.sqlSession != null)
+            return sqlSession;
 
+        return this.sqlSession;
     }
 }

@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.collections.TupleExtension;
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.model.NullResultException;
@@ -25,26 +25,24 @@ public class BaseRepository_Key<T, TKey>
         implements IBaseRepository_Key<T, TKey> {
     private final List<Field> keyFields;
     private final Class<TKey> keyType;
-    private final String defaultNullErrorMessage = "数据不存在或已被移除";
+    private final String defaultNullErrorMessage = DbContextStrings.getDataUndefined();
 
     /**
      * @param entityType 实体类型
      * @param keyType    主键类型
      * @param dbProvider 基础构造器
      */
-    public BaseRepository_Key(BaseConfig config,
-                              Class<T> entityType,
+    public BaseRepository_Key(Class<T> entityType,
                               Class<TKey> keyType,
                               IBaseDbProvider<T> dbProvider)
             throws
             ApplicationException {
-        super(config,
-              entityType,
+        super(entityType,
               dbProvider);
         this.keyFields = RepositoryExtension.getPrimaryKeyField(entityType);
-        if (this.keyFields.size() == 0) throw new Exception("请在实体里设置主键@ColumnSetting(primaryKey = true)");
+        if (this.keyFields.size() == 0) throw new ApplicationException(DbContextStrings.getEntityPrimaryKeyUndefined());
         if (keyFields.size() > 1 && !ITuple.class.isAssignableFrom(keyType))
-            throw new Exception("实体存在联合主键时，主键类型必须为Tuple元组类型");
+            throw new ApplicationException(DbContextStrings.getEntityCompositePrimaryKeyMustBeTupleType());
         this.keyType = keyType;
     }
 

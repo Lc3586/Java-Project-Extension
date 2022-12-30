@@ -5,7 +5,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.TransactionDefinition;
 import project.extension.func.IFunc0;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.BaseConfig;
@@ -69,14 +71,12 @@ public class DbContextScopedNaiveSql
     /**
      * 创建
      *
-     * @param config            配置
      * @param orm               Orm对象
      * @param resolveDbContext  获取数据源上下文
      * @param resolveUnitOfWork 获取工作单元
      * @return 有生命周期的Orm对象
      */
-    public static DbContextScopedNaiveSql create(BaseConfig config,
-                                                 INaiveSql orm,
+    public static DbContextScopedNaiveSql create(INaiveSql orm,
                                                  IFunc0<DbContext> resolveDbContext,
                                                  IFunc0<IUnitOfWork> resolveUnitOfWork) {
         if (orm == null) return null;
@@ -86,17 +86,16 @@ public class DbContextScopedNaiveSql
             return new DbContextScopedNaiveSql(orm,
                                                resolveDbContext,
                                                resolveUnitOfWork,
-                                               new ScopeTransactionAdo(config,
-                                                                       orm.getAdo()
+                                               new ScopeTransactionAdo(orm.getAdo()
                                                                           .getDataSource(),
                                                                        (sqlSessionFactory, executorType) -> {
                                                                            DbContext dbContext = resolveDbContext.invoke();
-                                                                           dbContext.
-                                                                           return sqlSessionFactory.openSession(executorType, );
+                                                                           return resolveUnitOfWork.invoke()
+                                                                                                   .getOrBeginTransaction();
                                                                        }));
         return create(scopedOrm.getOriginalOrm(),
                       resolveDbContext,
-                      resolveUnitOfWork,);
+                      resolveUnitOfWork);
     }
 
     /**

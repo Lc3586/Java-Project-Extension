@@ -209,4 +209,25 @@ public class DbContextStrings {
     public static String getResolveTransactionFailed() {
         return getString("ResolveTransactionFailed");
     }
+
+    /**
+     * 实体中未定义主键
+     */
+    public static String getEntityPrimaryKeyUndefined() {
+        return getString("EntityPrimaryKeyUndefined");
+    }
+
+    /**
+     * 实体存在联合主键时，主键类型必须为Tuple元组类型
+     */
+    public static String getEntityCompositePrimaryKeyMustBeTupleType() {
+        return getString("EntityCompositePrimaryKeyMustBeTupleType");
+    }
+
+    /**
+     * 数据不存在或已被移除
+     */
+    public static String getDataUndefined() {
+        return getString("DataUndefined");
+    }
 }

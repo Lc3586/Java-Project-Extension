@@ -1,6 +1,5 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 
 /**
@@ -12,11 +11,9 @@ import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
  */
 public class DefaultRepository<T>
         extends BaseRepository<T> {
-    public DefaultRepository(BaseConfig config,
-                             Class<T> entityType,
+    public DefaultRepository(Class<T> entityType,
                              IBaseDbProvider<T> dbProvider) {
-        super(config,
-              entityType,
+        super(entityType,
               dbProvider);
     }
 

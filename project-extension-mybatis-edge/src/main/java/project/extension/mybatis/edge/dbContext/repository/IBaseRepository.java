@@ -1,6 +1,5 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.provider.standard.IDelete;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
 import project.extension.mybatis.edge.core.provider.standard.ISelect;
@@ -16,11 +15,6 @@ import java.util.Collection;
  * @date 2022-03-28
  */
 public interface IBaseRepository<T> {
-    /**
-     * 获取当前配置信息
-     */
-    BaseConfig getConfig();
-
     /**
      * 所有操作是否在由springframework管理的事务下运行
      * <p>如果是 需要在方法上添加此注解 org.springframework.transaction.annotation.Transactional</p>

@@ -1,24 +1,19 @@
 package project.extension.mybatis.edge.core.provider;
 
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
 import project.extension.mybatis.edge.INaiveSql;
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
 import project.extension.mybatis.edge.core.ado.NaiveDataSource;
-import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.standard.exception.ApplicationException;
-
-import javax.sql.DataSource;
 
 /**
  * 数据仓储构造器
@@ -27,20 +22,15 @@ import javax.sql.DataSource;
  * @date 2022-03-28
  */
 @Component
-@DependsOn({"RepositoryExtension"})
 public class BaseProvider
         implements INaiveSql {
-    public BaseProvider(BaseConfig config,
-                        NaiveDataSource naiveDataSource,
+    public BaseProvider(NaiveDataSource naiveDataSource,
                         INaiveAop aop) {
-        this.config = config;
-        this.ado = new NaiveAdoProvider(this.config,
-                                        naiveDataSource.getResolvedDataSources()
-                                                       .get(this.config.getDataSource()));
+        this.ado = new NaiveAdoProvider(naiveDataSource.getResolvedDataSources()
+                                                       .get(CommonUtils.getConfig()
+                                                                       .getDataSource()));
         this.aop = aop;
     }
-
-    private final BaseConfig config;
 
     private final INaiveAdo ado;
 
@@ -50,9 +40,9 @@ public class BaseProvider
     public <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
             ApplicationException {
-        return new DefaultRepository<>(this.config,
-                                       entityType,
-                                       DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+        return new DefaultRepository<>(entityType,
+                                       DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                                           .getDataSourceConfig(),
                                                                 this.aop));
     }
 
@@ -61,10 +51,10 @@ public class BaseProvider
                                                                     Class<TKey> keyType)
             throws
             ApplicationException {
-        return new DefaultRepository_Key<>(this.config,
-                                           entityType,
+        return new DefaultRepository_Key<>(entityType,
                                            keyType,
-                                           DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+                                           DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                                               .getDataSourceConfig(),
                                                                     this.aop));
     }
 
@@ -92,7 +82,8 @@ public class BaseProvider
     public IDbFirst getDbFirst()
             throws
             ApplicationException {
-        return DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+        return DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                   .getDataSourceConfig(),
                                         this.aop)
                          .createDbFirst();
     }
@@ -101,7 +92,8 @@ public class BaseProvider
     public ICodeFirst getCodeFirst()
             throws
             ApplicationException {
-        return DbProvider.getDbProvider(this.config.getDataSourceConfig(),
+        return DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                   .getDataSourceConfig(),
                                         this.aop)
                          .createCodeFirst();
     }

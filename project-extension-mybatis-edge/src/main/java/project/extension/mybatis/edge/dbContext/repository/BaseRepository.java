@@ -1,6 +1,5 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.model.DynamicSqlSetting;
 
@@ -18,28 +17,19 @@ import java.util.Collection;
  */
 public class BaseRepository<T>
         implements IBaseRepository<T> {
-    protected final BaseConfig config;
     protected final DynamicSqlSetting<T> setting;
     protected final IBaseDbProvider<T> dbProvider;
 
     protected boolean useTransactional = false;
 
     /**
-     * @param config     配置
      * @param entityType 实体类型
      * @param dbProvider 基础构造器
      */
-    public BaseRepository(BaseConfig config,
-                          Class<T> entityType,
+    public BaseRepository(Class<T> entityType,
                           IBaseDbProvider<T> dbProvider) {
-        this.config = config;
         this.setting = new DynamicSqlSetting<>(entityType);
         this.dbProvider = dbProvider;
-    }
-
-    @Override
-    public BaseConfig getConfig() {
-        return config;
     }
 
     @Override
