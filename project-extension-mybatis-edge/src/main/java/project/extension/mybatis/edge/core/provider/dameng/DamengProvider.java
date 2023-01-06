@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
-import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.standard.*;
 
 /**
@@ -12,59 +12,52 @@ import project.extension.mybatis.edge.core.provider.standard.*;
  */
 public class DamengProvider<T>
         implements IBaseDbProvider<T> {
-    public DamengProvider(DataSourceConfig config,
-                          INaiveAop aop) {
+    public DamengProvider(DataSourceConfig config) {
         this.config = config;
-        this.aop = aop;
     }
 
     private final DataSourceConfig config;
 
-    private final INaiveAop aop;
-
     @Override
     public ISelect<T> createSelect(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new DamengSelect<>(config,
-                                  aop,
-                                  entityType,
-                                  withTransactional);
+                                  ado,
+                                  entityType);
     }
 
     @Override
     public IInsert<T> createInsert(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new DamengInsert<>(config,
-                                  aop,
-                                  entityType,
-                                  withTransactional);
+                                  ado,
+                                  entityType);
     }
 
     @Override
     public IUpdate<T> createUpdate(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new DamengUpdate<>(config,
-                                  aop,
-                                  entityType,
-                                  withTransactional);
+                                  ado,
+                                  entityType);
     }
 
     @Override
     public IDelete<T> createDelete(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new DamengDelete<>(config,
-                                  aop,
-                                  entityType,
-                                  withTransactional);
+                                  ado,
+                                  entityType);
     }
 
     @Override
-    public IDbFirst createDbFirst() {
-        return new DamengDbFirst(config);
+    public IDbFirst createDbFirst(INaiveAdo ado) {
+        return new DamengDbFirst(config,
+                                 ado);
     }
 
     @Override
-    public ICodeFirst createCodeFirst() {
-        return new DamengCodeFirst();
+    public ICodeFirst createCodeFirst(INaiveAdo ado) {
+        return new DamengCodeFirst(ado);
     }
 }

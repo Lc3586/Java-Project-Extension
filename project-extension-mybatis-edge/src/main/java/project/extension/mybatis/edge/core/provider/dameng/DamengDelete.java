@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.Delete;
-import project.extension.mybatis.edge.aop.INaiveAop;
 
 /**
  * Dameng数据删除对象
@@ -14,13 +14,11 @@ import project.extension.mybatis.edge.aop.INaiveAop;
 public class DamengDelete<T>
         extends Delete<T> {
     public DamengDelete(DataSourceConfig config,
-                        INaiveAop aop,
-                        Class<T> entityType,
-                        boolean withTransactional) {
+                        INaiveAdo ado,
+                        Class<T> entityType) {
         super(config,
               new DamengSqlProvider(config),
-              aop,
-              entityType,
-              withTransactional);
+              ado,
+              entityType);
     }
 }

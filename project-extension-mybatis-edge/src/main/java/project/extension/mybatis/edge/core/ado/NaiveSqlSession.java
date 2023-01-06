@@ -19,8 +19,7 @@ import project.extension.mybatis.edge.dbContext.repository.ITransactionAction;
  * @author LCTR
  * @date 2022-04-06
  */
-@Component("NaiveSqlSession")
-@DependsOn("NaiveDataSourceProvider")
+//@Component("NaiveSqlSession")
 public class NaiveSqlSession {
     public NaiveSqlSession(BaseConfig config,
                            DataSourceTransactionManager dataSourceTransactionManager,
@@ -67,82 +66,82 @@ public class NaiveSqlSession {
         NaiveSqlSession.transactionDefinition = transactionDefinition;
     }
 
-    /**
-     * 获取当前SQL会话
-     * <p>如果不存在会自动创建</p>
-     *
-     * @return SqlSession
-     */
-    public static SqlSession current() {
-        return SqlSessionUtils.getSqlSession(sqlSessionFactory);
-    }
+//    /**
+//     * 获取当前SQL会话
+//     * <p>如果不存在会自动创建</p>
+//     *
+//     * @return SqlSession
+//     */
+//    public static SqlSession current() {
+//        return SqlSessionUtils.getSqlSession(sqlSessionFactory);
+//    }
 
-    /**
-     * 打开一个新的SQL会话
-     *
-     * @return SQL会话
-     */
-    public static SqlSession open()
-            throws
-            Throwable {
-        return open(null);
-    }
+//    /**
+//     * 打开一个新的SQL会话
+//     *
+//     * @return SQL会话
+//     */
+//    public static SqlSession open()
+//            throws
+//            Throwable {
+//        return open(null);
+//    }
 
-    /**
-     * 打开一个新的SQL会话
-     *
-     * @return SQL会话
-     */
-    public static SqlSession open(TransactionIsolationLevel level)
-            throws
-            Throwable {
-        if (level != null) return sqlSessionFactory.openSession(level);
-        else return sqlSessionFactory.openSession();
-    }
+//    /**
+//     * 打开一个新的SQL会话
+//     *
+//     * @return SQL会话
+//     */
+//    public static SqlSession open(TransactionIsolationLevel level)
+//            throws
+//            Throwable {
+//        if (level != null) return sqlSessionFactory.openSession(level);
+//        else return sqlSessionFactory.openSession();
+//    }
 
-    /**
-     * 停止使用
-     *
-     * @param sqlSession SQL会话
-     */
-    public static void done(SqlSession sqlSession) {
-        done(sqlSession,
-             false);
-    }
+//    /**
+//     * 停止使用
+//     *
+//     * @param sqlSession SQL会话
+//     */
+//    public static void done(SqlSession sqlSession) {
+//        done(sqlSession,
+//             false);
+//    }
 
-    /**
-     * 停止使用
-     *
-     * @param sqlSession SQL会话
-     * @param commit     提交事务
-     */
-    public static void done(SqlSession sqlSession,
-                            boolean commit) {
-        if (commit) sqlSession.commit();
-        sqlSession.close();
-    }
-
-    /**
-     * 停止使用
-     *
-     * @param sqlSession SQL会话
-     */
-    public static void error(SqlSession sqlSession) {
-        error(sqlSession,
-              false);
-    }
-
-    /**
-     * 停止使用
-     *
-     * @param sqlSession SQL会话
-     * @param rollback   回滚事务
-     */
-    public static void error(SqlSession sqlSession,
-                             boolean rollback) {
-        if (rollback) sqlSession.rollback();
-        sqlSession.close();
-    }
+//    /**
+//     * 停止使用
+//     *
+//     * @param sqlSession SQL会话
+//     * @param commit     提交事务
+//     */
+//    public static void done(SqlSession sqlSession,
+//                            boolean commit) {
+//        if (commit) sqlSession.commit();
+//        sqlSession.close();
+//    }
+//
+//    /**
+//     * 停止使用
+//     *
+//     * @param sqlSession SQL会话
+//     */
+//    public static void error(SqlSession sqlSession) {
+//        error(sqlSession,
+//              false);
+//    }
+//
+//    /**
+//     * 停止使用
+//     *
+//     * @param sqlSession SQL会话
+//     * @param rollback   回滚事务
+//     */
+//    public static void error(SqlSession sqlSession,
+//                             boolean rollback) {
+//        if (rollback) sqlSession.rollback();
+//        sqlSession.close();
+//    }
 
     /**
      * 获取配置

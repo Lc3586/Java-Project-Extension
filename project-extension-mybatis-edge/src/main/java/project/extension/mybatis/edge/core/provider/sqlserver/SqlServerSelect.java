@@ -4,9 +4,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.normal.Select;
-import project.extension.mybatis.edge.aop.INaiveAop;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.model.OrderMethod;
 
 import java.lang.reflect.Field;
@@ -23,14 +23,12 @@ import java.util.Map;
 public class SqlServerSelect<T>
         extends Select<T> {
     public SqlServerSelect(DataSourceConfig config,
-                           INaiveAop aop,
-                           Class<T> entityType,
-                           boolean withTransactional) {
+                           INaiveAdo ado,
+                           Class<T> entityType) {
         super(config,
               new SqlServerSqlProvider(config),
-              aop,
-              entityType,
-              withTransactional);
+              ado,
+              entityType);
         this.config = config;
     }
 
@@ -63,8 +61,8 @@ public class SqlServerSelect<T>
                 orderBy.getDynamicOrder()
                        .setMethod(OrderMethod.ASC);
             } else {
-                Map<String, String> primaryKey = RepositoryExtension.getPrimaryKeyFieldNameWithColumns(entityType,
-                                                                                                       config.getNameConvertType());
+                Map<String, String> primaryKey = EntityTypeHandler.getPrimaryKeyFieldNameWithColumns(entityType,
+                                                                                                     config.getNameConvertType());
                 if (primaryKey.size() > 0) {
                     //使用主键作为默认的排序条件
                     orderBy.getDynamicOrder()
@@ -73,8 +71,8 @@ public class SqlServerSelect<T>
                            .setMethod(OrderMethod.ASC);
                 } else {
                     //使用任意一个列作为默认的排序条件
-                    List<Field> fields = RepositoryExtension.getColumnFieldsByEntityType(entityType,
-                                                                                         false);
+                    List<Field> fields = EntityTypeHandler.getColumnFieldsByEntityType(entityType,
+                                                                                       false);
                     orderBy.getDynamicOrder()
                            .setFieldName(fields.get(0)
                                                .getName());

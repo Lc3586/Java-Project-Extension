@@ -1,7 +1,8 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
+import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 /**
  * 默认数据仓储
@@ -13,12 +14,14 @@ import project.extension.standard.exception.ApplicationException;
  */
 public class DefaultRepository_Key<T, TKey>
         extends BaseRepository_Key<T, TKey> {
-    public DefaultRepository_Key(Class<T> type,
+    public DefaultRepository_Key(INaiveSql orm,
+                                 Class<T> type,
                                  Class<TKey> keyType,
                                  IBaseDbProvider<T> dbProvider)
             throws
-            ApplicationException {
-        super(type,
+            ModuleException {
+        super(orm,
+              type,
               keyType,
               dbProvider);
     }

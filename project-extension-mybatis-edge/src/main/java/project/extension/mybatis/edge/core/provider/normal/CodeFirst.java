@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.normal;
 
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 
 /**
@@ -10,4 +11,7 @@ import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
  */
 public abstract class CodeFirst
         implements ICodeFirst {
+    protected CodeFirst(INaiveAdo ado){
+
+    }
 }

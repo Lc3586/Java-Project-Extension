@@ -56,10 +56,45 @@ public class DbContextStrings {
     }
 
     /**
+     * 方法尚未实现
+     */
+    public static String getFunctionNotImplemented() {
+        return getString("FunctionNotImplemented");
+    }
+
+    /**
      * 已开启事务，不能禁用工作单元
      */
-    public static String transactionHasBeenStarted() {
+    public static String getTransactionHasBeenStarted() {
         return getString("TransactionHasBeenStarted");
+    }
+
+    /**
+     * 开启事务失败
+     */
+    public static String getTransactionBeginFailed() {
+        return getString("TransactionBeginFailed");
+    }
+
+    /**
+     * 提交事务失败
+     */
+    public static String getTransactionCommitFailed() {
+        return getString("TransactionCommitFailed");
+    }
+
+    /**
+     * 回滚事务失败
+     */
+    public static String getTransactionRollbackFailed() {
+        return getString("TransactionRollbackFailed");
+    }
+
+    /**
+     * 检查Sql会话是否已关闭失败
+     */
+    public static String getSqlSessionCheckClosedFailed() {
+        return getString("SqlSessionCheckClosedFailed");
     }
 
     /**
@@ -173,13 +208,6 @@ public class DbContextStrings {
     }
 
     /**
-     * 初始化实体数据失败
-     */
-    public static String getEntityInitializationFailed() {
-        return getString("EntityInitializationFailed");
-    }
-
-    /**
      * 不支持的主键数据类型
      *
      * @param typeName 类型名称
@@ -211,6 +239,23 @@ public class DbContextStrings {
     }
 
     /**
+     * 未找到指定的实体
+     *
+     * @param entityName 实体名称
+     */
+    public static String getEntityUndefined(String entityName) {
+        return getString("EntityUndefined",
+                         entityName);
+    }
+
+    /**
+     * 初始化实体数据失败
+     */
+    public static String getEntityInitializationFailed() {
+        return getString("EntityInitializationFailed");
+    }
+
+    /**
      * 实体中未定义主键
      */
     public static String getEntityPrimaryKeyUndefined() {
@@ -223,6 +268,33 @@ public class DbContextStrings {
     public static String getEntityCompositePrimaryKeyMustBeTupleType() {
         return getString("EntityCompositePrimaryKeyMustBeTupleType");
     }
+
+    /**
+     * 未在实体中找到指定列对应的字段
+     *
+     * @param entityName 实体名称
+     * @param columnName 列名称
+     */
+    public static String getEntityField4ColumnUndefined(String entityName,
+                                                        String columnName) {
+        return getString("EntityField4ColumnUndefined",
+                         entityName,
+                         columnName);
+    }
+
+    /**
+     * 未在实体中找到指定的字段
+     *
+     * @param entityName 实体名称
+     * @param fieldName  字段名称
+     */
+    public static String getEntityFieldUndefined(String entityName,
+                                                 String fieldName) {
+        return getString("EntityFieldUndefined",
+                         entityName,
+                         fieldName);
+    }
+
 
     /**
      * 数据不存在或已被移除

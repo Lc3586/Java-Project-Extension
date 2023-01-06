@@ -7,7 +7,7 @@ import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DbType;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -39,7 +39,7 @@ public class CommonUtils {
      */
     public static com.alibaba.druid.DbType convertToAlibabaDbType(DbType dbType)
             throws
-            ApplicationException {
+            ModuleException {
         switch (dbType) {
             case JdbcMySql:
                 return com.alibaba.druid.DbType.mysql;
@@ -65,14 +65,14 @@ public class CommonUtils {
      */
     public static Driver getDriver(DbType dbType)
             throws
-            ApplicationException {
+            ModuleException {
         switch (dbType) {
             case JdbcMySql:
                 try {
                     return new com.mysql.cj.jdbc.Driver();
                 } catch (Exception ex) {
-                    throw new ApplicationException(DbContextStrings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
-                                                   ex);
+                    throw new ModuleException(DbContextStrings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
+                                              ex);
                 }
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
@@ -90,7 +90,7 @@ public class CommonUtils {
             case JdbcPostgreSQL:
                 return new org.postgresql.Driver();
             default:
-                throw new ApplicationException(DbContextStrings.getUnsupportedDbType(dbType.toString()));
+                throw new ModuleException(DbContextStrings.getUnsupportedDbType(dbType.toString()));
         }
     }
 }

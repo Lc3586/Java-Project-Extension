@@ -1,12 +1,13 @@
 package project.extension.mybatis.edge.core.provider.sqlserver;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
 import project.extension.tuple.Tuple2;
@@ -25,8 +26,10 @@ import java.util.regex.Pattern;
  */
 public class SqlServerDbFirst
         extends DbFirst {
-    public SqlServerDbFirst(DataSourceConfig config) {
+    public SqlServerDbFirst(DataSourceConfig config,
+                            INaiveAdo ado) {
         super(config,
+              ado,
               "SqlServerDbFirst");
         initialization();
     }
@@ -363,13 +366,14 @@ public class SqlServerDbFirst
                                                    : " is null"),
                                    currentDatabase);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -440,13 +444,14 @@ public class SqlServerDbFirst
                             sql,
                             currentDatabase);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -480,13 +485,14 @@ public class SqlServerDbFirst
                                    t_v_MatcherSql,
                                    currentDatabase);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -524,13 +530,14 @@ public class SqlServerDbFirst
                                                              "b.object_id"),
                                    currentDatabase);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -545,7 +552,8 @@ public class SqlServerDbFirst
         Matcher matcher = Pattern.compile("jdbc:sqlserver://(.*?);DatabaseName=(.*?);.*?$",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(String.format("%s;",
-                                                        config.getConnectionString()));
+                                                        config.getProperties()
+                                                              .getProperty(DruidDataSourceFactory.PROP_URL)));
         if (!matcher.find())
             throw new Exception("无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为 jdbc:sqlserver://(.*?);DatabaseName=(.*?);.*?$");
 
@@ -1051,14 +1059,15 @@ public class SqlServerDbFirst
             throws
             Exception {
         String sql = " select name from sys.databases where name not in ('master','tempdb','model','msdb')";
-        return SqlSessionExtension.selectList(getSqlSession(),
-                                              getMSId(MD5Utils.hash(sql)),
-                                              sql,
-                                              null,
-                                              null,
-                                              String.class,
-                                              true,
-                                              config.getNameConvertType());
+        return this.ado.selectList(getSqlSession(),
+                                   getMSId(MD5Utils.hash(sql)),
+                                   sql,
+                                   null,
+                                   null,
+                                   String.class,
+                                   null,
+                                   null,
+                                   config.getNameConvertType());
     }
 
     @Override
@@ -1124,14 +1133,15 @@ public class SqlServerDbFirst
                                    : " is null",
                                    currentDatabase);
 
-        return SqlSessionExtension.selectOne(getSqlSession(),
-                                             getMSId(MD5Utils.hash(sql)),
-                                             sql,
-                                             null,
-                                             null,
-                                             Boolean.class,
-                                             true,
-                                             config.getNameConvertType());
+        return this.ado.selectOne(getSqlSession(),
+                                  getMSId(MD5Utils.hash(sql)),
+                                  sql,
+                                  null,
+                                  null,
+                                  Boolean.class,
+                                  null,
+                                  null,
+                                  config.getNameConvertType());
     }
 
     @Override

@@ -7,7 +7,7 @@ import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 /**
  * NaiveSql
@@ -26,7 +26,7 @@ public interface INaiveSql {
      */
     <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 获取数据仓储
@@ -40,33 +40,33 @@ public interface INaiveSql {
     <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
                                                              Class<TKey> keyType)
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 获取数据库访问对象
      */
     INaiveAdo getAdo()
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 获取数据库访问对象
      */
     INaiveAop getAop()
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 获取DbFirst 开发模式相关功能
      */
     IDbFirst getDbFirst()
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 获取DbFirst 开发模式相关功能
      */
     ICodeFirst getCodeFirst()
             throws
-            ApplicationException;
+            ModuleException;
 }

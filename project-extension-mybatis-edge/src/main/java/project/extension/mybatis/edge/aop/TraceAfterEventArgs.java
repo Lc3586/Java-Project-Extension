@@ -9,8 +9,8 @@ package project.extension.mybatis.edge.aop;
 public class TraceAfterEventArgs
         extends TraceBeforeEventArgs {
     public TraceAfterEventArgs(TraceBeforeEventArgs beforeEventData,
-                               Exception exception,
-                               String remark) {
+                               String remark,
+                               Exception exception) {
         super(beforeEventData.getIdentifier(),
               beforeEventData.getWatch(),
               beforeEventData.getOperation(),
@@ -20,8 +20,8 @@ public class TraceAfterEventArgs
              .stop();
         this.costtime = super.getWatch()
                              .getTime();
-        this.exception = exception;
         this.remark = remark;
+        this.exception = exception;
     }
 
     /**

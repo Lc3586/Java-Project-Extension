@@ -4,8 +4,8 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.EntityMapping;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.extention.CacheExtension;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.extention.SqlExtension;
 import project.extension.mybatis.edge.model.*;
 import project.extension.mybatis.edge.model.OrderMethod;
@@ -185,9 +185,9 @@ public abstract class SqlProvider {
                                      boolean dataIsValue)
             throws
             Exception {
-        return field2ValueSql(RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                      entityType,
-                                                                      null),
+        return field2ValueSql(EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                    entityType,
+                                                                    null),
                               data,
                               dataIsValue);
     }
@@ -297,9 +297,9 @@ public abstract class SqlProvider {
                                                          boolean ignoreCase)
             throws
             Exception {
-        return field2ParameterSql(RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                          entityType,
-                                                                          null),
+        return field2ParameterSql(EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                        entityType,
+                                                                        null),
                                   parameter,
                                   data,
                                   dataIsValue,
@@ -319,9 +319,9 @@ public abstract class SqlProvider {
                                          Map<String, Object> parameter)
             throws
             Exception {
-        return field2ParameterSql(RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                          entityType,
-                                                                          null),
+        return field2ParameterSql(EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                        entityType,
+                                                                        null),
                                   parameter);
     }
 
@@ -400,7 +400,7 @@ public abstract class SqlProvider {
         return String.format("#{%s,javaType=%s,jdbcType=%s}",
                              parameterName_,
                              type.getSimpleName(),
-                             RepositoryExtension.getJdbcType(type));
+                             EntityTypeHandler.getJdbcType(type));
     }
 
     /**
@@ -453,7 +453,7 @@ public abstract class SqlProvider {
                             String.format("#{%s,javaType=%s,jdbcType=%s}",
                                           parameterName,
                                           type.getSimpleName(),
-                                          RepositoryExtension.getJdbcType(type)));
+                                          EntityTypeHandler.getJdbcType(type)));
     }
 
     /**
@@ -470,9 +470,9 @@ public abstract class SqlProvider {
         List<String> sqlList = new ArrayList<>();
         for (String fieldName : customSetByFieldNameWithSql.keySet()) {
             sqlList.add(String.format("\r\n\t\t%s = %s",
-                                      getNameWithAlias(RepositoryExtension.getColumnByFieldName(fieldName,
-                                                                                                entityType,
-                                                                                                config.getNameConvertType()),
+                                      getNameWithAlias(EntityTypeHandler.getColumnByFieldName(fieldName,
+                                                                                              entityType,
+                                                                                              config.getNameConvertType()),
                                                        alias),
                                       customSetByFieldNameWithSql.get(fieldName)));
         }
@@ -499,12 +499,12 @@ public abstract class SqlProvider {
             Exception {
         List<String> sqlList = new ArrayList<>();
         for (String fieldName : customSetByFieldNames.keySet()) {
-            Field field = RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                  entityType,
-                                                                  null);
+            Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                entityType,
+                                                                null);
             sqlList.add(String.format("\r\n\t\t%s = %s",
-                                      getNameWithAlias(RepositoryExtension.getColumn(field,
-                                                                                     config.getNameConvertType()),
+                                      getNameWithAlias(EntityTypeHandler.getColumn(field,
+                                                                                   config.getNameConvertType()),
                                                        alias),
                                       noParameter
                                       ? field2ValueSql(field,
@@ -539,12 +539,12 @@ public abstract class SqlProvider {
             Exception {
         List<String> sqlList = new ArrayList<>();
         for (DynamicSetter setter : setters) {
-            Field field = RepositoryExtension.getFieldByFieldName(setter.getFieldName(),
-                                                                  entityType,
-                                                                  null);
+            Field field = EntityTypeHandler.getFieldByFieldName(setter.getFieldName(),
+                                                                entityType,
+                                                                null);
             sqlList.add(String.format("\r\n\t\t%s = %s",
-                                      getNameWithAlias(RepositoryExtension.getColumn(field,
-                                                                                     config.getNameConvertType()),
+                                      getNameWithAlias(EntityTypeHandler.getColumn(field,
+                                                                                   config.getNameConvertType()),
                                                        alias),
                                       noParameter
                                       ? dynamicSetterExpression2ValueSql(entityType,
@@ -610,9 +610,9 @@ public abstract class SqlProvider {
             Exception {
         switch (target.getType()) {
             case FieldName:
-                return getNameWithAlias(RepositoryExtension.getColumnByFieldName(target.getFieldName(),
-                                                                                 entityType,
-                                                                                 config.getNameConvertType()),
+                return getNameWithAlias(EntityTypeHandler.getColumnByFieldName(target.getFieldName(),
+                                                                               entityType,
+                                                                               config.getNameConvertType()),
                                         alias);
             case Value:
                 return value2ValueSql(target.getValue());
@@ -647,9 +647,9 @@ public abstract class SqlProvider {
             Exception {
         switch (target.getType()) {
             case FieldName:
-                return getNameWithAlias(RepositoryExtension.getColumnByFieldName(target.getFieldName(),
-                                                                                 entityType,
-                                                                                 config.getNameConvertType()),
+                return getNameWithAlias(EntityTypeHandler.getColumnByFieldName(target.getFieldName(),
+                                                                               entityType,
+                                                                               config.getNameConvertType()),
                                         alias);
             case Value:
                 return value2ParameterSql(memberType,
@@ -814,9 +814,9 @@ public abstract class SqlProvider {
             Exception {
         List<String> sqlList = new ArrayList<>();
         for (String fieldName : fieldWithColumns.keySet()) {
-            Field field = RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                  entityType,
-                                                                  null);
+            Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                entityType,
+                                                                null);
             sqlList.add(String.format("\r\n\t\t%s = %s",
                                       getNameWithAlias(fieldWithColumns.get(fieldName),
                                                        alias),
@@ -855,9 +855,9 @@ public abstract class SqlProvider {
             Exception {
         List<String> where = new ArrayList<>();
         for (String fieldName : primaryKeyFieldWithColumns.keySet()) {
-            Field field = RepositoryExtension.getFieldByFieldName(fieldName,
-                                                                  entityType,
-                                                                  null);
+            Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
+                                                                entityType,
+                                                                null);
             where.add(String.format("%s = %s",
                                     getNameWithAlias(primaryKeyFieldWithColumns.get(fieldName),
                                                      alias),
@@ -929,18 +929,18 @@ public abstract class SqlProvider {
         Collection<String> columns = CacheExtension.getDtoTypeColumns(cacheKey);
         if (CollectionsExtension.anyPlus(columns)) return columns;
 
-        if (dtoType == null) columns = RepositoryExtension.getColumnsByEntityType(entityType,
-                                                                                  withOutPrimaryKey,
-                                                                                  config.getNameConvertType());
-        else columns = RepositoryExtension.getColumnFieldsByDtoType(dtoType,
-                                                                    mainTagLevel,
-                                                                    customTags,
-                                                                    withOutPrimaryKey,
-                                                                    inherit)
-                                          .stream()
-                                          .map(x -> RepositoryExtension.getColumn(x,
-                                                                                  config.getNameConvertType()))
-                                          .collect(Collectors.toList());
+        if (dtoType == null) columns = EntityTypeHandler.getColumnsByEntityType(entityType,
+                                                                                withOutPrimaryKey,
+                                                                                config.getNameConvertType());
+        else columns = EntityTypeHandler.getColumnFieldsByDtoType(dtoType,
+                                                                  mainTagLevel,
+                                                                  customTags,
+                                                                  withOutPrimaryKey,
+                                                                  inherit)
+                                        .stream()
+                                        .map(x -> EntityTypeHandler.getColumn(x,
+                                                                              config.getNameConvertType()))
+                                        .collect(Collectors.toList());
 
         //添加至缓存
         CacheExtension.setDtoTypeColumns(cacheKey,
@@ -1047,14 +1047,14 @@ public abstract class SqlProvider {
 
         fieldWithColumns = new HashMap<>();
 
-        for (Field field : RepositoryExtension.getColumnFieldsByDtoType(dtoType,
-                                                                        mainTagLevel,
-                                                                        customTags,
-                                                                        withOutPrimaryKey,
-                                                                        inherit)) {
+        for (Field field : EntityTypeHandler.getColumnFieldsByDtoType(dtoType,
+                                                                      mainTagLevel,
+                                                                      customTags,
+                                                                      withOutPrimaryKey,
+                                                                      inherit)) {
             fieldWithColumns.put(field.getName(),
-                                 RepositoryExtension.getColumn(field,
-                                                               config.getNameConvertType()));
+                                 EntityTypeHandler.getColumn(field,
+                                                             config.getNameConvertType()));
         }
 
         //添加至缓存
@@ -1097,25 +1097,25 @@ public abstract class SqlProvider {
         if (CollectionsExtension.anyPlus(tempKeyFieldNames)) {
             for (String fieldName : tempKeyFieldNames) {
                 primaryKeyFieldWithColumns.put(fieldName,
-                                               RepositoryExtension.getColumnByFieldName(fieldName,
-                                                                                        entityType,
-                                                                                        config.getNameConvertType()));
+                                               EntityTypeHandler.getColumnByFieldName(fieldName,
+                                                                                      entityType,
+                                                                                      config.getNameConvertType()));
             }
         }
 
         if (CollectionsExtension.anyPlus(tempKeyColumns)) {
             for (String column : tempKeyColumns) {
-                primaryKeyFieldWithColumns.put(RepositoryExtension.getFieldName(column,
-                                                                                entityType,
-                                                                                config.getNameConvertType()),
+                primaryKeyFieldWithColumns.put(EntityTypeHandler.getFieldName(column,
+                                                                              entityType,
+                                                                              config.getNameConvertType()),
                                                column);
             }
         }
 
         //默认主键
         if (primaryKeyFieldWithColumns.size() == 0)
-            primaryKeyFieldWithColumns.putAll(RepositoryExtension.getPrimaryKeyFieldNameWithColumns(entityType,
-                                                                                                    config.getNameConvertType()));
+            primaryKeyFieldWithColumns.putAll(EntityTypeHandler.getPrimaryKeyFieldNameWithColumns(entityType,
+                                                                                                  config.getNameConvertType()));
 
         if (check && primaryKeyFieldWithColumns.size() == 0)
             throw new Exception("需要在实体上使用@ColumnSetting注解设置主键，或使用手动设置临时主键");
@@ -1223,15 +1223,15 @@ public abstract class SqlProvider {
                     if (!StringUtils.hasText(alias_filter)) alias_filter = alias;
 
                     //字段
-                    Field field = RepositoryExtension.getFieldByFieldName(filter.getFieldName(),
-                                                                          entityType,
-                                                                          dtoType.isAnnotationPresent(EntityMapping.class)
-                                                                          ? dtoType
-                                                                          : null);
+                    Field field = EntityTypeHandler.getFieldByFieldName(filter.getFieldName(),
+                                                                        entityType,
+                                                                        dtoType.isAnnotationPresent(EntityMapping.class)
+                                                                        ? dtoType
+                                                                        : null);
 
                     //数据表别名+列名
-                    String column = RepositoryExtension.getColumn(field,
-                                                                  config.getNameConvertType());
+                    String column = EntityTypeHandler.getColumn(field,
+                                                                config.getNameConvertType());
                     if (!StringUtils.hasText(column)) skip = true;
                     else column = getNameWithAlias(column,
                                                    alias_filter);
@@ -1264,21 +1264,21 @@ public abstract class SqlProvider {
                                                         ? Arrays.asList((Object[]) value)
                                                         : (Collection<Object>) value;
                             for (Object item : values) {
-                                value2Columns.add(RepositoryExtension.getColumn(RepositoryExtension.getFieldByFieldName(item.toString(),
-                                                                                                                        entityType,
-                                                                                                                        dtoType.isAnnotationPresent(EntityMapping.class)
-                                                                                                                        ? dtoType
-                                                                                                                        : null),
-                                                                                config.getNameConvertType()));
-                            }
-                        } else if (StringUtils.hasText(String.valueOf(value)))
-                            //单个字段
-                            value2Columns.add(RepositoryExtension.getColumn(RepositoryExtension.getFieldByFieldName(String.valueOf(value),
+                                value2Columns.add(EntityTypeHandler.getColumn(EntityTypeHandler.getFieldByFieldName(item.toString(),
                                                                                                                     entityType,
                                                                                                                     dtoType.isAnnotationPresent(EntityMapping.class)
                                                                                                                     ? dtoType
                                                                                                                     : null),
-                                                                            config.getNameConvertType()));
+                                                                              config.getNameConvertType()));
+                            }
+                        } else if (StringUtils.hasText(String.valueOf(value)))
+                            //单个字段
+                            value2Columns.add(EntityTypeHandler.getColumn(EntityTypeHandler.getFieldByFieldName(String.valueOf(value),
+                                                                                                                entityType,
+                                                                                                                dtoType.isAnnotationPresent(EntityMapping.class)
+                                                                                                                ? dtoType
+                                                                                                                : null),
+                                                                          config.getNameConvertType()));
                         else
                             //无效值
                             skip = true;
@@ -1835,14 +1835,14 @@ public abstract class SqlProvider {
         StringBuilder sql = new StringBuilder();
         if (StringUtils.hasText(order.getFieldName())) {
             //字段
-            Field field = RepositoryExtension.getFieldByFieldName(order.getFieldName(),
-                                                                  entityType,
-                                                                  dtoType.isAnnotationPresent(EntityMapping.class)
-                                                                  ? dtoType
-                                                                  : null);
+            Field field = EntityTypeHandler.getFieldByFieldName(order.getFieldName(),
+                                                                entityType,
+                                                                dtoType.isAnnotationPresent(EntityMapping.class)
+                                                                ? dtoType
+                                                                : null);
 
-            String column = getNameWithAlias(RepositoryExtension.getColumn(field,
-                                                                           config.getNameConvertType()),
+            String column = getNameWithAlias(EntityTypeHandler.getColumn(field,
+                                                                         config.getNameConvertType()),
                                              alias_filter);
 
             OrderMethod method = order.getMethod();
@@ -1894,15 +1894,15 @@ public abstract class SqlProvider {
             if (!StringUtils.hasText(alias_order)) alias_order = alias;
 
             //字段
-            Field field = RepositoryExtension.getFieldByFieldName(order.getFieldName(),
-                                                                  entityType,
-                                                                  dtoType.isAnnotationPresent(EntityMapping.class)
-                                                                  ? dtoType
-                                                                  : null);
+            Field field = EntityTypeHandler.getFieldByFieldName(order.getFieldName(),
+                                                                entityType,
+                                                                dtoType.isAnnotationPresent(EntityMapping.class)
+                                                                ? dtoType
+                                                                : null);
 
             //数据表别名+列名
-            String column = getNameWithAlias(RepositoryExtension.getColumn(field,
-                                                                           config.getNameConvertType()),
+            String column = getNameWithAlias(EntityTypeHandler.getColumn(field,
+                                                                         config.getNameConvertType()),
                                              alias_order);
 
             OrderMethod method = order.getMethod();
@@ -2038,9 +2038,9 @@ public abstract class SqlProvider {
                            : columns2Sql(CollectionsExtension.anyPlus(executor.getCustomFieldNames())
                                          ? executor.getCustomFieldNames()
                                                    .stream()
-                                                   .map(c -> RepositoryExtension.getColumnByFieldName(c,
-                                                                                                      executor.getEntityType(),
-                                                                                                      config.getNameConvertType()))
+                                                   .map(c -> EntityTypeHandler.getColumnByFieldName(c,
+                                                                                                    executor.getEntityType(),
+                                                                                                    config.getNameConvertType()))
                                                    .collect(Collectors.toList())
                                          : getColumns(executor.getEntityType(),
                                                       executor.getDtoType(),
@@ -2170,10 +2170,10 @@ public abstract class SqlProvider {
                             noParameter,
                             withoutOrderBy,
                             String.format("MAX(%s)",
-                                          getNameWithAlias(RepositoryExtension.getColumnByFieldName(executor.getCustomFieldNames()
-                                                                                                            .get(0),
-                                                                                                    executor.getEntityType(),
-                                                                                                    config.getNameConvertType()),
+                                          getNameWithAlias(EntityTypeHandler.getColumnByFieldName(executor.getCustomFieldNames()
+                                                                                                          .get(0),
+                                                                                                  executor.getEntityType(),
+                                                                                                  config.getNameConvertType()),
                                                            executor.getAlias())),
                             null,
                             null,
@@ -2197,10 +2197,10 @@ public abstract class SqlProvider {
                             noParameter,
                             withoutOrderBy,
                             String.format("MIN(%s)",
-                                          getNameWithAlias(RepositoryExtension.getColumnByFieldName(executor.getCustomFieldNames()
-                                                                                                            .get(0),
-                                                                                                    executor.getEntityType(),
-                                                                                                    config.getNameConvertType()),
+                                          getNameWithAlias(EntityTypeHandler.getColumnByFieldName(executor.getCustomFieldNames()
+                                                                                                          .get(0),
+                                                                                                  executor.getEntityType(),
+                                                                                                  config.getNameConvertType()),
                                                            executor.getAlias())),
                             null,
                             null,
@@ -2223,10 +2223,10 @@ public abstract class SqlProvider {
                             noParameter,
                             true,
                             String.format("AVG(%s)",
-                                          getNameWithAlias(RepositoryExtension.getColumnByFieldName(executor.getCustomFieldNames()
-                                                                                                            .get(0),
-                                                                                                    executor.getEntityType(),
-                                                                                                    config.getNameConvertType()),
+                                          getNameWithAlias(EntityTypeHandler.getColumnByFieldName(executor.getCustomFieldNames()
+                                                                                                          .get(0),
+                                                                                                  executor.getEntityType(),
+                                                                                                  config.getNameConvertType()),
                                                            executor.getAlias())),
                             null,
                             null,
@@ -2249,10 +2249,10 @@ public abstract class SqlProvider {
                             noParameter,
                             true,
                             String.format("SUM(%s)",
-                                          getNameWithAlias(RepositoryExtension.getColumnByFieldName(executor.getCustomFieldNames()
-                                                                                                            .get(0),
-                                                                                                    executor.getEntityType(),
-                                                                                                    config.getNameConvertType()),
+                                          getNameWithAlias(EntityTypeHandler.getColumnByFieldName(executor.getCustomFieldNames()
+                                                                                                          .get(0),
+                                                                                                  executor.getEntityType(),
+                                                                                                  config.getNameConvertType()),
                                                            executor.getAlias())),
                             null,
                             null,

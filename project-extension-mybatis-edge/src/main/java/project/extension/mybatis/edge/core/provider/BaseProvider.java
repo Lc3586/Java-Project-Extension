@@ -13,7 +13,7 @@ import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.extention.CommonUtils;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 /**
  * 数据仓储构造器
@@ -39,23 +39,23 @@ public class BaseProvider
     @Override
     public <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
-            ApplicationException {
-        return new DefaultRepository<>(entityType,
+            ModuleException {
+        return new DefaultRepository<>(this,
+                                       entityType,
                                        DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                                           .getDataSourceConfig(),
-                                                                this.aop));
+                                                                           .getDataSourceConfig()));
     }
 
     @Override
     public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
                                                                     Class<TKey> keyType)
             throws
-            ApplicationException {
-        return new DefaultRepository_Key<>(entityType,
+            ModuleException {
+        return new DefaultRepository_Key<>(this,
+                                           entityType,
                                            keyType,
                                            DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                                               .getDataSourceConfig(),
-                                                                    this.aop));
+                                                                               .getDataSourceConfig()));
     }
 
     /**
@@ -64,7 +64,7 @@ public class BaseProvider
     @Override
     public INaiveAdo getAdo()
             throws
-            ApplicationException {
+            ModuleException {
         return this.ado;
     }
 
@@ -74,27 +74,25 @@ public class BaseProvider
     @Override
     public INaiveAop getAop()
             throws
-            ApplicationException {
+            ModuleException {
         return this.aop;
     }
 
     @Override
     public IDbFirst getDbFirst()
             throws
-            ApplicationException {
+            ModuleException {
         return DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                   .getDataSourceConfig(),
-                                        this.aop)
-                         .createDbFirst();
+                                                   .getDataSourceConfig())
+                         .createDbFirst(ado);
     }
 
     @Override
     public ICodeFirst getCodeFirst()
             throws
-            ApplicationException {
+            ModuleException {
         return DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                   .getDataSourceConfig(),
-                                        this.aop)
-                         .createCodeFirst();
+                                                   .getDataSourceConfig())
+                         .createCodeFirst(ado);
     }
 }

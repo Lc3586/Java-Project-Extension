@@ -1,12 +1,13 @@
 package project.extension.mybatis.edge.core.provider.dameng;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
 import project.extension.tuple.Tuple2;
@@ -26,8 +27,10 @@ import java.util.stream.Collectors;
  */
 public class DamengDbFirst
         extends DbFirst {
-    public DamengDbFirst(DataSourceConfig config) {
+    public DamengDbFirst(DataSourceConfig config,
+                         INaiveAdo ado) {
         super(config,
+              ado,
               "DamengDbFirst");
         initialization();
     }
@@ -385,13 +388,14 @@ public class DamengDbFirst
                                                                    tbname[1])
                                                    : " is null"));
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -429,13 +433,14 @@ public class DamengDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -473,13 +478,14 @@ public class DamengDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -535,13 +541,14 @@ public class DamengDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return this.ado.selectMapList(getSqlSession(),
+                                      getMSId(MD5Utils.hash(sql)),
+                                      sql,
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      config.getNameConvertType());
     }
 
     /**
@@ -554,14 +561,15 @@ public class DamengDbFirst
             Exception {
         //从数据库中查询
         String sql = " select username from user_users";
-        return SqlSessionExtension.selectOne(getSqlSession(),
-                                             getMSId(MD5Utils.hash(sql)),
-                                             sql,
-                                             null,
-                                             null,
-                                             String.class,
-                                             true,
-                                             config.getNameConvertType());
+        return this.ado.selectOne(getSqlSession(),
+                                  getMSId(MD5Utils.hash(sql)),
+                                  sql,
+                                  null,
+                                  null,
+                                  String.class,
+                                  null,
+                                  null,
+                                  config.getNameConvertType());
     }
 
     /**
@@ -575,7 +583,8 @@ public class DamengDbFirst
             Exception {
         Matcher matcher = Pattern.compile("jdbc:dm://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
-                                 .matcher(config.getConnectionString());
+                                 .matcher(config.getProperties()
+                                                .getProperty(DruidDataSourceFactory.PROP_URL));
         if (!matcher.find())
             throw new Exception("无法从连接字符串中获取用户标识，匹配所使用的正则表达式为 jdbc:dm://(.*?)/(.*?)\\?");
 
@@ -1147,14 +1156,15 @@ public class DamengDbFirst
             throws
             Exception {
         String sql = " select username from all_users";
-        return SqlSessionExtension.selectList(getSqlSession(),
-                                              getMSId(MD5Utils.hash(sql)),
-                                              sql,
-                                              null,
-                                              null,
-                                              String.class,
-                                              true,
-                                              config.getNameConvertType());
+        return this.ado.selectList(getSqlSession(),
+                                   getMSId(MD5Utils.hash(sql)),
+                                   sql,
+                                   null,
+                                   null,
+                                   String.class,
+                                   null,
+                                   null,
+                                   config.getNameConvertType());
     }
 
     @Override
@@ -1209,14 +1219,15 @@ public class DamengDbFirst
                                                    tbname[1])
                                    : " is null");
 
-        return SqlSessionExtension.selectOne(getSqlSession(),
-                                             getMSId(MD5Utils.hash(sql)),
-                                             sql,
-                                             null,
-                                             null,
-                                             Boolean.class,
-                                             true,
-                                             config.getNameConvertType());
+        return this.ado.selectOne(getSqlSession(),
+                                  getMSId(MD5Utils.hash(sql)),
+                                  sql,
+                                  null,
+                                  null,
+                                  Boolean.class,
+                                  null,
+                                  null,
+                                  config.getNameConvertType());
     }
 
     @Override

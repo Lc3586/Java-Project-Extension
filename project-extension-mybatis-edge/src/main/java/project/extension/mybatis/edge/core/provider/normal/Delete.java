@@ -2,13 +2,14 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.DeleterDTO;
 import project.extension.tuple.Tuple2;
@@ -29,9 +30,9 @@ public abstract class Delete<T>
 
     private final SqlProvider sqlProvider;
 
-    private final NaiveAopProvider aop;
+    private final INaiveAdo ado;
 
-    private final boolean withTransactional;
+    private final NaiveAopProvider aop;
 
     private final DeleterDTO deleter;
 
@@ -43,13 +44,12 @@ public abstract class Delete<T>
 
     public Delete(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  INaiveAop aop,
-                  Class<T> entityType,
-                  boolean withTransactional) {
+                  INaiveAdo ado,
+                  Class<T> entityType) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (NaiveAopProvider) aop;
-        this.withTransactional = withTransactional;
+        this.ado = ado;
+        this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.deleter = new DeleterDTO();
         this.entityType = entityType;
         this.msIdPrefix = String.format("Delete:%s",
@@ -62,8 +62,8 @@ public abstract class Delete<T>
      * 初始化
      */
     protected void initialization() {
-        Tuple2<String, String> table = RepositoryExtension.getTableName(entityType,
-                                                                        config.getNameConvertType());
+        Tuple2<String, String> table = EntityTypeHandler.getTableName(entityType,
+                                                                      config.getNameConvertType());
         deleter.setSchema(table.a);
         deleter.setTableName(table.b);
         deleter.setEntityType(entityType);
@@ -110,9 +110,7 @@ public abstract class Delete<T>
      * 获取Sql会话
      */
     protected SqlSession getSqlSession() {
-        return withTransactional
-               ? NaiveSqlSession.current()
-               : null;
+        return ado.getOrCreateSqlSession();
     }
 
     @Override
@@ -265,11 +263,12 @@ public abstract class Delete<T>
                                       deleter.getDtoType()
                                              .getTypeName());
 
-                int currentRows = aop.invokeWithAop(() -> SqlSessionExtension.delete(getSqlSession(),
-                                                                                     msId,
-                                                                                     script,
-                                                                                     deleter.getParameter(),
-                                                                                     config.getNameConvertType()),
+                int currentRows = aop.invokeWithAop(() -> this.ado.delete(getSqlSession(),
+                                                                          msId,
+                                                                          script,
+                                                                          null,
+                                                                          deleter.getParameter(),
+                                                                          config.getNameConvertType()),
                                                     CurdType.删除,
                                                     config.getName(),
                                                     script,
@@ -295,11 +294,12 @@ public abstract class Delete<T>
                                   deleter.getDtoType()
                                          .getTypeName());
 
-            int currentRows = aop.invokeWithAop(() -> SqlSessionExtension.delete(getSqlSession(),
-                                                                                 msId,
-                                                                                 script,
-                                                                                 deleter.getParameter(),
-                                                                                 config.getNameConvertType()),
+            int currentRows = aop.invokeWithAop(() -> this.ado.delete(getSqlSession(),
+                                                                      msId,
+                                                                      script,
+                                                                      null,
+                                                                      deleter.getParameter(),
+                                                                      config.getNameConvertType()),
                                                 CurdType.删除,
                                                 config.getName(),
                                                 script,

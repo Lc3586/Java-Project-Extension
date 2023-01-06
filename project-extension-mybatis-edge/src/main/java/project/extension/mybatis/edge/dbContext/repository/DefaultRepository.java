@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
+import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 
 /**
@@ -11,9 +12,11 @@ import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
  */
 public class DefaultRepository<T>
         extends BaseRepository<T> {
-    public DefaultRepository(Class<T> entityType,
+    public DefaultRepository(INaiveSql orm,
+                             Class<T> entityType,
                              IBaseDbProvider<T> dbProvider) {
-        super(entityType,
+        super(orm,
+              entityType,
               dbProvider);
     }
 

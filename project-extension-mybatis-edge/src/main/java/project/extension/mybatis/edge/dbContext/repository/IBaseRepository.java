@@ -8,21 +8,14 @@ import project.extension.mybatis.edge.core.provider.standard.IUpdate;
 import java.util.Collection;
 
 /**
- * 数据仓储基础接口
+ * 数据仓储基础泛型接口
  *
  * @param <T> 数据类型
  * @author LCTR
  * @date 2022-03-28
  */
-public interface IBaseRepository<T> {
-    /**
-     * 所有操作是否在由springframework管理的事务下运行
-     * <p>如果是 需要在方法上添加此注解 org.springframework.transaction.annotation.Transactional</p>
-     *
-     * @param withTransactional 所有操作是否在由springframework管理的事务下运行
-     */
-    IBaseRepository<T> withTransactional(boolean withTransactional);
-
+public interface IBaseRepository<T>
+        extends IBaseRepositoryBase {
     /**
      * 数据查询对象
      */

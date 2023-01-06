@@ -9,7 +9,7 @@ import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.config.DruidConfig;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class NaiveDataSourceProvider
     @Override
     public Map<String, DataSource> loadAllDataSources()
             throws
-            ApplicationException {
+            ModuleException {
         Map<String, DataSource> dataSourceMap = new HashMap<>();
         for (String dataSource : baseConfig.getAllDataSource()) {
             DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
@@ -65,8 +65,8 @@ public class NaiveDataSourceProvider
             try {
                 druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
             } catch (Exception ex) {
-                throw new ApplicationException(DbContextStrings.getCreateDataSourceFailed(dataSource),
-                                               ex);
+                throw new ModuleException(DbContextStrings.getCreateDataSourceFailed(dataSource),
+                                          ex);
             }
             druidConfig.applyConfig(druidDataSource,
                                     dataSourceConfig.getDbType());

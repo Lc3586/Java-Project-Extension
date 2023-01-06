@@ -1,8 +1,7 @@
-package project.extension.mybatis.edge.extention;
+package project.extension.mybatis.edge.core.mapper;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
@@ -10,15 +9,16 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.*;
 import project.extension.mybatis.edge.config.BaseConfig;
-import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
-import project.extension.mybatis.edge.dbContext.repository.ITransactionAction;
+import project.extension.mybatis.edge.extention.SqlExtension;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.annotations.OpenApiMainTag;
 import project.extension.openapi.annotations.OpenApiMainTags;
 import project.extension.openapi.annotations.OpenApiSchema;
 import project.extension.openapi.extention.SchemaExtension;
 import project.extension.openapi.model.OpenApiSchemaFormat;
-import project.extension.tuple.*;
+import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple2;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -27,18 +27,18 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * 数据仓储拓展方法
+ * 类型处理类
  *
  * @author LCTR
  * @date 2022-03-29
  */
-@Component("RepositoryExtension")
-public class RepositoryExtension {
-    public RepositoryExtension(BaseConfig config) {
-        RepositoryExtension.config = config;
+@Component
+public class EntityTypeHandler {
+    public EntityTypeHandler(BaseConfig config) {
+        this.config = config;
     }
 
-    private static BaseConfig config;
+    private final BaseConfig config;
 
     /**
      * 获取主键字段集合
@@ -147,8 +147,7 @@ public class RepositoryExtension {
                          .map(fieldName -> getColumnByFieldName(fieldName,
                                                                 entityType,
                                                                 nameConvertType))
-                         .collect(
-                                 Collectors.toList());
+                         .collect(Collectors.toList());
     }
 
     /**
@@ -166,9 +165,8 @@ public class RepositoryExtension {
         while (true) {
             for (Field field : entityType.getDeclaredFields()) {
                 if (field.getName()
-                         .equals(fieldName))
-                    return getColumn(field,
-                                     nameConvertType);
+                         .equals(fieldName)) return getColumn(field,
+                                                              nameConvertType);
             }
 
             //递归处理父类类型
@@ -192,7 +190,7 @@ public class RepositoryExtension {
      * @param entityType 实体类型
      * @return a: 模式名（可能为空）, b: 表名
      */
-    public static Tuple2<String, String> getTableName(Class<?> entityType) {
+    public Tuple2<String, String> getTableName(Class<?> entityType) {
         return getTableName(entityType,
                             config.getNameConvertType());
     }
@@ -215,9 +213,8 @@ public class RepositoryExtension {
             result.b = tableSettingAttribute.name();
         }
 
-        if (!StringUtils.hasText(result.b))
-            result.b = SqlExtension.convertName(entityType.getSimpleName(),
-                                                nameConvertType);
+        if (!StringUtils.hasText(result.b)) result.b = SqlExtension.convertName(entityType.getSimpleName(),
+                                                                                nameConvertType);
         return result;
     }
 
@@ -249,9 +246,7 @@ public class RepositoryExtension {
      */
     public static Field getFieldByColumn(String column,
                                          Class<?> entityType,
-                                         NameConvertType nameConvertType)
-            throws
-            NoSuchFieldException {
+                                         NameConvertType nameConvertType) {
         Field result = null;
 
         while (true) {
@@ -277,9 +272,8 @@ public class RepositoryExtension {
         }
 
         if (result == null)
-            throw new NoSuchFieldException(String.format("未在实体%s中找到列%s对应的字段",
-                                                         entityType.getTypeName(),
-                                                         column));
+            throw new ModuleException(DbContextStrings.getEntityField4ColumnUndefined(entityType.getTypeName(),
+                                                                                      column));
 
         return result;
     }
@@ -316,8 +310,7 @@ public class RepositoryExtension {
 
             for (Field field : entityType.getDeclaredFields()) {
                 if (isIgnoreColumn(field,
-                                   withOutPrimaryKey))
-                    continue;
+                                   withOutPrimaryKey)) continue;
 
                 //必须是业务模型才会包括那些添加了实体映射设置的字段
 //                if (entityMappingAttribute != null
@@ -364,9 +357,7 @@ public class RepositoryExtension {
                                                    Collection<String> customTags,
                                                    boolean withOutPrimaryKey,
                                                    boolean inherit,
-                                                   NameConvertType nameConvertType)
-            throws
-            NoSuchFieldException {
+                                                   NameConvertType nameConvertType) {
         return getColumns(getColumnFieldsByDtoType(dtoType,
                                                    mainTagLevel,
                                                    customTags,
@@ -383,15 +374,12 @@ public class RepositoryExtension {
      * @param customTags        自定义标签
      * @param withOutPrimaryKey 排除主键
      * @param inherit           仅继承成员
-     * @return 字段集合
      */
     public static List<Field> getColumnFieldsByDtoType(Class<?> dtoType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean inherit)
-            throws
-            NoSuchFieldException {
+                                                       boolean inherit) {
         List<Field> fields = new ArrayList<>();
 
         EntityMapping entityMappingAttribute = null;
@@ -404,20 +392,17 @@ public class RepositoryExtension {
                 for (Field field : dtoType.getDeclaredFields()) {
                     getColumnField(field,
                                    entityMappingAttribute,
-                                   withOutPrimaryKey)
-                            .ifPresent(x -> {
-                                //是否忽略列
-                                if (!isIgnoreColumn(field,
-                                                    withOutPrimaryKey))
-                                    fields.add(x);
-                            });
+                                   withOutPrimaryKey).ifPresent(x -> {
+                        //是否忽略列
+                        if (!isIgnoreColumn(field,
+                                            withOutPrimaryKey)) fields.add(x);
+                    });
                 }
             }
         }
 
         //如果指定了标签则获取继承类的信息
-        if (dtoType.isAnnotationPresent(OpenApiMainTag.class)
-                || dtoType.isAnnotationPresent(OpenApiMainTags.class)) {
+        if (dtoType.isAnnotationPresent(OpenApiMainTag.class) || dtoType.isAnnotationPresent(OpenApiMainTags.class)) {
             //继承到实体的业务模型
             List<String> tags = new ArrayList<>();
             String[] mainTags = SchemaExtension.getMainTag(dtoType,
@@ -440,14 +425,12 @@ public class RepositoryExtension {
                                              .collect(Collectors.toList());
             } else if (entityMappingAttribute == null)
                 //如果没有标签，则直接使用实体类的所有相关字段
-                openApiFields = RepositoryExtension.getColumnFieldsByEntityType(RepositoryExtension.getEntityType(dtoType),
-                                                                                withOutPrimaryKey);
+                openApiFields = getColumnFieldsByEntityType(getEntityType(dtoType),
+                                                            withOutPrimaryKey);
 
-            if (CollectionsExtension.anyPlus(openApiFields))
-                fields.addAll(openApiFields);
-        } else if (entityMappingAttribute == null)
-            fields.addAll(RepositoryExtension.getColumnFieldsByEntityType(RepositoryExtension.getEntityType(dtoType),
-                                                                          withOutPrimaryKey));
+            if (CollectionsExtension.anyPlus(openApiFields)) fields.addAll(openApiFields);
+        } else if (entityMappingAttribute == null) fields.addAll(getColumnFieldsByEntityType(getEntityType(dtoType),
+                                                                                             withOutPrimaryKey));
 
         return fields;
     }
@@ -458,41 +441,52 @@ public class RepositoryExtension {
      * @param field                  字段
      * @param entityMappingAttribute 实体映射设置
      * @param withOutPrimaryKey      排除主键
-     * @return 字段
      */
     public static Optional<Field> getColumnField(Field field,
                                                  EntityMapping entityMappingAttribute,
-                                                 boolean withOutPrimaryKey)
-            throws
-            NoSuchFieldException {
+                                                 boolean withOutPrimaryKey) {
         if (isIgnoreField(field)) return Optional.empty();
 
         EntityMappingSetting entityMappingSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                             EntityMappingSetting.class);
         String entityFieldName = field.getName();
         Field entityField;
+
         if (entityMappingSettingAttribute != null) {
             //忽略字段或者忽略主键
-            if (entityMappingSettingAttribute.ignore() || (
-                    withOutPrimaryKey
-                            && entityMappingSettingAttribute.primaryKey()))
-                return Optional.empty();
+            if (entityMappingSettingAttribute.ignore() || (withOutPrimaryKey
+                    && entityMappingSettingAttribute.primaryKey())) return Optional.empty();
 
             //列名来自字段本身
             if (entityMappingSettingAttribute.self()) {
                 return Optional.of(field);
             } else {
-                entityField = (entityMappingSettingAttribute.entityType()
-                                                            .equals(Void.class)
-                               ? entityMappingAttribute.entityType()
-                               : entityMappingSettingAttribute.entityType())
-                        .getDeclaredField(StringUtils.hasText(entityMappingSettingAttribute.entityFieldName())
-                                          ? entityMappingSettingAttribute.entityFieldName()
-                                          : entityFieldName);
+                Class<?> entityType = entityMappingSettingAttribute.entityType()
+                                                                   .equals(Void.class)
+                                      ? entityMappingAttribute.entityType()
+                                      : entityMappingSettingAttribute.entityType();
+                entityFieldName = StringUtils.hasText(entityMappingSettingAttribute.entityFieldName())
+                                  ? entityMappingSettingAttribute.entityFieldName()
+                                  : entityFieldName;
+
+                try {
+                    entityField = entityType.getDeclaredField(entityFieldName);
+                } catch (NoSuchFieldException ex) {
+                    throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityType.getTypeName(),
+                                                                                       entityFieldName),
+                                              ex);
+                }
             }
-        } else
-            entityField = entityMappingAttribute.entityType()
-                                                .getDeclaredField(entityFieldName);
+        } else {
+            Class<?> entityType = entityMappingAttribute.entityType();
+            try {
+                entityField = entityType.getDeclaredField(entityFieldName);
+            } catch (NoSuchFieldException ex) {
+                throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityType.getTypeName(),
+                                                                                   entityFieldName),
+                                          ex);
+            }
+        }
 
         return Optional.of(entityField);
     }
@@ -539,37 +533,40 @@ public class RepositoryExtension {
      * @param fieldName         字段名
      * @param modelType         模型类型
      * @param entityMappingType 映射模型类型
-     * @return 字段
-     * @throws NoSuchFieldException 未找到字段
      */
     public static Field getFieldByFieldName(String fieldName,
                                             Class<?> modelType,
-                                            Class<?> entityMappingType)
-            throws
-            NoSuchFieldException {
+                                            Class<?> entityMappingType) {
         try {
             //搜索模型类型的字段
             return modelType.getDeclaredField(fieldName);
-        } catch (NoSuchFieldException ex) {
+        } catch (NoSuchFieldException ex1) {
             //搜索模型类型基类的字段
             Class<?> superClazz = SchemaExtension.getSuperModelType(modelType);
-            if (!superClazz.equals(Object.class) && !superClazz.equals(modelType))
-                return getFieldByFieldName(fieldName,
-                                           superClazz,
-                                           entityMappingType);
+            if (!superClazz.equals(Object.class) && !superClazz.equals(modelType)) return getFieldByFieldName(fieldName,
+                                                                                                              superClazz,
+                                                                                                              entityMappingType);
 
             //搜索映射模型的字段
             if (entityMappingType != null) {
-                Field mappingField = entityMappingType.getDeclaredField(fieldName);
+                Field mappingField;
+                try {
+                    mappingField = entityMappingType.getDeclaredField(fieldName);
+                } catch (NoSuchFieldException ex2) {
+                    throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityMappingType.getTypeName(),
+                                                                                       fieldName),
+                                              ex2);
+                }
                 Optional<Field> optionalField = getColumnField(mappingField,
                                                                AnnotationUtils.findAnnotation(entityMappingType,
                                                                                               EntityMapping.class),
                                                                false);
-                if (optionalField.isPresent())
-                    return optionalField.get();
+                if (optionalField.isPresent()) return optionalField.get();
             }
 
-            throw ex;
+            throw new ModuleException(DbContextStrings.getEntityFieldUndefined(modelType.getTypeName(),
+                                                                               fieldName),
+                                      ex1);
         }
     }
 
@@ -580,8 +577,8 @@ public class RepositoryExtension {
      * @param fieldName 字段名
      * @return 值
      */
-    public static Object getMapValueByFieldName(Map<String, Object> mapResult,
-                                                String fieldName) {
+    public Object getMapValueByFieldName(Map<String, Object> mapResult,
+                                         String fieldName) {
         return mapResult.get(SqlExtension.convertName(fieldName,
                                                       config.getNameConvertType()));
     }
@@ -608,14 +605,10 @@ public class RepositoryExtension {
      * @param entityType      实体类型
      * @param nameConvertType 命名规则
      * @param <T>             实体类型
-     * @return Jdbc数据类型
-     * @throws NoSuchFieldException 未找到字段
      */
     public static <T> JdbcType getJdbcTypeByColumn(String column,
                                                    Class<T> entityType,
-                                                   NameConvertType nameConvertType)
-            throws
-            NoSuchFieldException {
+                                                   NameConvertType nameConvertType) {
         return getJdbcType(getFieldByColumn(column,
                                             entityType,
                                             nameConvertType));
@@ -627,13 +620,9 @@ public class RepositoryExtension {
      * @param fieldName  字段名
      * @param entityType 实体类型
      * @param <T>        实体类型
-     * @return Jdbc数据类型
-     * @throws NoSuchFieldException 未找到字段
      */
     public static <T> JdbcType getJdbcType(String fieldName,
-                                           Class<T> entityType)
-            throws
-            NoSuchFieldException {
+                                           Class<T> entityType) {
         return getJdbcType(getFieldByFieldName(fieldName,
                                                entityType,
                                                null));
@@ -657,7 +646,6 @@ public class RepositoryExtension {
      * <hr>
      *
      * @param field 字段
-     * @return Jdbc数据类型
      */
     public static JdbcType getJdbcType(Field field) {
         MappingSetting mappingSettingAttribute = AnnotationUtils.findAnnotation(field,
@@ -732,8 +720,7 @@ public class RepositoryExtension {
             }
             if (StringUtils.hasText(format)) {
                 if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?:\\d\\d?$",
-                                    format))
-                    return JdbcType.TIMESTAMP;
+                                    format)) return JdbcType.TIMESTAMP;
                 else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d?$",
                                          format)) return JdbcType.DATE;
                 else if (Pattern.matches("^\\d\\d?:\\d\\d?:\\d\\d?",
@@ -768,53 +755,16 @@ public class RepositoryExtension {
     }
 
     /**
-     * 运行事务
-     * <p>代码运行成功后事务会自动提交</p>
-     * <p>代码运行失败会自动回滚，并抛出异常</p>
-     * <p>如需手动回滚，则主动抛出异常即可</p>
-     *
-     * @param action 事件
-     * @return a:是否成功，b:异常信息
-     */
-    public static Tuple2<Boolean, Exception> runTransaction(ITransactionAction action) {
-        return runTransaction(null,
-                              action);
-    }
-
-    /**
-     * 运行事务
-     * <p>代码运行成功后事务会自动提交</p>
-     * <p>代码运行失败会自动回滚，并抛出异常</p>
-     * <p>如需手动回滚，则主动抛出异常即可</p>
-     *
-     * @param action 事件
-     * @return a:是否成功，b:异常信息
-     */
-    public static Tuple2<Boolean, Exception> runTransaction(TransactionIsolationLevel level,
-                                                            ITransactionAction action) {
-        try {
-            NaiveSqlSession.runTransaction(level,
-                                           action);
-            return new Tuple2<>(true,
-                                null);
-        } catch (Exception ex) {
-            return new Tuple2<>(false,
-                                ex);
-        }
-    }
-
-    /**
      * 获取实体类型
      *
      * @param type 类型
      */
-    public static Class<?> getEntityType(Class<?> type)
-            throws
-            NoSuchFieldException {
+    public static Class<?> getEntityType(Class<?> type) {
         if (type.getDeclaredAnnotation(TableSetting.class) != null) return type;
 
         Class<?> superClassz = type.getSuperclass();
-        if (superClassz.equals(Object.class) || superClassz.equals(type)) throw new NoSuchFieldException("未找到实体类型");
+        if (superClassz.equals(Object.class) || superClassz.equals(type))
+            throw new ModuleException(DbContextStrings.getEntityUndefined(type.getTypeName()));
         return getEntityType(superClassz);
     }
 }

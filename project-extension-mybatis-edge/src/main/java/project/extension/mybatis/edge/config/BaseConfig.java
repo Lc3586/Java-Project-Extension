@@ -9,7 +9,7 @@ import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.mybatis.edge.model.NameConvertType;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -201,7 +201,7 @@ public class BaseConfig {
                 if (!StringUtils.hasText(this.getDataSource())) {
                     if (this.getMultiDataSource()
                             .size() > 1)
-                        throw new ApplicationException(DbContextStrings.getConfigDataSourceNameUndefined());
+                        throw new ModuleException(DbContextStrings.getConfigDataSourceNameUndefined());
 
                     //设置默认数据源为master
                     this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATASOURCE);
@@ -220,7 +220,7 @@ public class BaseConfig {
      */
     public DataSourceConfig getDataSourceConfig(String dataSource)
             throws
-            ApplicationException {
+            ModuleException {
         if (multiDataSource == null)
             multiDataSource = new HashMap<>();
 
@@ -257,10 +257,10 @@ public class BaseConfig {
                                                       })
                                                       .findAny();
         if (!matchConfig.isPresent())
-            throw new ApplicationException(DbContextStrings.getConfigDataSourceUndefined(dataSource));
+            throw new ModuleException(DbContextStrings.getConfigDataSourceUndefined(dataSource));
 
         if (count.get() > 1)
-            throw new ApplicationException(DbContextStrings.getConfigDataSourceRepeat(dataSource));
+            throw new ModuleException(DbContextStrings.getConfigDataSourceRepeat(dataSource));
 
         DataSourceConfig config = multiDataSource.get(matchConfig.get());
 
@@ -273,8 +273,8 @@ public class BaseConfig {
             config.setDbType(this.getDbType());
 
         if (config.getDbType() == null)
-            throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
-                                                                                               "dbType"));
+            throw new ModuleException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                          "dbType"));
 
         if (config.getNameConvertType() == null)
             config.setNameConvertType(this.getNameConvertType());
@@ -283,8 +283,8 @@ public class BaseConfig {
             config.setConfigLocation(this.getConfigLocation());
 
         if (!StringUtils.hasText(config.getConfigLocation()))
-            throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
-                                                                                               "configLocation"));
+            throw new ModuleException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                          "configLocation"));
 
         config.getProperties()
               .computeIfAbsent(DruidDataSourceFactory.PROP_URL,
@@ -308,8 +308,8 @@ public class BaseConfig {
                       .get(property) == null
                     || !StringUtils.hasText((String) config.getProperties()
                                                            .get(property)))
-                throw new ApplicationException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
-                                                                                                   property));
+                throw new ModuleException(DbContextStrings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                              property));
         }
 
         return config;

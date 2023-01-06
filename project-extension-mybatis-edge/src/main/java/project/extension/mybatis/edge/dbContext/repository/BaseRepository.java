@@ -1,7 +1,17 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
+import org.apache.ibatis.session.TransactionIsolationLevel;
+import project.extension.action.IAction0;
+import project.extension.func.IFunc1;
+import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
+import project.extension.mybatis.edge.dbContext.RepositoryDbContext;
+import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
+import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.DynamicSqlSetting;
+import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
 
@@ -17,31 +27,96 @@ import java.util.Collection;
  */
 public class BaseRepository<T>
         implements IBaseRepository<T> {
-    protected final DynamicSqlSetting<T> setting;
-    protected final IBaseDbProvider<T> dbProvider;
-
-    protected boolean useTransactional = false;
-
     /**
      * @param entityType 实体类型
      * @param dbProvider 基础构造器
      */
-    public BaseRepository(Class<T> entityType,
+    public BaseRepository(INaiveSql orm,
+                          Class<T> entityType,
                           IBaseDbProvider<T> dbProvider) {
+        this.ormScoped = DbContextScopedNaiveSql.create(orm,
+                                                        this::getDb,
+                                                        this::getUnitOfWork);
         this.setting = new DynamicSqlSetting<>(entityType);
         this.dbProvider = dbProvider;
     }
 
+    protected DbContextScopedNaiveSql ormScoped;
+
+    protected RepositoryDbContext db;
+
+    protected IUnitOfWork unitOfWork;
+
+    protected final DynamicSqlSetting<T> setting;
+    protected final IBaseDbProvider<T> dbProvider;
+
+    private RepositoryDbContext getDb() {
+        if (this.db == null)
+            this.db = new RepositoryDbContext(getOrm(),
+                                              this);
+        return this.db;
+    }
+
     @Override
-    public IBaseRepository<T> withTransactional(boolean withTransactional) {
-        this.useTransactional = withTransactional;
-        return this;
+    public Class<?> getEntityType() {
+        return this.setting.getEntityType();
+    }
+
+    @Override
+    public IUnitOfWork getUnitOfWork() {
+        return this.unitOfWork;
+    }
+
+    @Override
+    public void setUnitOfWork(IUnitOfWork unitOfWork) {
+        this.unitOfWork = unitOfWork;
+        if (this.db != null)
+            this.db.setUnitOfWork(unitOfWork);
+    }
+
+    @Override
+    public INaiveSql getOrm() {
+        return this.ormScoped.getOriginalOrm();
+    }
+
+    @Override
+    public void asType(Class<?> entityType) {
+        throw new ModuleException(DbContextStrings.getFunctionNotImplemented());
+    }
+
+    @Override
+    public void asTable(IFunc1<String, String> change) {
+        throw new ModuleException(DbContextStrings.getFunctionNotImplemented());
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
+        return transaction(null,
+                           handler);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
+                                                  IAction0 handler) {
+        try {
+            if (isolationLevel != null)
+                getUnitOfWork().setIsolationLevel(isolationLevel);
+            getUnitOfWork().getOrBeginTransaction();
+            handler.invoke();
+            getUnitOfWork().commit();
+            return new Tuple2<>(true,
+                                null);
+        } catch (Exception ex) {
+            getUnitOfWork().rollback();
+            return new Tuple2<>(false,
+                                ex);
+        }
     }
 
     @Override
     public ISelect<T> select() {
         return dbProvider.createSelect(setting.getEntityType(),
-                                       useTransactional);
+                                       this.ormScoped.getAdo());
     }
 
     @Override
@@ -49,7 +124,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createInsert(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .appendData(data)
                       .executeAffrows() <= 0)
             throw new Exception("执行操作失败");
@@ -62,7 +137,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createInsert(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .appendData(data)
                       .asDto(dtoType)
                       .mainTagLevel(mainTagLevel)
@@ -75,7 +150,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createInsert(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .appendData(data)
                       .executeAffrows() != data.size())
             throw new Exception("执行操作失败");
@@ -88,7 +163,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createInsert(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .appendData(data)
                       .asDto(dtoType)
                       .mainTagLevel(mainTagLevel)
@@ -99,7 +174,7 @@ public class BaseRepository<T>
     @Override
     public IInsert<T> insertDiy() {
         return dbProvider.createInsert(setting.getEntityType(),
-                                       useTransactional);
+                                       this.ormScoped.getAdo());
     }
 
     @Override
@@ -107,7 +182,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createUpdate(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .executeAffrows() < 0)
             throw new Exception("执行操作失败");
@@ -120,7 +195,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createUpdate(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .asDto(dtoType)
                       .mainTagLevel(mainTagLevel)
@@ -133,7 +208,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createUpdate(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .executeAffrows() < 0)
             throw new Exception("执行操作失败");
@@ -146,7 +221,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createUpdate(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .asDto(dtoType)
                       .mainTagLevel(mainTagLevel)
@@ -157,7 +232,7 @@ public class BaseRepository<T>
     @Override
     public IUpdate<T> updateDiy() {
         return dbProvider.createUpdate(setting.getEntityType(),
-                                       useTransactional);
+                                       this.ormScoped.getAdo());
     }
 
     @Override
@@ -165,7 +240,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createDelete(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .executeAffrows() < 0)
             throw new Exception("执行操作失败");
@@ -177,7 +252,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createDelete(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .asDto(dtoType)
                       .executeAffrows() < 0)
@@ -189,7 +264,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createDelete(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .executeAffrows() < 0)
             throw new Exception("执行操作失败");
@@ -201,7 +276,7 @@ public class BaseRepository<T>
             throws
             Exception {
         if (dbProvider.createDelete(setting.getEntityType(),
-                                    useTransactional)
+                                    this.ormScoped.getAdo())
                       .setSource(data)
                       .asDto(dtoType)
                       .executeAffrows() < 0)
@@ -211,6 +286,6 @@ public class BaseRepository<T>
     @Override
     public IDelete<T> deleteDiy() {
         return dbProvider.createDelete(setting.getEntityType(),
-                                       useTransactional);
+                                       this.ormScoped.getAdo());
     }
 }

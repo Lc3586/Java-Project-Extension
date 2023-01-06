@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.core.provider.normal;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.util.StringUtils;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.model.DbTypeToJavaType;
 import project.extension.mybatis.edge.model.DbColumnInfo;
@@ -24,8 +24,10 @@ import java.util.regex.Pattern;
 public abstract class DbFirst
         implements IDbFirst {
     public DbFirst(DataSourceConfig config,
+                   INaiveAdo ado,
                    String msIdPrefix) {
         this.config = config;
+        this.ado = ado;
         this.msIdPrefix = msIdPrefix;
     }
 
@@ -37,6 +39,8 @@ public abstract class DbFirst
     protected boolean withTransactional = false;
 
     protected final DataSourceConfig config;
+
+    protected final INaiveAdo ado;
 
     private final String msIdPrefix;
 
@@ -56,9 +60,7 @@ public abstract class DbFirst
      * 获取Sql会话
      */
     protected SqlSession getSqlSession() {
-        return withTransactional
-               ? NaiveSqlSession.current()
-               : null;
+        return ado.getOrCreateSqlSession();
     }
 
     /**

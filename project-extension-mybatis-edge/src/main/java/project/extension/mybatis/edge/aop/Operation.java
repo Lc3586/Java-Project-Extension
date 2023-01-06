@@ -8,5 +8,5 @@ package project.extension.mybatis.edge.aop;
  */
 public enum Operation {
     UnitOfWork,
-
+    BeginTransaction
 }

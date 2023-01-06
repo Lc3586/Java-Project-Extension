@@ -2,12 +2,13 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
+import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.InserterDTO;
 import project.extension.tuple.Tuple2;
@@ -28,9 +29,9 @@ public abstract class Insert<T>
 
     private final SqlProvider sqlProvider;
 
-    private final NaiveAopProvider aop;
+    private final INaiveAdo ado;
 
-    private final boolean withTransactional;
+    private final NaiveAopProvider aop;
 
     private final InserterDTO inserter;
 
@@ -40,13 +41,12 @@ public abstract class Insert<T>
 
     public Insert(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  INaiveAop aop,
-                  Class<T> entityType,
-                  boolean withTransactional) {
+                  INaiveAdo ado,
+                  Class<T> entityType) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (NaiveAopProvider) aop;
-        this.withTransactional = withTransactional;
+        this.ado = ado;
+        this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.inserter = new InserterDTO();
         this.entityType = entityType;
         this.msIdPrefix = String.format("Insert:%s",
@@ -58,8 +58,8 @@ public abstract class Insert<T>
      * 初始化
      */
     protected void initialization() {
-        Tuple2<String, String> table = RepositoryExtension.getTableName(entityType,
-                                                                        config.getNameConvertType());
+        Tuple2<String, String> table = EntityTypeHandler.getTableName(entityType,
+                                                                      config.getNameConvertType());
         inserter.setSchema(table.a);
         inserter.setTableName(table.b);
         inserter.setEntityType(entityType);
@@ -101,9 +101,7 @@ public abstract class Insert<T>
      * 获取Sql会话
      */
     protected SqlSession getSqlSession() {
-        return withTransactional
-               ? NaiveSqlSession.current()
-               : null;
+        return ado.getOrCreateSqlSession();
     }
 
     @Override
@@ -219,10 +217,11 @@ public abstract class Insert<T>
                                           .getTypeName());
 
             //批量插入
-            int currentRows = aop.invokeWithAop(() -> SqlSessionExtension.insert(
+            int currentRows = aop.invokeWithAop(() -> this.ado.insert(
                                                         getSqlSession(),
                                                         msId,
                                                         script,
+                                                        null,
                                                         inserter.getParameter(),
                                                         config.getNameConvertType()),
                                                 CurdType.插入,

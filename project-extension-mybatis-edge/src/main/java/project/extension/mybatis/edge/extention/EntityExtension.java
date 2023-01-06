@@ -8,7 +8,7 @@ import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.authentication.IAuthenticationService;
 import project.extension.standard.entity.Base_Fields;
 import project.extension.standard.entity.IEntityExtension;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -100,7 +100,7 @@ public class EntityExtension
     private Object getDateValue(Field field,
                                 Date date)
             throws
-            ApplicationException {
+            ModuleException {
         Class<?> fieldType = field.getType();
         if (fieldType.equals(Date.class)) return new Date();
         else if (fieldType.equals(Long.class)) return new Date().getTime();
@@ -108,7 +108,7 @@ public class EntityExtension
             return DateExtension.format(field,
                                         date);
         } else
-            throw new ApplicationException(DbContextStrings.getUnsupportedDateType(fieldType.getTypeName()));
+            throw new ModuleException(DbContextStrings.getUnsupportedDateType(fieldType.getTypeName()));
     }
 
     /**
@@ -118,7 +118,7 @@ public class EntityExtension
      */
     private <T> void setPrimaryKey(T entity)
             throws
-            ApplicationException {
+            ModuleException {
         Class<?> classz = entity.getClass();
 
         while (true) {
@@ -133,8 +133,8 @@ public class EntityExtension
                             field.set(entity,
                                       newLongId());
                         } catch (IllegalAccessException ex) {
-                            throw new ApplicationException(DbContextStrings.getEntityInitializationFailed(),
-                                                           ex);
+                            throw new ModuleException(DbContextStrings.getEntityInitializationFailed(),
+                                                      ex);
                         }
                     } else if (fieldType.equals(String.class)) {
                         try {
@@ -143,11 +143,11 @@ public class EntityExtension
                                       ? newStringId()
                                       : newStringId("O"));
                         } catch (Throwable ex) {
-                            throw new ApplicationException(DbContextStrings.getEntityInitializationFailed(),
-                                                           ex);
+                            throw new ModuleException(DbContextStrings.getEntityInitializationFailed(),
+                                                      ex);
                         }
                     } else
-                        throw new ApplicationException(DbContextStrings.getUnsupportedDataType4PrimaryKey(fieldType.getTypeName()));
+                        throw new ModuleException(DbContextStrings.getUnsupportedDataType4PrimaryKey(fieldType.getTypeName()));
                 }
             }
 
@@ -170,7 +170,7 @@ public class EntityExtension
                                      String[] setUserIdFields,
                                      String[] setDateFields)
             throws
-            ApplicationException {
+            ModuleException {
         Class<?> classz = entity.getClass();
 
         while (true) {
@@ -194,8 +194,8 @@ public class EntityExtension
                                   getDateValue(field,
                                                new Date()));
                     } catch (IllegalAccessException ex) {
-                        throw new ApplicationException(DbContextStrings.getSetupOperatorTimeFailed(),
-                                                       ex);
+                        throw new ModuleException(DbContextStrings.getSetupOperatorTimeFailed(),
+                                                  ex);
                     }
                 }
             }
@@ -221,7 +221,7 @@ public class EntityExtension
 
     public <T> T initialization(T entity)
             throws
-            ApplicationException {
+            ModuleException {
         setPrimaryKey(entity);
         setOperatorInfo(entity,
                         createByFields,
@@ -231,7 +231,7 @@ public class EntityExtension
 
     public <T> Collection<T> initialization(Collection<T> entities)
             throws
-            ApplicationException {
+            ModuleException {
         for (T entity : entities) {
             setPrimaryKey(entity);
             setOperatorInfo(entity,
@@ -243,7 +243,7 @@ public class EntityExtension
 
     public <T> T modify(T entity)
             throws
-            ApplicationException {
+            ModuleException {
         setOperatorInfo(entity,
                         updateByFields,
                         updateTimeFields);
@@ -252,7 +252,7 @@ public class EntityExtension
 
     public <T> Collection<T> modify(Collection<T> entities)
             throws
-            ApplicationException {
+            ModuleException {
         for (T entity : entities) {
             setOperatorInfo(entity,
                             updateByFields,

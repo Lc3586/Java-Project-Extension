@@ -1,6 +1,6 @@
 package project.extension.standard.entity;
 
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import java.util.Collection;
 
@@ -42,7 +42,7 @@ public interface IEntityExtension {
      */
     <T> T initialization(T entity)
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 初始化实体
@@ -53,7 +53,7 @@ public interface IEntityExtension {
      */
     <T> Collection<T> initialization(Collection<T> entities)
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 修改实体
@@ -64,7 +64,7 @@ public interface IEntityExtension {
      */
     <T> T modify(T entity)
             throws
-            ApplicationException;
+            ModuleException;
 
     /**
      * 修改实体
@@ -75,5 +75,5 @@ public interface IEntityExtension {
      */
     <T> Collection<T> modify(Collection<T> entities)
             throws
-            ApplicationException;
+            ModuleException;
 }

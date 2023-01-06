@@ -1,23 +1,27 @@
 package project.extension.mybatis.edge.dbContext.unitOfWork;
 
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.Operation;
+import project.extension.mybatis.edge.aop.TraceAfterEventArgs;
 import project.extension.mybatis.edge.aop.TraceBeforeEventArgs;
-import project.extension.mybatis.edge.core.provider.normal.NaiveAopProvider;
+import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 工作单元
@@ -27,15 +31,16 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class UnitOfWork
         implements IUnitOfWork {
-    public UnitOfWork(INaiveSql orm,
-                      INaiveAop aop) {
+    public UnitOfWork(INaiveSql orm) {
         this.orm = orm;
         if (orm == null)
-            throw new ApplicationException(DbContextStrings.getInstanceParamsUndefined("project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork",
+            throw new ModuleException(DbContextStrings.getInstanceParamsUndefined("project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork",
 
 
-                                                                                       "INaiveSql orm"));
-        this.aop = (NaiveAopProvider) aop;
+                                                                                  "INaiveSql orm"));
+        this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
+        this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(DataSourceTransactionManager.class);
+        this.transactionDefinition = IOCExtension.applicationContext.getBean(TransactionDefinition.class);
         this.uowBefore = new TraceBeforeEventArgs(Operation.UnitOfWork,
                                                   null);
         this.aop.traceBefore(this.uowBefore);
@@ -54,7 +59,7 @@ public class UnitOfWork
     /**
      * 种子
      */
-    private static int seed;
+    private static final AtomicInteger seed = new AtomicInteger();
 
     /**
      * 正在使用中的工作单元
@@ -63,9 +68,14 @@ public class UnitOfWork
     private static final ConcurrentMap<String, UnitOfWork> debugBeingUsed = new ConcurrentHashMap<>();
 
     /**
-     * 实体变更记录
+     * 工作单元内的实体变化跟踪
      */
     private final EntityChangeRecord entityChangeRecord;
+
+    /**
+     * 用户自定义的状态数据
+     */
+    private final Map<String, Object> states = new HashMap<>();
 
     /**
      * 启用状态
@@ -83,6 +93,16 @@ public class UnitOfWork
     private DbContextScopedNaiveSql ormScoped;
 
     /**
+     * 事务管理器
+     */
+    private final DataSourceTransactionManager dataSourceTransactionManager;
+
+    /**
+     * 事务定义
+     */
+    private TransactionDefinition transactionDefinition;
+
+    /**
      * 事务隔离等级
      */
     private TransactionIsolationLevel isolationLevel;
@@ -91,15 +111,6 @@ public class UnitOfWork
      * AOP编程对象
      */
     protected final NaiveAopProvider aop;
-
-    protected final DataSourceTransactionManager dataSourceTransactionManager;
-
-    protected final TransactionDefinition transactionDefinition;
-
-    /**
-     * Sql会话
-     */
-    protected SqlSession sqlSession;
 
     /**
      * 事务对象
@@ -173,7 +184,7 @@ public class UnitOfWork
      */
     public void close() {
         if (this.transactionStatus != null)
-            throw new ApplicationException(DbContextStrings.transactionHasBeenStarted());
+            throw new ModuleException(DbContextStrings.getTransactionHasBeenStarted());
 
         this.enable = false;
     }
@@ -185,11 +196,6 @@ public class UnitOfWork
         this.enable = true;
     }
 
-    /**
-     * 获取Orm对象
-     *
-     * @return Orm对象
-     */
     @Override
     public INaiveSql getOrm() {
         if (this.ormScoped == null)
@@ -199,72 +205,109 @@ public class UnitOfWork
         return this.ormScoped;
     }
 
-    /**
-     * 获取事务隔离等级
-     *
-     * @return 事务隔离等级
-     */
     @Override
     public TransactionIsolationLevel getIsolationLevel() {
         return this.isolationLevel;
     }
 
-    /**
-     * 设置事务隔离等级
-     *
-     * @param isolationLevel 事务隔离等级
-     */
     @Override
     public void setIsolationLevel(TransactionIsolationLevel isolationLevel) {
         this.isolationLevel = isolationLevel;
-    }
-
-    /**
-     * 提交事务
-     */
-    @Override
-    public void commit() {
-
-    }
-
-    /**
-     * 回滚事务
-     */
-    @Override
-    public void rollback() {
-
-    }
-
-    /**
-     * 获取工作单元内的实体变化跟踪
-     *
-     * @return 工作单元内的实体变化跟踪
-     */
-    @Override
-    public EntityChangeRecord getEntityChangeReport() {
-        return null;
-    }
-
-    /**
-     * 获取用户自定义的状态数据，便于扩展
-     *
-     * @return 用户自定义的状态数据
-     */
-    @Override
-    public Map<String, Object> getStates() {
-        return null;
+        DefaultTransactionDefinition definition = new DefaultTransactionDefinition(this.transactionDefinition);
+        definition.setIsolationLevel(this.isolationLevel.getLevel());
+        this.transactionDefinition = definition;
     }
 
     @Override
-    public SqlSession getOrBeginTransaction() {
+    public TransactionStatus getOrBeginTransaction() {
         return this.getOrBeginTransaction(true);
     }
 
     @Override
-    public SqlSession getOrBeginTransaction(boolean isCreate) {
-        if (this.sqlSession != null)
-            return sqlSession;
+    public TransactionStatus getOrBeginTransaction(boolean isCreate) {
+        if (this.transactionStatus != null)
+            return this.transactionStatus;
+        if (!isCreate)
+            return null;
+        if (!this.enable)
+            return null;
 
-        return this.sqlSession;
+        this.tranBefore = new TraceBeforeEventArgs(Operation.BeginTransaction,
+                                                   this.isolationLevel);
+        this.aop.traceBefore(this.tranBefore);
+
+        try {
+            this.transactionStatus = this.dataSourceTransactionManager.getTransaction(this.transactionDefinition);
+
+
+            this.id = String.format("%s_%s",
+                                    new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
+                                    seed.incrementAndGet());
+            debugBeingUsed.putIfAbsent(this.getId(),
+                                       this);
+        } catch (Exception ex) {
+            this.returnObject();
+            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
+                                                        "失败",
+                                                        ex));
+            throw new ModuleException(DbContextStrings.getTransactionBeginFailed(),
+                                      ex);
+        }
+
+        return this.transactionStatus;
+    }
+
+    @Override
+    public void commit() {
+        try {
+            if (this.transactionStatus != null) {
+                if (!this.transactionStatus.isCompleted())
+                    this.dataSourceTransactionManager.commit(this.transactionStatus);
+                this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
+                                                            "提交",
+                                                            null));
+            }
+        } catch (Exception ex) {
+            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
+                                                        "提交失败",
+                                                        ex));
+            throw new ModuleException(DbContextStrings.getTransactionCommitFailed(),
+                                      ex);
+        } finally {
+            this.returnObject();
+            this.tranBefore = null;
+        }
+    }
+
+    @Override
+    public void rollback() {
+        try {
+            if (this.transactionStatus != null) {
+                if (!this.transactionStatus.isCompleted())
+                    this.dataSourceTransactionManager.rollback(this.transactionStatus);
+                this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
+                                                            "回滚",
+                                                            null));
+            }
+        } catch (Exception ex) {
+            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
+                                                        "回滚失败",
+                                                        ex));
+            throw new ModuleException(DbContextStrings.getTransactionRollbackFailed(),
+                                      ex);
+        } finally {
+            this.returnObject();
+            this.tranBefore = null;
+        }
+    }
+
+    @Override
+    public EntityChangeRecord getEntityChangeReport() {
+        return this.entityChangeRecord;
+    }
+
+    @Override
+    public Map<String, Object> getStates() {
+        return this.states;
     }
 }

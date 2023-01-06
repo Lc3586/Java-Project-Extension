@@ -1,12 +1,9 @@
 package project.extension.mybatis.edge.dbContext;
 
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.transaction.TransactionStatus;
-import project.extension.func.IFunc2;
+import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 import javax.sql.DataSource;
 
@@ -22,9 +19,9 @@ public class ScopeTransactionAdo
      * @param dataSource 数据源
      */
     protected ScopeTransactionAdo(DataSource dataSource,
-                                  IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction)
+                                  IFunc0<TransactionStatus> resolveTransaction)
             throws
-            ApplicationException {
+            ModuleException {
         super(dataSource);
         super.setResolveTransaction(resolveTransaction);
     }

@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.core.provider.mysql;
 
-import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.standard.*;
 
 /**
@@ -12,59 +12,52 @@ import project.extension.mybatis.edge.core.provider.standard.*;
  */
 public class MySqlProvider<T>
         implements IBaseDbProvider<T> {
-    public MySqlProvider(DataSourceConfig config,
-                         INaiveAop aop) {
+    public MySqlProvider(DataSourceConfig config) {
         this.config = config;
-        this.aop = aop;
     }
 
     private final DataSourceConfig config;
 
-    private final INaiveAop aop;
-
     @Override
     public ISelect<T> createSelect(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new MySqlSelect<>(config,
-                                 aop,
-                                 entityType,
-                                 withTransactional);
+                                 ado,
+                                 entityType);
     }
 
     @Override
     public IInsert<T> createInsert(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new MySqlInsert<>(config,
-                                 aop,
-                                 entityType,
-                                 withTransactional);
+                                 ado,
+                                 entityType);
     }
 
     @Override
     public IUpdate<T> createUpdate(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new MySqlUpdate<>(config,
-                                 aop,
-                                 entityType,
-                                 withTransactional);
+                                 ado,
+                                 entityType);
     }
 
     @Override
     public IDelete<T> createDelete(Class<T> entityType,
-                                   boolean withTransactional) {
+                                   INaiveAdo ado) {
         return new MySqlDelete<>(config,
-                                 aop,
-                                 entityType,
-                                 withTransactional);
+                                 ado,
+                                 entityType);
     }
 
     @Override
-    public IDbFirst createDbFirst() {
-        return new MySqlDbFirst(config);
+    public IDbFirst createDbFirst(INaiveAdo ado) {
+        return new MySqlDbFirst(config,
+                                ado);
     }
 
     @Override
-    public ICodeFirst createCodeFirst() {
-        return new MySqlCodeFirst();
+    public ICodeFirst createCodeFirst(INaiveAdo ado) {
+        return new MySqlCodeFirst(ado);
     }
 }

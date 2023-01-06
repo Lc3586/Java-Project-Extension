@@ -2,14 +2,15 @@ package project.extension.mybatis.edge.core.provider.normal;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.cryptography.MD5Utils;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.config.DataSourceConfig;
-import project.extension.mybatis.edge.core.ado.NaiveSqlSession;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.OrderByProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.DynamicFilter;
 import project.extension.mybatis.edge.model.ExecutorDTO;
@@ -32,9 +33,9 @@ public abstract class Select<T>
 
     protected final SqlProvider sqlProvider;
 
-    protected final NaiveAopProvider aop;
+    protected final INaiveAdo ado;
 
-    protected final boolean withTransactional;
+    protected final NaiveAopProvider aop;
 
     protected final ExecutorDTO executor;
 
@@ -48,13 +49,12 @@ public abstract class Select<T>
 
     public Select(DataSourceConfig config,
                   SqlProvider sqlProvider,
-                  INaiveAop aop,
-                  Class<T> entityType,
-                  boolean withTransactional) {
+                  INaiveAdo ado,
+                  Class<T> entityType) {
         this.config = config;
         this.sqlProvider = sqlProvider;
-        this.aop = (NaiveAopProvider) aop;
-        this.withTransactional = withTransactional;
+        this.ado = ado;
+        this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.executor = new ExecutorDTO();
         this.entityType = entityType;
         this.msIdPrefix = String.format("Select:%s",
@@ -68,8 +68,8 @@ public abstract class Select<T>
      * 初始化
      */
     protected void initialization() {
-        Tuple2<String, String> table = RepositoryExtension.getTableName(entityType,
-                                                                        config.getNameConvertType());
+        Tuple2<String, String> table = EntityTypeHandler.getTableName(entityType,
+                                                                      config.getNameConvertType());
         executor.setSchema(table.a);
         executor.setTableName(table.b);
         executor.setEntityType(entityType);
@@ -117,7 +117,7 @@ public abstract class Select<T>
 
 //            String sql = sqlProvider.originalSql2CountSql(originalSql);
 //            executor.getPagination()
-//                    .setRecordCount(aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+//                    .setRecordCount(aop.invokeWithAop(() -> this.ado.selectOne(
 //                                                              getSqlSession(),
 //                                                              getMSId(MD5Utils.hash(sql),
 //                                                                      entityType.getTypeName(),
@@ -199,9 +199,7 @@ public abstract class Select<T>
      * 获取Sql会话
      */
     protected SqlSession getSqlSession() {
-        return withTransactional
-               ? NaiveSqlSession.current()
-               : null;
+        return ado.getOrCreateSqlSession();
     }
 
     @Override
@@ -453,14 +451,17 @@ public abstract class Select<T>
                                                                   false,
                                                                   true));
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  Boolean.class.getTypeName()),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          Boolean.class,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -491,13 +492,16 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectList(getSqlSession(),
-                                                                      getMSId(MD5Utils.hash(sql),
-                                                                              entityType.getTypeName()),
-                                                                      sql,
-                                                                      executor.getParameter(),
-                                                                      entityType,
-                                                                      config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
+                                                           getMSId(MD5Utils.hash(sql),
+                                                                   entityType.getTypeName()),
+                                                           sql,
+                                                           null,
+                                                           executor.getParameter(),
+                                                           entityType,
+                                                           null,
+                                                           null,
+                                                           config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -514,16 +518,17 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectList(getSqlSession(),
-                                                                      getMSId(MD5Utils.hash(sql),
-                                                                              entityType.getTypeName(),
-                                                                              dtoType.getTypeName()),
-                                                                      sql,
-                                                                      executor.getParameter(),
-                                                                      dtoType,
-                                                                      executor.getMainTagLevel(),
-                                                                      executor.getCustomTags(),
-                                                                      config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
+                                                           getMSId(MD5Utils.hash(sql),
+                                                                   entityType.getTypeName(),
+                                                                   dtoType.getTypeName()),
+                                                           sql,
+                                                           null,
+                                                           executor.getParameter(),
+                                                           dtoType,
+                                                           executor.getMainTagLevel(),
+                                                           executor.getCustomTags(),
+                                                           config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -539,13 +544,16 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectMapList(getSqlSession(),
-                                                                         getMSId(MD5Utils.hash(sql),
-                                                                                 entityType.getTypeName(),
-                                                                                 HashMap.class.getTypeName()),
-                                                                         sql,
-                                                                         executor.getParameter(),
-                                                                         config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectMapList(getSqlSession(),
+                                                              getMSId(MD5Utils.hash(sql),
+                                                                      entityType.getTypeName(),
+                                                                      HashMap.class.getTypeName()),
+                                                              sql,
+                                                              null,
+                                                              executor.getParameter(),
+                                                              null,
+                                                              null,
+                                                              config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -566,13 +574,16 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(getSqlSession(),
-                                                                     getMSId(MD5Utils.hash(sql),
-                                                                             entityType.getTypeName()),
-                                                                     sql,
-                                                                     executor.getParameter(),
-                                                                     entityType,
-                                                                     config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
+                                                          getMSId(MD5Utils.hash(sql),
+                                                                  entityType.getTypeName()),
+                                                          sql,
+                                                          null,
+                                                          executor.getParameter(),
+                                                          entityType,
+                                                          null,
+                                                          null,
+                                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -593,16 +604,17 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(getSqlSession(),
-                                                                     getMSId(MD5Utils.hash(sql),
-                                                                             entityType.getTypeName(),
-                                                                             dtoType.getTypeName()),
-                                                                     sql,
-                                                                     executor.getParameter(),
-                                                                     dtoType,
-                                                                     executor.getMainTagLevel(),
-                                                                     executor.getCustomTags(),
-                                                                     config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
+                                                          getMSId(MD5Utils.hash(sql),
+                                                                  entityType.getTypeName(),
+                                                                  dtoType.getTypeName()),
+                                                          sql,
+                                                          null,
+                                                          executor.getParameter(),
+                                                          dtoType,
+                                                          executor.getMainTagLevel(),
+                                                          executor.getCustomTags(),
+                                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -627,14 +639,17 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  fieldName),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          memberType,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -655,13 +670,16 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectMap(getSqlSession(),
-                                                                     getMSId(MD5Utils.hash(sql),
-                                                                             entityType.getTypeName(),
-                                                                             HashMap.class.getTypeName()),
-                                                                     sql,
-                                                                     executor.getParameter(),
-                                                                     config.getNameConvertType()),
+        return aop.invokeWithAop(() -> this.ado.selectMap(getSqlSession(),
+                                                          getMSId(MD5Utils.hash(sql),
+                                                                  entityType.getTypeName(),
+                                                                  HashMap.class.getTypeName()),
+                                                          sql,
+                                                          null,
+                                                          executor.getParameter(),
+                                                          null,
+                                                          null,
+                                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -681,14 +699,17 @@ public abstract class Select<T>
                                                    false,
                                                    true);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  Long.class.getTypeName()),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          Long.class,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -715,14 +736,17 @@ public abstract class Select<T>
                                                  false,
                                                  true);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  fieldName),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          memberType,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -749,14 +773,17 @@ public abstract class Select<T>
                                                  false,
                                                  true);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  fieldName),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          memberType,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -782,14 +809,17 @@ public abstract class Select<T>
         String sql = sqlProvider.executor2AvgSql(executor,
                                                  false);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  fieldName),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          memberType,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),
@@ -815,14 +845,17 @@ public abstract class Select<T>
         String sql = sqlProvider.executor2SumSql(executor,
                                                  false);
 
-        return aop.invokeWithAop(() -> SqlSessionExtension.selectOne(
+        return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
                                          getMSId(MD5Utils.hash(sql),
                                                  entityType.getTypeName(),
                                                  fieldName),
                                          sql,
+                                         null,
                                          executor.getParameter(),
                                          memberType,
+                                         null,
+                                         null,
                                          config.getNameConvertType()),
                                  CurdType.查询,
                                  config.getName(),

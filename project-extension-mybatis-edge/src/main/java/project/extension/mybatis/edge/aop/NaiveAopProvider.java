@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.core.provider.normal;
+package project.extension.mybatis.edge.aop;
 
 import org.springframework.stereotype.Component;
 import project.extension.action.IAction1;

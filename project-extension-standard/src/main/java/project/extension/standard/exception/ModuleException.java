@@ -1,12 +1,12 @@
 package project.extension.standard.exception;
 
 /**
- * 应用层级的异常
+ * 模块层级的异常
  *
  * @author LCTR
  * @date 2022-12-08
  */
-public class ApplicationException
+public class ModuleException
         extends RuntimeException {
     /**
      * 消息
@@ -18,16 +18,16 @@ public class ApplicationException
      */
     private Throwable innerException;
 
-    public ApplicationException() {
+    public ModuleException() {
     }
 
-    public ApplicationException(String message) {
+    public ModuleException(String message) {
         this(message,
              null);
     }
 
-    public ApplicationException(String message,
-                                Throwable innerException) {
+    public ModuleException(String message,
+                           Throwable innerException) {
         this.message = message;
         this.setInnerException(innerException);
     }

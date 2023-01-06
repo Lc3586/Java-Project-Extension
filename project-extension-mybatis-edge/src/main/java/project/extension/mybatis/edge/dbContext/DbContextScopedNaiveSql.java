@@ -1,24 +1,19 @@
 package project.extension.mybatis.edge.dbContext;
 
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionDefinition;
 import project.extension.func.IFunc0;
-import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
-import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.provider.DbProvider;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.object.ObjectExtension;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 
 /**
  * 有生命周期的Orm对象
@@ -29,44 +24,38 @@ import project.extension.standard.exception.ApplicationException;
 @Component
 public class DbContextScopedNaiveSql
         implements INaiveSql {
-    private DbContextScopedNaiveSql(BaseConfig config,
-                                    AbstractRoutingDataSource abstractRoutingDataSource,
-
-                                    INaiveSql orm,
+    private DbContextScopedNaiveSql(INaiveSql orm,
                                     IFunc0<DbContext> resolveDbContext,
                                     IFunc0<IUnitOfWork> resolveUnitOfWork,
                                     INaiveAdo ado) {
-        this.config = config;
-        this.abstractRoutingDataSource = abstractRoutingDataSource;
         this.originalOrm = orm;
         this.resolveDbContext = resolveDbContext;
         this.resolveUnitOfWork = resolveUnitOfWork;
         this.ado = ado;
+        this.aop = orm.getAop();
     }
-
-    private final BaseConfig config;
-
-    private final AbstractRoutingDataSource abstractRoutingDataSource;
 
     /**
      * 原始的Orm对象
      */
-    private INaiveSql originalOrm;
+    private final INaiveSql originalOrm;
 
     /**
      * 获取数据源上下文
      */
-    private IFunc0<DbContext> resolveDbContext;
+    private final IFunc0<DbContext> resolveDbContext;
 
     /**
      * 获取工作单元
      */
-    private IFunc0<IUnitOfWork> resolveUnitOfWork;
+    private final IFunc0<IUnitOfWork> resolveUnitOfWork;
 
     /**
      * 数据库访问对象
      */
-    private INaiveAdo ado;
+    private final INaiveAdo ado;
+
+    private final INaiveAop aop;
 
     /**
      * 创建
@@ -88,10 +77,16 @@ public class DbContextScopedNaiveSql
                                                resolveUnitOfWork,
                                                new ScopeTransactionAdo(orm.getAdo()
                                                                           .getDataSource(),
-                                                                       (sqlSessionFactory, executorType) -> {
-                                                                           DbContext dbContext = resolveDbContext.invoke();
-                                                                           return resolveUnitOfWork.invoke()
-                                                                                                   .getOrBeginTransaction();
+                                                                       () -> {
+                                                                           if (resolveDbContext != null) {
+                                                                               DbContext dbContext = resolveDbContext.invoke();
+                                                                               dbContext.flushCommand();
+                                                                           }
+                                                                           if (resolveUnitOfWork != null) {
+                                                                               IUnitOfWork uow = resolveUnitOfWork.invoke();
+                                                                               return uow.getOrBeginTransaction();
+                                                                           }
+                                                                           return null;
                                                                        }));
         return create(scopedOrm.getOriginalOrm(),
                       resolveDbContext,
@@ -114,7 +109,7 @@ public class DbContextScopedNaiveSql
     @Override
     public <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
-            ApplicationException {
+            ModuleException {
         return null;
     }
 
@@ -129,7 +124,7 @@ public class DbContextScopedNaiveSql
     public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
                                                                     Class<TKey> keyType)
             throws
-            ApplicationException {
+            ModuleException {
         return null;
     }
 
@@ -148,8 +143,8 @@ public class DbContextScopedNaiveSql
     @Override
     public INaiveAop getAop()
             throws
-            ApplicationException {
-        return null;
+            ModuleException {
+        return this.aop;
     }
 
     /**
@@ -158,8 +153,10 @@ public class DbContextScopedNaiveSql
     @Override
     public IDbFirst getDbFirst()
             throws
-            ApplicationException {
-        return null;
+            ModuleException {
+        return DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                   .getDataSourceConfig())
+                         .createDbFirst(ado);
     }
 
     /**
@@ -168,7 +165,9 @@ public class DbContextScopedNaiveSql
     @Override
     public ICodeFirst getCodeFirst()
             throws
-            ApplicationException {
-        return null;
+            ModuleException {
+        return DbProvider.getDbProvider(CommonUtils.getConfig()
+                                                   .getDataSourceConfig())
+                         .createCodeFirst(ado);
     }
 }

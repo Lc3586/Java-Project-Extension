@@ -1,9 +1,8 @@
 package project.extension.mybatis.edge.core.ado;
 
 import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.session.*;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
@@ -11,13 +10,19 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import project.extension.func.IFunc2;
+import project.extension.func.IFunc0;
+import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.core.mapper.MappedStatementHandler;
 import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.mybatis.edge.model.NameConvertType;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import javax.sql.DataSource;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 数据库访问对象构造器
@@ -32,7 +37,8 @@ public class NaiveAdoProvider
      */
     public NaiveAdoProvider(DataSource dataSource)
             throws
-            ApplicationException {
+            ModuleException {
+        this.mappedStatementHandler = IOCExtension.applicationContext.getBean(MappedStatementHandler.class);
         this.dataSource = dataSource;
         final SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
@@ -41,9 +47,14 @@ public class NaiveAdoProvider
         try {
             this.sqlSessionFactory = sqlSessionFactory.getObject();
         } catch (Exception ex) {
-            throw new ApplicationException(DbContextStrings.getSqlSessionFactoryFailed());
+            throw new ModuleException(DbContextStrings.getSqlSessionFactoryFailed());
         }
     }
+
+    /**
+     * MappedStatement处理类
+     */
+    private final MappedStatementHandler mappedStatementHandler;
 
     /**
      * 数据源
@@ -58,7 +69,7 @@ public class NaiveAdoProvider
     /**
      * 解析事务的方法
      */
-    private IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction;
+    private IFunc0<TransactionStatus> resolveTransaction;
 
     /**
      * 获取执行器类型
@@ -105,7 +116,7 @@ public class NaiveAdoProvider
                                               ExecutorType executorType,
                                               SqlSession session)
             throws
-            ApplicationException {
+            ModuleException {
         SqlSessionHolder holder;
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             Environment environment = sessionFactory.getConfiguration()
@@ -125,7 +136,7 @@ public class NaiveAdoProvider
                 holder.requested();
             } else {
                 if (TransactionSynchronizationManager.getResource(environment.getDataSource()) != null)
-                    throw new ApplicationException(DbContextStrings.getNoneSpringManagedTransactionFactory());
+                    throw new ModuleException(DbContextStrings.getNoneSpringManagedTransactionFactory());
 
                 //Sql会话未同步事务
             }
@@ -138,7 +149,7 @@ public class NaiveAdoProvider
      *
      * @return 解析事务的方法
      */
-    protected IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> getResolveTransaction() {
+    protected IFunc0<TransactionStatus> getResolveTransaction() {
         return this.resolveTransaction;
     }
 
@@ -147,8 +158,18 @@ public class NaiveAdoProvider
      *
      * @param resolveTransaction 解析事务的方法
      */
-    protected void setResolveTransaction(IFunc2<SqlSessionFactory, ExecutorType, TransactionStatus> resolveTransaction) {
+    protected void setResolveTransaction(IFunc0<TransactionStatus> resolveTransaction) {
         this.resolveTransaction = resolveTransaction;
+    }
+
+    @Override
+    public SqlSessionFactory getSqlSessionFactory() {
+        return this.sqlSessionFactory;
+    }
+
+    @Override
+    public Configuration getConfiguration() {
+        return this.sqlSessionFactory.getConfiguration();
     }
 
     @Override
@@ -159,24 +180,35 @@ public class NaiveAdoProvider
     @Override
     public SqlSession getOrCreateSqlSession()
             throws
-            ApplicationException {
+            ModuleException {
+        return getOrCreateSqlSession(null);
+    }
+
+    @Override
+    public SqlSession getOrCreateSqlSession(TransactionIsolationLevel level)
+            throws
+            ModuleException {
         Tuple2<Boolean, SqlSession> currentSqlSession = currentSqlSession();
         if (currentSqlSession.a)
             return currentSqlSession.b;
 
-        //创建新的Sql会话
-        ExecutorType executorType = getExecutorType();
-        SqlSession session;
-        if (getResolveTransaction() == null) {
-            session = sqlSessionFactory.openSession();
-        } else {
+        //开启事务
+        if (getResolveTransaction() != null) {
             try {
-                session = getResolveTransaction().invoke().;
+                getResolveTransaction().invoke();
             } catch (Exception ex) {
-                throw new ApplicationException(DbContextStrings.getResolveTransactionFailed(),
-                                               ex);
+                throw new ModuleException(DbContextStrings.getResolveTransactionFailed(),
+                                          ex);
             }
         }
+
+        //创建新的Sql会话
+        ExecutorType executorType = getExecutorType();
+        SqlSession session = level == null
+                             ? sqlSessionFactory.openSession(executorType)
+                             : sqlSessionFactory.openSession(executorType,
+                                                             level);
+
         registerSessionHolder(this.sqlSessionFactory,
                               executorType,
                               session);
@@ -192,5 +224,350 @@ public class NaiveAdoProvider
                                            holder);
         return new Tuple2<>(session != null,
                             session);
+    }
+
+    @Override
+    public <TParameter, TResult> TResult selectOne(SqlSession sqlSession,
+                                                   String msId,
+                                                   String script,
+                                                   Class<TParameter> parameterType,
+                                                   Map<String, Object> parameterHashMap,
+                                                   Class<TResult> resultType,
+                                                   Integer resultMainTagLevel,
+                                                   Collection<String> resultCustomTags,
+                                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterHashMap,
+                                           resultType,
+                                           resultMainTagLevel,
+                                           resultCustomTags,
+                                           nameConvertType);
+
+        return sqlSession.selectOne(msId,
+                                    parameterHashMap);
+    }
+
+    @Override
+    public <TParameter, TResult> TResult selectOne(SqlSession sqlSession,
+                                                   String msId,
+                                                   String script,
+                                                   TParameter parameter,
+                                                   Class<TParameter> parameterType,
+                                                   Integer parameterMainTagLevel,
+                                                   Collection<String> parameterCustomTags,
+                                                   Class<TResult> resultType,
+                                                   Integer resultMainTagLevel,
+                                                   Collection<String> resultCustomTags,
+                                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           resultType,
+                                           resultMainTagLevel,
+                                           resultCustomTags,
+                                           nameConvertType);
+
+        return sqlSession.selectOne(msId,
+                                    parameter);
+    }
+
+    @Override
+    public <TParameter, TResult> List<TResult> selectList(SqlSession sqlSession,
+                                                          String msId,
+                                                          String script,
+                                                          Class<TParameter> parameterType,
+                                                          Map<String, Object> parameterHashMap,
+                                                          Class<TResult> resultType,
+                                                          Integer resultMainTagLevel,
+                                                          Collection<String> resultCustomTags,
+                                                          NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterHashMap,
+                                           resultType,
+                                           resultMainTagLevel,
+                                           resultCustomTags,
+                                           nameConvertType);
+
+        return sqlSession.selectList(msId,
+                                     parameterHashMap);
+    }
+
+    @Override
+    public <TParameter, TResult> List<TResult> selectList(SqlSession sqlSession,
+                                                          String msId,
+                                                          String script,
+                                                          TParameter parameter,
+                                                          Class<TParameter> parameterType,
+                                                          Integer parameterMainTagLevel,
+                                                          Collection<String> parameterCustomTags,
+                                                          Class<TResult> resultType,
+                                                          Integer resultMainTagLevel,
+                                                          Collection<String> resultCustomTags,
+                                                          NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           resultType,
+                                           resultMainTagLevel,
+                                           resultCustomTags,
+                                           nameConvertType);
+
+        return sqlSession.selectList(msId,
+                                     parameter);
+    }
+
+    @Override
+    public <TParameter, TResult> Map<String, Object> selectMap(SqlSession sqlSession,
+                                                               String msId,
+                                                               String script,
+                                                               Class<TParameter> parameterType,
+                                                               Map<String, Object> parameterHashMap,
+                                                               Class<TResult> resultType,
+                                                               Collection<String> resultFields,
+                                                               NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterHashMap,
+                                           resultType,
+                                           resultFields,
+                                           nameConvertType);
+
+        return sqlSession.selectOne(msId,
+                                    parameterHashMap);
+    }
+
+    @Override
+    public <TParameter, TResult> Map<String, Object> selectMap(SqlSession sqlSession,
+                                                               String msId,
+                                                               String script,
+                                                               TParameter parameter,
+                                                               Class<TParameter> parameterType,
+                                                               Integer parameterMainTagLevel,
+                                                               Collection<String> parameterCustomTags,
+                                                               Class<TResult> resultType,
+                                                               Collection<String> resultFields,
+                                                               NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           resultType,
+                                           resultFields,
+                                           nameConvertType);
+
+        return sqlSession.selectOne(msId,
+                                    parameter);
+    }
+
+    @Override
+    public <TParameter, TResult> List<Map<String, Object>> selectMapList(SqlSession sqlSession,
+                                                                         String msId,
+                                                                         String script,
+                                                                         Class<TParameter> parameterType,
+                                                                         Map<String, Object> parameterHashMap,
+                                                                         Class<TResult> resultType,
+                                                                         Collection<String> resultFields,
+                                                                         NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterHashMap,
+                                           resultType,
+                                           resultFields,
+                                           nameConvertType);
+
+        return sqlSession.selectList(msId,
+                                     parameterHashMap);
+    }
+
+    @Override
+    public <TParameter, TResult> List<Map<String, Object>> selectMapList(SqlSession sqlSession,
+                                                                         String msId,
+                                                                         String script,
+                                                                         TParameter parameter,
+                                                                         Class<TParameter> parameterType,
+                                                                         Integer parameterMainTagLevel,
+                                                                         Collection<String> parameterCustomTags,
+                                                                         Class<TResult> resultType,
+                                                                         Collection<String> resultFields,
+                                                                         NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.SELECT,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           resultType,
+                                           resultFields,
+                                           nameConvertType);
+
+        return sqlSession.selectList(msId,
+                                     parameter);
+    }
+
+    @Override
+    public <TParameter> int insert(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   Class<TParameter> parameterType,
+                                   Map<String, Object> parameterHashMap,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.INSERT,
+                                           parameterType,
+                                           parameterHashMap,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.insert(msId,
+                                 parameterHashMap);
+    }
+
+    @Override
+    public <TParameter> int insert(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   TParameter parameter,
+                                   Class<TParameter> parameterType,
+                                   Integer parameterMainTagLevel,
+                                   Collection<String> parameterCustomTags,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.INSERT,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.insert(msId,
+                                 parameter);
+    }
+
+    @Override
+    public <TParameter> int update(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   Class<TParameter> parameterType,
+                                   Map<String, Object> parameterHashMap,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.UPDATE,
+                                           parameterType,
+                                           parameterHashMap,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.update(msId,
+                                 parameterHashMap);
+    }
+
+    @Override
+    public <TParameter> int update(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   TParameter parameter,
+                                   Class<TParameter> parameterType,
+                                   Integer parameterMainTagLevel,
+                                   Collection<String> parameterCustomTags,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.UPDATE,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.update(msId,
+                                 parameter);
+    }
+
+    @Override
+    public <TParameter> int delete(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   Class<TParameter> parameterType,
+                                   Map<String, Object> parameterHashMap,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.DELETE,
+                                           parameterType,
+                                           parameterHashMap,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.delete(msId,
+                                 parameterHashMap);
+    }
+
+    @Override
+    public <TParameter> int delete(SqlSession sqlSession,
+                                   String msId,
+                                   String script,
+                                   TParameter parameter,
+                                   Class<TParameter> parameterType,
+                                   Integer parameterMainTagLevel,
+                                   Collection<String> parameterCustomTags,
+                                   NameConvertType nameConvertType) {
+        mappedStatementHandler.getOrCreate(getConfiguration(),
+                                           msId,
+                                           script,
+                                           SqlCommandType.DELETE,
+                                           parameterType,
+                                           parameterMainTagLevel,
+                                           parameterCustomTags,
+                                           Integer.class,
+                                           null,
+                                           null,
+                                           nameConvertType);
+
+        return sqlSession.delete(msId,
+                                 parameter);
     }
 }

@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.sqlserver;
 
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.CodeFirst;
 
 /**
@@ -10,5 +11,7 @@ import project.extension.mybatis.edge.core.provider.normal.CodeFirst;
  */
 public class SqlServerCodeFirst
         extends CodeFirst {
-
+    protected SqlServerCodeFirst(INaiveAdo ado) {
+        super(ado);
+    }
 }

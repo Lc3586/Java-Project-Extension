@@ -1,13 +1,14 @@
 package project.extension.mybatis.edge.core.provider.mysql;
 
+import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
-import project.extension.mybatis.edge.extention.SqlSessionExtension;
 import project.extension.mybatis.edge.model.*;
 
 import java.math.BigDecimal;
@@ -25,8 +26,10 @@ import java.util.stream.Collectors;
  */
 public class MySqlDbFirst
         extends DbFirst {
-    public MySqlDbFirst(DataSourceConfig config) {
+    public MySqlDbFirst(DataSourceConfig config,
+                        INaiveAdo ado) {
         super(config,
+              ado,
               "MySqlDbFirst");
         initialization();
     }
@@ -325,13 +328,14 @@ public class MySqlDbFirst
                                                                    tbname[1])
                                                    : " is null"));
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return super.ado.selectMapList(getSqlSession(),
+                                       getMSId(MD5Utils.hash(sql)),
+                                       sql,
+                                       null,
+                                       null,
+                                       null,
+                                       null,
+                                       config.getNameConvertType());
     }
 
     /**
@@ -366,13 +370,14 @@ public class MySqlDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return super.ado.selectMapList(getSqlSession(),
+                                       getMSId(MD5Utils.hash(sql)),
+                                       sql,
+                                       null,
+                                       null,
+                                       null,
+                                       null,
+                                       config.getNameConvertType());
     }
 
     /**
@@ -405,13 +410,14 @@ public class MySqlDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return super.ado.selectMapList(getSqlSession(),
+                                       getMSId(MD5Utils.hash(sql)),
+                                       sql,
+                                       null,
+                                       null,
+                                       null,
+                                       null,
+                                       config.getNameConvertType());
     }
 
     /**
@@ -444,13 +450,14 @@ public class MySqlDbFirst
                                    inDatabase,
                                    tablesMatcher);
 
-        return SqlSessionExtension.selectMapList(getSqlSession(),
-                                                 getMSId(MD5Utils.hash(sql)),
-                                                 sql,
-                                                 null,
-                                                 null,
-                                                 true,
-                                                 config.getNameConvertType());
+        return super.ado.selectMapList(getSqlSession(),
+                                       getMSId(MD5Utils.hash(sql)),
+                                       sql,
+                                       null,
+                                       null,
+                                       null,
+                                       null,
+                                       config.getNameConvertType());
     }
 
     /**
@@ -465,7 +472,8 @@ public class MySqlDbFirst
         Matcher matcher = Pattern.compile("jdbc:mysql://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(String.format("%s;",
-                                                        config.getConnectionString()));
+                                                        config.getProperties()
+                                                              .getProperty(DruidDataSourceFactory.PROP_URL)));
         if (!matcher.find())
             throw new Exception("无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为 jdbc:mysql://(.*?)/(.*?)\\?");
 
@@ -970,14 +978,15 @@ public class MySqlDbFirst
             throws
             Exception {
         String sql = " select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'mysql', 'performance_schema')";
-        return SqlSessionExtension.selectList(getSqlSession(),
-                                              getMSId(MD5Utils.hash(sql)),
-                                              sql,
-                                              null,
-                                              null,
-                                              String.class,
-                                              true,
-                                              config.getNameConvertType());
+        return super.ado.selectList(getSqlSession(),
+                                    getMSId(MD5Utils.hash(sql)),
+                                    sql,
+                                    null,
+                                    null,
+                                    String.class,
+                                    null,
+                                    null,
+                                    config.getNameConvertType());
     }
 
     @Override
@@ -1032,14 +1041,15 @@ public class MySqlDbFirst
                                                    tbname[1])
                                    : " is null");
 
-        return SqlSessionExtension.selectOne(getSqlSession(),
-                                             getMSId(MD5Utils.hash(sql)),
-                                             sql,
-                                             null,
-                                             null,
-                                             Boolean.class,
-                                             true,
-                                             config.getNameConvertType());
+        return super.ado.selectOne(getSqlSession(),
+                                   getMSId(MD5Utils.hash(sql)),
+                                   sql,
+                                   null,
+                                   null,
+                                   Boolean.class,
+                                   null,
+                                   null,
+                                   config.getNameConvertType());
     }
 
     @Override

@@ -1,12 +1,13 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.collections.TupleExtension;
+import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.FilterCompare;
-import project.extension.mybatis.edge.extention.RepositoryExtension;
 import project.extension.mybatis.edge.model.NullResultException;
-import project.extension.standard.exception.ApplicationException;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.ITuple;
 
 import java.lang.reflect.Field;
@@ -28,21 +29,24 @@ public class BaseRepository_Key<T, TKey>
     private final String defaultNullErrorMessage = DbContextStrings.getDataUndefined();
 
     /**
+     * @param orm        orm
      * @param entityType 实体类型
      * @param keyType    主键类型
      * @param dbProvider 基础构造器
      */
-    public BaseRepository_Key(Class<T> entityType,
+    public BaseRepository_Key(INaiveSql orm,
+                              Class<T> entityType,
                               Class<TKey> keyType,
                               IBaseDbProvider<T> dbProvider)
             throws
-            ApplicationException {
-        super(entityType,
+            ModuleException {
+        super(orm,
+              entityType,
               dbProvider);
-        this.keyFields = RepositoryExtension.getPrimaryKeyField(entityType);
-        if (this.keyFields.size() == 0) throw new ApplicationException(DbContextStrings.getEntityPrimaryKeyUndefined());
+        this.keyFields = EntityTypeHandler.getPrimaryKeyField(entityType);
+        if (this.keyFields.size() == 0) throw new ModuleException(DbContextStrings.getEntityPrimaryKeyUndefined());
         if (keyFields.size() > 1 && !ITuple.class.isAssignableFrom(keyType))
-            throw new ApplicationException(DbContextStrings.getEntityCompositePrimaryKeyMustBeTupleType());
+            throw new ModuleException(DbContextStrings.getEntityCompositePrimaryKeyMustBeTupleType());
         this.keyType = keyType;
     }
 
@@ -58,12 +62,6 @@ public class BaseRepository_Key<T, TKey>
                                                                                                keyType));
         else keyValues.add(id);
         return keyValues;
-    }
-
-    @Override
-    public BaseRepository_Key<T, TKey> withTransactional(boolean withTransactional) {
-        this.useTransactional = withTransactional;
-        return this;
     }
 
     @Override
@@ -110,7 +108,7 @@ public class BaseRepository_Key<T, TKey>
             Exception {
         List<Object> keyValues = getKeyValues(id);
         return dbProvider.createSelect(setting.getEntityType(),
-                                       useTransactional)
+                                       super.ormScoped.getAdo())
                          .as("a")
                          .where(x -> {
                              for (int i = 0; i < keyFields.size(); i++) {
@@ -185,7 +183,7 @@ public class BaseRepository_Key<T, TKey>
             throws
             Exception {
         if (dbProvider.createDelete(setting.getEntityType(),
-                                    useTransactional)
+                                    super.ormScoped.getAdo())
                       .where(x -> {
                           if (keyFields.size() == 1) {
                               //单个主键 id IN('1', '2')

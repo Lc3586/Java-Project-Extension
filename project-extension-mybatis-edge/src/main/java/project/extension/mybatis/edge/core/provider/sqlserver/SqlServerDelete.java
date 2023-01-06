@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.core.provider.sqlserver;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
+import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.Delete;
-import project.extension.mybatis.edge.aop.INaiveAop;
 
 /**
  * SqlServer数据删除对象
@@ -14,13 +14,11 @@ import project.extension.mybatis.edge.aop.INaiveAop;
 public class SqlServerDelete<T>
         extends Delete<T> {
     public SqlServerDelete(DataSourceConfig config,
-                           INaiveAop aop,
-                           Class<T> entityType,
-                           boolean withTransactional) {
+                           INaiveAdo ado,
+                           Class<T> entityType) {
         super(config,
               new SqlServerSqlProvider(config),
-              aop,
-              entityType,
-              withTransactional);
+              ado,
+              entityType);
     }
 }
