@@ -1,19 +1,21 @@
 package project.extension.mybatis.edge.dbContext;
 
-import org.springframework.stereotype.Component;
+import org.apache.ibatis.session.TransactionIsolationLevel;
+import project.extension.action.IAction0;
 import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
-import project.extension.mybatis.edge.core.provider.DbProvider;
-import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
-import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
+import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
-import project.extension.mybatis.edge.extention.CommonUtils;
+import project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork;
 import project.extension.object.ObjectExtension;
 import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple2;
+
+import java.util.Collection;
 
 /**
  * 有生命周期的Orm对象
@@ -21,7 +23,6 @@ import project.extension.standard.exception.ModuleException;
  * @author LCTR
  * @date 2022-12-19
  */
-@Component
 public class DbContextScopedNaiveSql
         implements INaiveSql {
     private DbContextScopedNaiveSql(INaiveSql orm,
@@ -100,32 +101,223 @@ public class DbContextScopedNaiveSql
         return originalOrm;
     }
 
-    /**
-     * 获取数据仓储
-     *
-     * @param entityType 实体类型
-     * @return 数据仓储
-     */
     @Override
-    public <T> IBaseRepository<T> getRepository(Class<T> entityType)
+    public <TEntity> ISelect<TEntity> select(Class<TEntity> entityType)
             throws
             ModuleException {
-        return null;
+        if (this.resolveDbContext != null) {
+            DbContext dbContext = this.resolveDbContext.invoke();
+            dbContext.flushCommand();
+        }
+
+        if (this.resolveUnitOfWork != null) {
+            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
+            uow.getOrBeginTransaction();
+        }
+
+        return getOriginalOrm().select(entityType);
     }
 
-    /**
-     * 获取数据仓储
-     *
-     * @param entityType 实体类型
-     * @param keyType    主键类型
-     * @return 数据仓储
-     */
     @Override
-    public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
-                                                                    Class<TKey> keyType)
+    public <TEntity> IInsert<TEntity> insert(Class<TEntity> entityType)
             throws
             ModuleException {
-        return null;
+        if (this.resolveDbContext != null) {
+            DbContext dbContext = this.resolveDbContext.invoke();
+            dbContext.flushCommand();
+        }
+
+        if (this.resolveUnitOfWork != null) {
+            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
+            uow.getOrBeginTransaction();
+        }
+
+        return getOriginalOrm().insert(entityType);
+    }
+
+    @Override
+    public <TEntity> IInsert<TEntity> insert(Class<TEntity> entityType,
+                                             TEntity data)
+            throws
+            ModuleException {
+        return insert(entityType).appendData(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IInsert<TEntity> insert(Class<TEntity> entityType,
+                                                   TDto data,
+                                                   Class<TDto> dtoType,
+                                                   Integer mainTagLevel)
+            throws
+            ModuleException {
+        return insert(entityType).appendData(data)
+                                 .asDto(dtoType)
+                                 .mainTagLevel(mainTagLevel);
+    }
+
+    @Override
+    public <TEntity> IInsert<TEntity> batchInsert(Class<TEntity> entityType,
+                                                  Collection<TEntity> data)
+            throws
+            ModuleException {
+        return insert(entityType).appendData(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IInsert<TEntity> batchInsert(Class<TEntity> entityType,
+                                                        Collection<TDto> data,
+                                                        Class<TDto> dtoType,
+                                                        Integer mainTagLevel)
+            throws
+            ModuleException {
+        return insert(entityType).appendData(data)
+                                 .asDto(dtoType)
+                                 .mainTagLevel(mainTagLevel);
+    }
+
+    @Override
+    public <TEntity> IUpdate<TEntity> update(Class<TEntity> entityType)
+            throws
+            ModuleException {
+        if (this.resolveDbContext != null) {
+            DbContext dbContext = this.resolveDbContext.invoke();
+            dbContext.flushCommand();
+        }
+
+        if (this.resolveUnitOfWork != null) {
+            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
+            uow.getOrBeginTransaction();
+        }
+
+        return getOriginalOrm().update(entityType);
+    }
+
+    @Override
+    public <TEntity> IUpdate<TEntity> update(Class<TEntity> entityType,
+                                             TEntity data)
+            throws
+            ModuleException {
+        return update(entityType).setSource(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IUpdate<TEntity> update(Class<TEntity> entityType,
+                                                   TDto data,
+                                                   Class<TDto> dtoType,
+                                                   Integer mainTagLevel)
+            throws
+            ModuleException {
+        return update(entityType).setSource(data)
+                                 .asDto(dtoType)
+                                 .mainTagLevel(mainTagLevel);
+    }
+
+    @Override
+    public <TEntity> IUpdate<TEntity> batchUpdate(Class<TEntity> entityType,
+                                                  Collection<TEntity> data)
+            throws
+            ModuleException {
+        return update(entityType).setSource(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IUpdate<TEntity> batchUpdate(Class<TEntity> entityType,
+                                                        Collection<TDto> data,
+                                                        Class<TDto> dtoType,
+                                                        Integer mainTagLevel)
+            throws
+            ModuleException {
+        return update(entityType).setSource(data)
+                                 .asDto(dtoType)
+                                 .mainTagLevel(mainTagLevel);
+    }
+
+    @Override
+    public <TEntity> IDelete<TEntity> delete(Class<TEntity> entityType)
+            throws
+            ModuleException {
+        if (this.resolveDbContext != null) {
+            DbContext dbContext = this.resolveDbContext.invoke();
+            dbContext.flushCommand();
+        }
+
+        if (this.resolveUnitOfWork != null) {
+            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
+            uow.getOrBeginTransaction();
+        }
+
+        return getOriginalOrm().delete(entityType);
+    }
+
+    @Override
+    public <TEntity> IDelete<TEntity> delete(Class<TEntity> entityType,
+                                             TEntity data)
+            throws
+            ModuleException {
+        return delete(entityType).setSource(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IDelete<TEntity> delete(Class<TEntity> entityType,
+                                                   TDto data,
+                                                   Class<TDto> dtoType)
+            throws
+            ModuleException {
+        return delete(entityType).setSource(data)
+                                 .asDto(dtoType);
+    }
+
+    @Override
+    public <TEntity> IDelete<TEntity> batchDelete(Class<TEntity> entityType,
+                                                  Collection<TEntity> data)
+            throws
+            ModuleException {
+        return delete(entityType).setSource(data);
+    }
+
+    @Override
+    public <TEntity, TDto> IDelete<TEntity> batchDelete(Class<TEntity> entityType,
+                                                        Collection<TDto> data,
+                                                        Class<TDto> dtoType)
+            throws
+            ModuleException {
+        return delete(entityType).setSource(data)
+                                 .asDto(dtoType);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
+        return transaction(null,
+                           handler);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
+                                                  IAction0 handler) {
+        IUnitOfWork uow;
+        if (this.resolveUnitOfWork != null)
+            uow = this.resolveUnitOfWork.invoke();
+        else
+            uow = new UnitOfWork(getOriginalOrm());
+
+        try {
+            getAdo().commit();
+            if (isolationLevel != null)
+                uow.setIsolationLevel(isolationLevel);
+            uow.getOrBeginTransaction();
+            handler.invoke();
+            uow.commit();
+            getAdo().commit();
+            return new Tuple2<>(true,
+                                null);
+        } catch (Exception ex) {
+            uow.rollback();
+            getAdo().rollback();
+            return new Tuple2<>(false,
+                                ex);
+        } finally {
+            getAdo().close();
+        }
     }
 
     /**
@@ -154,9 +346,7 @@ public class DbContextScopedNaiveSql
     public IDbFirst getDbFirst()
             throws
             ModuleException {
-        return DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                   .getDataSourceConfig())
-                         .createDbFirst(ado);
+        return getOriginalOrm().getDbFirst();
     }
 
     /**
@@ -166,8 +356,35 @@ public class DbContextScopedNaiveSql
     public ICodeFirst getCodeFirst()
             throws
             ModuleException {
-        return DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                   .getDataSourceConfig())
-                         .createCodeFirst(ado);
+        return getOriginalOrm().getCodeFirst();
+    }
+
+    /**
+     * 获取数据仓储
+     *
+     * @param entityType 实体类型
+     * @return 数据仓储
+     */
+    @Override
+    public <T> IBaseRepository<T> getRepository(Class<T> entityType)
+            throws
+            ModuleException {
+        return getOriginalOrm().getRepository(entityType);
+    }
+
+    /**
+     * 获取数据仓储
+     *
+     * @param entityType 实体类型
+     * @param keyType    主键类型
+     * @return 数据仓储
+     */
+    @Override
+    public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
+                                                                    Class<TKey> keyType)
+            throws
+            ModuleException {
+        return getOriginalOrm().getRepository_Key(entityType,
+                                                  keyType);
     }
 }

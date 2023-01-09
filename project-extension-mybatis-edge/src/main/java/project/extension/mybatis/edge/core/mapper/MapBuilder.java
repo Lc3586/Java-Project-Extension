@@ -104,8 +104,8 @@ public class MapBuilder {
 
         List<ParameterMapping> parameterMappings = new ArrayList<>();
 
-        if ((parameterType != null && !parameterType.equals(Object.class))
-                || !CollectionsExtension.anyPlus(parameterHashMap)) {
+        if ((parameterType == null || !parameterType.equals(Object.class))
+                && CollectionsExtension.anyPlus(parameterHashMap)) {
             if (parameterType == null)
                 for (String parameterName : parameterHashMap.keySet()) {
                     parameterMappings.add(new ParameterMapping.Builder(config,
@@ -230,7 +230,9 @@ public class MapBuilder {
 
         List<ResultMapping> resultMappings = new ArrayList<>();
 
-        if (resultType != null && !resultType.equals(Object.class))
+        if (resultType != null
+                && !resultType.equals(Object.class)
+                && CollectionsExtension.anyPlus(resultFields))
             for (String fieldName : resultFields) {
                 Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
                                                                     resultType,

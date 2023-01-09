@@ -5,46 +5,49 @@ import project.extension.mybatis.edge.core.ado.INaiveAdo;
 /**
  * 基础构造器
  *
- * @param <T> 实体类型
  * @author LCTR
  * @date 2022-03-30
  */
-public interface IBaseDbProvider<T> {
+public interface IBaseDbProvider {
     /**
      * 数据查询对象
      *
      * @param entityType 实体类型
      * @param ado        数据访问对象
+     * @param <TEntity>  实体类型
      */
-    ISelect<T> createSelect(Class<T> entityType,
-                            INaiveAdo ado);
+    <TEntity> ISelect<TEntity> createSelect(Class<TEntity> entityType,
+                                            INaiveAdo ado);
 
     /**
      * 数据插入对象
      *
      * @param entityType 实体类型
      * @param ado        数据访问对象
+     * @param <TEntity>  实体类型
      */
-    IInsert<T> createInsert(Class<T> entityType,
-                            INaiveAdo ado);
+    <TEntity> IInsert<TEntity> createInsert(Class<TEntity> entityType,
+                                            INaiveAdo ado);
 
     /**
      * 数据更新对象
      *
      * @param entityType 实体类型
      * @param ado        数据访问对象
+     * @param <TEntity>  实体类型
      */
-    IUpdate<T> createUpdate(Class<T> entityType,
-                            INaiveAdo ado);
+    <TEntity> IUpdate<TEntity> createUpdate(Class<TEntity> entityType,
+                                            INaiveAdo ado);
 
     /**
      * 数据删除对象
      *
      * @param entityType 实体类型
      * @param ado        数据访问对象
+     * @param <TEntity>  实体类型
      */
-    IDelete<T> createDelete(Class<T> entityType,
-                            INaiveAdo ado);
+    <TEntity> IDelete<TEntity> createDelete(Class<TEntity> entityType,
+                                            INaiveAdo ado);
 
     /**
      * DbFirst 开发模式相关功能

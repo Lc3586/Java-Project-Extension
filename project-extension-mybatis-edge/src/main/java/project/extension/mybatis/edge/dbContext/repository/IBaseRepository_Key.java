@@ -7,20 +7,20 @@ import java.util.Collection;
 /**
  * 数据仓储基础泛型接口
  *
- * @param <T>    数据模型类型
- * @param <TKey> 主键类型
+ * @param <TEntity> 实体类型
+ * @param <TKey>    主键类型
  * @author LCTR
  * @date 2022-03-28
  */
-public interface IBaseRepository_Key<T, TKey>
-        extends IBaseRepository<T> {
+public interface IBaseRepository_Key<TEntity, TKey>
+        extends IBaseRepository<TEntity> {
     /**
      * 获取数据
      * <p>必须在实体的主键上添加注解@ColumnSetting(primaryKey = true)</p>
      *
      * @param id 主键ID
      */
-    T getById(TKey id)
+    TEntity getById(TKey id)
             throws
             Exception;
 
@@ -32,7 +32,7 @@ public interface IBaseRepository_Key<T, TKey>
      * @param id 主键ID
      * @throws NullResultException 数据为空
      */
-    T getByIdAndCheckNull(TKey id)
+    TEntity getByIdAndCheckNull(TKey id)
             throws
             Exception;
 
@@ -44,8 +44,8 @@ public interface IBaseRepository_Key<T, TKey>
      * @param nullErrorMessage 数据为空时的错误信息（默认值 数据不存在或已被移除）
      * @throws NullResultException 数据为空
      */
-    T getByIdAndCheckNull(TKey id,
-                          String nullErrorMessage)
+    TEntity getByIdAndCheckNull(TKey id,
+                                String nullErrorMessage)
             throws
             Exception;
 
@@ -55,10 +55,10 @@ public interface IBaseRepository_Key<T, TKey>
      *
      * @param id      主键ID
      * @param dtoType 业务模型类型
-     * @param <T2>    业务模型类型
+     * @param <TDto>  业务模型类型
      */
-    <T2> T2 getById(TKey id,
-                    Class<T2> dtoType)
+    <TDto> TDto getById(TKey id,
+                        Class<TDto> dtoType)
             throws
             Exception;
 
@@ -69,11 +69,11 @@ public interface IBaseRepository_Key<T, TKey>
      * @param id           主键ID
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      */
-    <T2> T2 getById(TKey id,
-                    Class<T2> dtoType,
-                    int mainTagLevel)
+    <TDto> TDto getById(TKey id,
+                        Class<TDto> dtoType,
+                        int mainTagLevel)
             throws
             Exception;
 
@@ -84,11 +84,11 @@ public interface IBaseRepository_Key<T, TKey>
      *
      * @param id      主键ID
      * @param dtoType 业务模型类型
-     * @param <T2>    业务模型类型
+     * @param <TDto>  业务模型类型
      * @throws NullResultException 数据为空
      */
-    <T2> T2 getByIdAndCheckNull(TKey id,
-                                Class<T2> dtoType)
+    <TDto> TDto getByIdAndCheckNull(TKey id,
+                                    Class<TDto> dtoType)
             throws
             Exception;
 
@@ -100,12 +100,12 @@ public interface IBaseRepository_Key<T, TKey>
      * @param id           主键ID
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      * @throws NullResultException 数据为空
      */
-    <T2> T2 getByIdAndCheckNull(TKey id,
-                                Class<T2> dtoType,
-                                int mainTagLevel)
+    <TDto> TDto getByIdAndCheckNull(TKey id,
+                                    Class<TDto> dtoType,
+                                    int mainTagLevel)
             throws
             Exception;
 
@@ -116,12 +116,12 @@ public interface IBaseRepository_Key<T, TKey>
      * @param id               主键ID
      * @param dtoType          业务模型类型
      * @param nullErrorMessage 数据为空时的错误信息（默认值 数据不存在或已被移除）
-     * @param <T2>             业务模型类型
+     * @param <TDto>           业务模型类型
      * @throws NullResultException 数据为空
      */
-    <T2> T2 getByIdAndCheckNull(TKey id,
-                                Class<T2> dtoType,
-                                String nullErrorMessage)
+    <TDto> TDto getByIdAndCheckNull(TKey id,
+                                    Class<TDto> dtoType,
+                                    String nullErrorMessage)
             throws
             Exception;
 
@@ -133,13 +133,13 @@ public interface IBaseRepository_Key<T, TKey>
      * @param dtoType          业务模型类型
      * @param mainTagLevel     主标签等级
      * @param nullErrorMessage 数据为空时的错误信息（默认值 数据不存在或已被移除）
-     * @param <T2>             业务模型类型
+     * @param <TDto>           业务模型类型
      * @throws NullResultException 数据为空
      */
-    <T2> T2 getByIdAndCheckNull(TKey id,
-                                Class<T2> dtoType,
-                                int mainTagLevel,
-                                String nullErrorMessage)
+    <TDto> TDto getByIdAndCheckNull(TKey id,
+                                    Class<TDto> dtoType,
+                                    int mainTagLevel,
+                                    String nullErrorMessage)
             throws
             Exception;
 

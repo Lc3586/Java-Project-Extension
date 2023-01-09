@@ -48,6 +48,54 @@ public interface INaiveAdo {
             ModuleException;
 
     /**
+     * 提交当前的Sql会话
+     */
+    void commit()
+            throws
+            ModuleException;
+
+    /**
+     * 提交
+     *
+     * @param sqlSession Sql会话
+     */
+    void commit(SqlSession sqlSession)
+            throws
+            ModuleException;
+
+    /**
+     * 撤回当前的Sql会话
+     */
+    void rollback()
+            throws
+            ModuleException;
+
+    /**
+     * 撤回
+     *
+     * @param sqlSession Sql会话
+     */
+    void rollback(SqlSession sqlSession)
+            throws
+            ModuleException;
+
+    /**
+     * 关闭当前的Sql会话
+     */
+    void close()
+            throws
+            ModuleException;
+
+    /**
+     * 关闭
+     *
+     * @param sqlSession Sql会话
+     */
+    void close(SqlSession sqlSession)
+            throws
+            ModuleException;
+
+    /**
      * 获取或创建Sql会话
      *
      * @param level 事务隔离等级

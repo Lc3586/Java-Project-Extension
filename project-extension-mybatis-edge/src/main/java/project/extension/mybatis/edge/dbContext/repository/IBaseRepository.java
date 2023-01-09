@@ -10,23 +10,23 @@ import java.util.Collection;
 /**
  * 数据仓储基础泛型接口
  *
- * @param <T> 数据类型
+ * @param <TEntity> 实体类型
  * @author LCTR
  * @date 2022-03-28
  */
-public interface IBaseRepository<T>
+public interface IBaseRepository<TEntity>
         extends IBaseRepositoryBase {
     /**
      * 数据查询对象
      */
-    ISelect<T> select();
+    ISelect<TEntity> select();
 
     /**
      * 插入一条记录
      *
      * @param data 数据
      */
-    <T2> void insert(T2 data)
+    void insert(TEntity data)
             throws
             Exception;
 
@@ -36,11 +36,11 @@ public interface IBaseRepository<T>
      * @param data         数据
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      */
-    <T2> void insert(T2 data,
-                     Class<T2> dtoType,
-                     Integer mainTagLevel)
+    <TDto> void insert(TDto data,
+                       Class<TDto> dtoType,
+                       Integer mainTagLevel)
             throws
             Exception;
 
@@ -49,7 +49,7 @@ public interface IBaseRepository<T>
      *
      * @param data 数据集合
      */
-    <T2> void batchInsert(Collection<T2> data)
+    void batchInsert(Collection<TEntity> data)
             throws
             Exception;
 
@@ -59,25 +59,25 @@ public interface IBaseRepository<T>
      * @param data         数据集合
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      */
-    <T2> void batchInsert(Collection<T2> data,
-                          Class<T2> dtoType,
-                          Integer mainTagLevel)
+    <TDto> void batchInsert(Collection<TDto> data,
+                            Class<TDto> dtoType,
+                            Integer mainTagLevel)
             throws
             Exception;
 
     /**
      * 数据插入对象
      */
-    IInsert<T> insertDiy();
+    IInsert<TEntity> insertDiy();
 
     /**
      * 更新一条记录
      *
      * @param data 数据
      */
-    <T2> void update(T2 data)
+    void update(TEntity data)
             throws
             Exception;
 
@@ -87,11 +87,11 @@ public interface IBaseRepository<T>
      * @param data         数据
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      */
-    <T2> void update(T2 data,
-                     Class<T2> dtoType,
-                     Integer mainTagLevel)
+    <TDto> void update(TDto data,
+                       Class<TDto> dtoType,
+                       Integer mainTagLevel)
             throws
             Exception;
 
@@ -100,7 +100,7 @@ public interface IBaseRepository<T>
      *
      * @param data 数据集合
      */
-    <T2> void batchUpdate(Collection<T2> data)
+    void batchUpdate(Collection<TEntity> data)
             throws
             Exception;
 
@@ -110,25 +110,25 @@ public interface IBaseRepository<T>
      * @param data         数据集合
      * @param dtoType      业务模型类型
      * @param mainTagLevel 主标签等级
-     * @param <T2>         业务模型类型
+     * @param <TDto>       业务模型类型
      */
-    <T2> void batchUpdate(Collection<T2> data,
-                          Class<T2> dtoType,
-                          Integer mainTagLevel)
+    <TDto> void batchUpdate(Collection<TDto> data,
+                            Class<TDto> dtoType,
+                            Integer mainTagLevel)
             throws
             Exception;
 
     /**
      * 数据更新对象
      */
-    IUpdate<T> updateDiy();
+    IUpdate<TEntity> updateDiy();
 
     /**
      * 删除一条记录
      *
      * @param data 数据
      */
-    <T2> void delete(T2 data)
+    void delete(TEntity data)
             throws
             Exception;
 
@@ -137,10 +137,10 @@ public interface IBaseRepository<T>
      *
      * @param data    数据
      * @param dtoType 业务模型类型
-     * @param <T2>    业务模型类型
+     * @param <TDto>  业务模型类型
      */
-    <T2> void delete(T2 data,
-                     Class<T2> dtoType)
+    <TDto> void delete(TDto data,
+                       Class<TDto> dtoType)
             throws
             Exception;
 
@@ -149,7 +149,7 @@ public interface IBaseRepository<T>
      *
      * @param data 数据集合
      */
-    <T2> void batchDelete(Collection<T2> data)
+    void batchDelete(Collection<TEntity> data)
             throws
             Exception;
 
@@ -158,15 +158,15 @@ public interface IBaseRepository<T>
      *
      * @param data    数据
      * @param dtoType 业务模型类型
-     * @param <T2>    业务模型类型
+     * @param <TDto>  业务模型类型
      */
-    <T2> void batchDelete(Collection<T> data,
-                          Class<T2> dtoType)
+    <TDto> void batchDelete(Collection<TDto> data,
+                            Class<TDto> dtoType)
             throws
             Exception;
 
     /**
      * 数据删除对象
      */
-    IDelete<T> deleteDiy();
+    IDelete<TEntity> deleteDiy();
 }

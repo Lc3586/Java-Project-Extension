@@ -239,7 +239,6 @@ public class UnitOfWork
         try {
             this.transactionStatus = this.dataSourceTransactionManager.getTransaction(this.transactionDefinition);
 
-
             this.id = String.format("%s_%s",
                                     new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
                                     seed.incrementAndGet());

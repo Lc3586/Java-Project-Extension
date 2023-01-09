@@ -15,17 +15,17 @@ import project.extension.standard.exception.ModuleException;
  * @date 2022-03-30
  */
 public class DbProvider {
-    public static <T> IBaseDbProvider<T> getDbProvider(DataSourceConfig config)
+    public static IBaseDbProvider getDbProvider(DataSourceConfig config)
             throws
             ModuleException {
         switch (config.getDbType()) {
             case JdbcMySql:
-                return new MySqlProvider<>(config);
+                return new MySqlProvider(config);
             case JdbcDameng:
-                return new DamengProvider<>(config);
+                return new DamengProvider(config);
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
-                return new SqlServerProvider<>(config);
+                return new SqlServerProvider(config);
             default:
                 throw new ModuleException(DbContextStrings.getUnsupportedDbType(config.getDbType()
                                                                                       .toString()));

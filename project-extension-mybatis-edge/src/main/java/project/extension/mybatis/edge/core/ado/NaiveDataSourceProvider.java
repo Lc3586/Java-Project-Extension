@@ -71,8 +71,7 @@ public class NaiveDataSourceProvider
             druidConfig.applyConfig(druidDataSource,
                                     dataSourceConfig.getDbType());
             dataSourceMap.put(
-                    String.format("MybatisDataSource-%s",
-                                  dataSourceConfig.getName()),
+                    dataSourceConfig.getName(),
                     druidDataSource);
         }
 

@@ -10,8 +10,8 @@ import project.extension.mybatis.edge.core.provider.standard.*;
  * @author LCTR
  * @date 2022-07-15
  */
-public class SqlServerProvider<T>
-        implements IBaseDbProvider<T> {
+public class SqlServerProvider
+        implements IBaseDbProvider {
     public SqlServerProvider(DataSourceConfig config) {
         this.config = config;
     }
@@ -19,32 +19,32 @@ public class SqlServerProvider<T>
     private final DataSourceConfig config;
 
     @Override
-    public ISelect<T> createSelect(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> ISelect<TEntity> createSelect(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new SqlServerSelect<>(config,
                                      ado,
                                      entityType);
     }
 
     @Override
-    public IInsert<T> createInsert(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IInsert<TEntity> createInsert(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new SqlServerInsert<>(config,
                                      ado,
                                      entityType);
     }
 
     @Override
-    public IUpdate<T> createUpdate(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IUpdate<TEntity> createUpdate(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new SqlServerUpdate<>(config,
                                      ado,
                                      entityType);
     }
 
     @Override
-    public IDelete<T> createDelete(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IDelete<TEntity> createDelete(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new SqlServerDelete<>(config,
                                      ado,
                                      entityType);

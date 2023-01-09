@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.extention;
 
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
 import project.extension.Identity.SnowFlake;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
@@ -23,7 +24,9 @@ import java.util.Date;
  */
 public class EntityExtension
         implements IEntityExtension {
-    public EntityExtension(IAuthenticationService authenticationService) {
+    public EntityExtension(
+            @Nullable
+                    IAuthenticationService authenticationService) {
         this(authenticationService,
              new String[]{Base_Fields.createBy},
              new String[]{Base_Fields.createTime},
@@ -37,11 +40,13 @@ public class EntityExtension
      * @param updateByFields   修改者字段
      * @param updateTimeFields 修改时间字段
      */
-    public EntityExtension(IAuthenticationService authenticationService,
-                           String[] createByFields,
-                           String[] createTimeFields,
-                           String[] updateByFields,
-                           String[] updateTimeFields) {
+    public EntityExtension(
+            @Nullable
+                    IAuthenticationService authenticationService,
+            String[] createByFields,
+            String[] createTimeFields,
+            String[] updateByFields,
+            String[] updateTimeFields) {
         this.authenticationService = authenticationService;
         this.createByFields = createByFields;
         this.createTimeFields = createTimeFields;
@@ -86,8 +91,10 @@ public class EntityExtension
      * @return 操作者标识
      */
     private Object getOperatorOperatorKey() {
-        return authenticationService.getOperator()
-                                    .getKey();
+        return authenticationService == null
+               ? null
+               : authenticationService.getOperator()
+                                      .getKey();
     }
 
     /**

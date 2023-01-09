@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.globalization;
 
-import org.springframework.context.MessageSource;
-import project.extension.ioc.IOCExtension;
+import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
 
@@ -13,31 +12,28 @@ import java.util.Locale;
  */
 public class DbContextStrings {
     /**
-     * 信息源
-     */
-    private static final MessageSource messageSource = IOCExtension.applicationContext.getBean(MessageSource.class);
-
-    /**
      * 本土化信息
      */
-    private static Locale resourceLocale;
+    private static Locale locale = LocaleContextHolder.getLocale();
 
     /**
      * 获取当前的本地化信息
      *
      * @return 本土化信息
      */
-    public static Locale getResourceLocale() {
-        return resourceLocale;
+    public static Locale getLocale() {
+        return DbContextStrings.locale;
     }
 
     /**
      * 设置本地化信息
+     * <p>设置中文：Locale.SIMPLIFIED_CHINESE</p>
+     * <p>设置英文：Locale.US</p>
      *
      * @param locale 本土化信息
      */
-    public static void setResourceLocale(Locale locale) {
-        resourceLocale = locale;
+    public static void setLocale(Locale locale) {
+        DbContextStrings.locale = locale;
     }
 
     /**
@@ -49,10 +45,18 @@ public class DbContextStrings {
      */
     public static String getString(String code,
                                    Object... args) {
+        String message;
+        if (Locale.CHINESE.equals(locale)
+                || Locale.SIMPLIFIED_CHINESE.equals(locale)
+                || Locale.TRADITIONAL_CHINESE.equals(locale))
+            message = String.format(Strings_zh_CN.getValue(code),
+                                    args);
+        else
+            message = String.format(Strings_en_US.getValue(code),
+                                    args);
+
         return String.format("MybatisEdge: %s",
-                             messageSource.getMessage(code,
-                                                      args,
-                                                      resourceLocale));
+                             message);
     }
 
     /**

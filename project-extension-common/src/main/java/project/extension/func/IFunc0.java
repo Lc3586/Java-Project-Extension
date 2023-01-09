@@ -10,7 +10,5 @@ public interface IFunc0<TResult> {
     /**
      * 执行
      */
-    TResult invoke()
-            throws
-            Exception;
+    TResult invoke();
 }

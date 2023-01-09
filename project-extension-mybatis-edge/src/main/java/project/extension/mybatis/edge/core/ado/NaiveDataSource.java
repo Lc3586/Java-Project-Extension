@@ -2,6 +2,7 @@ package project.extension.mybatis.edge.core.ado;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
  * @date 2022-12-15
  */
 @Primary
+@Component
 public class NaiveDataSource
         extends AbstractRoutingDataSource {
     public NaiveDataSource(INaiveDataSourceProvider naiveDataSourceProvider) {
@@ -32,7 +34,7 @@ public class NaiveDataSource
     /**
      * 设置数据源
      *
-     * @param dataSource 数据源
+     * @param dataSource 数据源（必须先使用NaiveDataSourceProvider.getName()进行处理)
      */
     public void setDataSource(String dataSource) {
         this.dataSource = dataSource;

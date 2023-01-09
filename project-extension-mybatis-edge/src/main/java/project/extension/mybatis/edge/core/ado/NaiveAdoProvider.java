@@ -185,6 +185,57 @@ public class NaiveAdoProvider
     }
 
     @Override
+    public void commit()
+            throws
+            ModuleException {
+        Tuple2<Boolean, SqlSession> currentSqlSession = currentSqlSession();
+        if (!currentSqlSession.a)
+            return;
+        commit(currentSqlSession.b);
+    }
+
+    @Override
+    public void commit(SqlSession sqlSession)
+            throws
+            ModuleException {
+        sqlSession.commit();
+    }
+
+    @Override
+    public void rollback()
+            throws
+            ModuleException {
+        Tuple2<Boolean, SqlSession> currentSqlSession = currentSqlSession();
+        if (!currentSqlSession.a)
+            return;
+        rollback(currentSqlSession.b);
+    }
+
+    @Override
+    public void rollback(SqlSession sqlSession)
+            throws
+            ModuleException {
+        sqlSession.rollback();
+    }
+
+    @Override
+    public void close()
+            throws
+            ModuleException {
+        Tuple2<Boolean, SqlSession> currentSqlSession = currentSqlSession();
+        if (!currentSqlSession.a)
+            return;
+        close(currentSqlSession.b);
+    }
+
+    @Override
+    public void close(SqlSession sqlSession)
+            throws
+            ModuleException {
+        sqlSession.close();
+    }
+
+    @Override
     public SqlSession getOrCreateSqlSession(TransactionIsolationLevel level)
             throws
             ModuleException {

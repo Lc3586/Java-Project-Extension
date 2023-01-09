@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.dbContext.repository;
 import project.extension.collections.TupleExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
-import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.model.NullResultException;
@@ -16,14 +15,14 @@ import java.util.*;
 /**
  * 数据仓储基础实现类
  *
- * @param <T>    数据类型
- * @param <TKey> 主键类型
+ * @param <TEntity> 实体类型
+ * @param <TKey>    主键类型
  * @author LCTR
  * @date 2022-03-29
  */
-public class BaseRepository_Key<T, TKey>
-        extends BaseRepository<T>
-        implements IBaseRepository_Key<T, TKey> {
+public class BaseRepository_Key<TEntity, TKey>
+        extends BaseRepository<TEntity>
+        implements IBaseRepository_Key<TEntity, TKey> {
     private final List<Field> keyFields;
     private final Class<TKey> keyType;
     private final String defaultNullErrorMessage = DbContextStrings.getDataUndefined();
@@ -32,17 +31,14 @@ public class BaseRepository_Key<T, TKey>
      * @param orm        orm
      * @param entityType 实体类型
      * @param keyType    主键类型
-     * @param dbProvider 基础构造器
      */
     public BaseRepository_Key(INaiveSql orm,
-                              Class<T> entityType,
-                              Class<TKey> keyType,
-                              IBaseDbProvider<T> dbProvider)
+                              Class<TEntity> entityType,
+                              Class<TKey> keyType)
             throws
             ModuleException {
         super(orm,
-              entityType,
-              dbProvider);
+              entityType);
         this.keyFields = EntityTypeHandler.getPrimaryKeyField(entityType);
         if (this.keyFields.size() == 0) throw new ModuleException(DbContextStrings.getEntityPrimaryKeyUndefined());
         if (keyFields.size() > 1 && !ITuple.class.isAssignableFrom(keyType))
@@ -65,7 +61,7 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public T getById(TKey id)
+    public TEntity getById(TKey id)
             throws
             Exception {
         return getById(id,
@@ -73,7 +69,7 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public T getByIdAndCheckNull(TKey id)
+    public TEntity getByIdAndCheckNull(TKey id)
             throws
             Exception {
         return getByIdAndCheckNull(id,
@@ -81,18 +77,18 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public T getByIdAndCheckNull(TKey id,
-                                 String nullErrorMessage)
+    public TEntity getByIdAndCheckNull(TKey id,
+                                       String nullErrorMessage)
             throws
             Exception {
-        T result = getById(id);
+        TEntity result = getById(id);
         if (result == null) throw new Exception(nullErrorMessage);
         return result;
     }
 
     @Override
-    public <T2> T2 getById(TKey id,
-                           Class<T2> dtoType)
+    public <TDto> TDto getById(TKey id,
+                               Class<TDto> dtoType)
             throws
             Exception {
         return getById(id,
@@ -101,31 +97,30 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public <T2> T2 getById(TKey id,
-                           Class<T2> dtoType,
-                           int mainTagLevel)
+    public <TDto> TDto getById(TKey id,
+                               Class<TDto> dtoType,
+                               int mainTagLevel)
             throws
             Exception {
         List<Object> keyValues = getKeyValues(id);
-        return dbProvider.createSelect(setting.getEntityType(),
-                                       super.ormScoped.getAdo())
-                         .as("a")
-                         .where(x -> {
-                             for (int i = 0; i < keyFields.size(); i++) {
-                                 x.and(keyFields.get(i)
-                                                .getName(),
-                                       FilterCompare.Eq,
-                                       keyValues.get(i));
-                             }
-                             return x;
-                         })
-                         .mainTagLevel(mainTagLevel)
-                         .first(dtoType);
+        return getOrm().select(setting.getEntityType())
+                       .as("a")
+                       .where(x -> {
+                           for (int i = 0; i < keyFields.size(); i++) {
+                               x.and(keyFields.get(i)
+                                              .getName(),
+                                     FilterCompare.Eq,
+                                     keyValues.get(i));
+                           }
+                           return x;
+                       })
+                       .mainTagLevel(mainTagLevel)
+                       .first(dtoType);
     }
 
     @Override
-    public <T2> T2 getByIdAndCheckNull(TKey id,
-                                       Class<T2> dtoType)
+    public <TDto> TDto getByIdAndCheckNull(TKey id,
+                                           Class<TDto> dtoType)
             throws
             Exception {
         return getByIdAndCheckNull(id,
@@ -134,9 +129,9 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public <T2> T2 getByIdAndCheckNull(TKey id,
-                                       Class<T2> dtoType,
-                                       int mainTagLevel)
+    public <TDto> TDto getByIdAndCheckNull(TKey id,
+                                           Class<TDto> dtoType,
+                                           int mainTagLevel)
             throws
             Exception {
         return getByIdAndCheckNull(id,
@@ -146,9 +141,9 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public <T2> T2 getByIdAndCheckNull(TKey id,
-                                       Class<T2> dtoType,
-                                       String nullErrorMessage)
+    public <TDto> TDto getByIdAndCheckNull(TKey id,
+                                           Class<TDto> dtoType,
+                                           String nullErrorMessage)
             throws
             Exception {
         return getByIdAndCheckNull(id,
@@ -158,15 +153,15 @@ public class BaseRepository_Key<T, TKey>
     }
 
     @Override
-    public <T2> T2 getByIdAndCheckNull(TKey id,
-                                       Class<T2> dtoType,
-                                       int mainTagLevel,
-                                       String nullErrorMessage)
+    public <TDto> TDto getByIdAndCheckNull(TKey id,
+                                           Class<TDto> dtoType,
+                                           int mainTagLevel,
+                                           String nullErrorMessage)
             throws
             Exception {
-        T2 result = getById(id,
-                            dtoType,
-                            mainTagLevel);
+        TDto result = getById(id,
+                              dtoType,
+                              mainTagLevel);
         if (result == null) throw new NullResultException(nullErrorMessage);
         return result;
     }
@@ -182,32 +177,31 @@ public class BaseRepository_Key<T, TKey>
     public void deleteByIds(Collection<TKey> ids)
             throws
             Exception {
-        if (dbProvider.createDelete(setting.getEntityType(),
-                                    super.ormScoped.getAdo())
-                      .where(x -> {
-                          if (keyFields.size() == 1) {
-                              //单个主键 id IN('1', '2')
-                              x.and(keyFields.get(0)
-                                             .getName(),
-                                    FilterCompare.InSet,
-                                    ids);
-                          } else {
-                              //联合主键 (ida='1' AND idb='1') OR (ida='2' AND idb='2')
-                              for (TKey id : ids) {
-                                  List<Object> keyValues = getKeyValues(id);
-                                  x.and(y -> {
-                                      for (int i = 0; i < keyFields.size(); i++) {
-                                          y.and(keyFields.get(i)
-                                                         .getName(),
-                                                FilterCompare.Eq,
-                                                keyValues.get(i));
-                                      }
-                                      return y;
-                                  });
-                              }
-                          }
-                          return x;
-                      })
-                      .executeAffrows() < 0) throw new Exception("执行操作失败");
+        if (getOrm().delete(setting.getEntityType())
+                    .where(x -> {
+                        if (keyFields.size() == 1) {
+                            //单个主键 id IN('1', '2')
+                            x.and(keyFields.get(0)
+                                           .getName(),
+                                  FilterCompare.InSet,
+                                  ids);
+                        } else {
+                            //联合主键 (ida='1' AND idb='1') OR (ida='2' AND idb='2')
+                            for (TKey id : ids) {
+                                List<Object> keyValues = getKeyValues(id);
+                                x.and(y -> {
+                                    for (int i = 0; i < keyFields.size(); i++) {
+                                        y.and(keyFields.get(i)
+                                                       .getName(),
+                                              FilterCompare.Eq,
+                                              keyValues.get(i));
+                                    }
+                                    return y;
+                                });
+                            }
+                        }
+                        return x;
+                    })
+                    .executeAffrows() < 0) throw new Exception("执行操作失败");
     }
 }

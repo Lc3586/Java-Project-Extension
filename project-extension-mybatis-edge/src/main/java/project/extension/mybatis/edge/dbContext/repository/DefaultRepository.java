@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.mybatis.edge.INaiveSql;
-import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 
 /**
  * 默认数据仓储
@@ -13,11 +12,9 @@ import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 public class DefaultRepository<T>
         extends BaseRepository<T> {
     public DefaultRepository(INaiveSql orm,
-                             Class<T> entityType,
-                             IBaseDbProvider<T> dbProvider) {
+                             Class<T> entityType) {
         super(orm,
-              entityType,
-              dbProvider);
+              entityType);
     }
 
 }

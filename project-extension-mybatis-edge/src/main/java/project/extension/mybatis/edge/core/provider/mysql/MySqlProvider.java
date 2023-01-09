@@ -10,8 +10,8 @@ import project.extension.mybatis.edge.core.provider.standard.*;
  * @author LCTR
  * @date 2022-03-30
  */
-public class MySqlProvider<T>
-        implements IBaseDbProvider<T> {
+public class MySqlProvider
+        implements IBaseDbProvider {
     public MySqlProvider(DataSourceConfig config) {
         this.config = config;
     }
@@ -19,32 +19,32 @@ public class MySqlProvider<T>
     private final DataSourceConfig config;
 
     @Override
-    public ISelect<T> createSelect(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> ISelect<TEntity> createSelect(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new MySqlSelect<>(config,
                                  ado,
                                  entityType);
     }
 
     @Override
-    public IInsert<T> createInsert(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IInsert<TEntity> createInsert(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new MySqlInsert<>(config,
                                  ado,
                                  entityType);
     }
 
     @Override
-    public IUpdate<T> createUpdate(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IUpdate<TEntity> createUpdate(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new MySqlUpdate<>(config,
                                  ado,
                                  entityType);
     }
 
     @Override
-    public IDelete<T> createDelete(Class<T> entityType,
-                                   INaiveAdo ado) {
+    public <TEntity> IDelete<TEntity> createDelete(Class<TEntity> entityType,
+                                                   INaiveAdo ado) {
         return new MySqlDelete<>(config,
                                  ado,
                                  entityType);

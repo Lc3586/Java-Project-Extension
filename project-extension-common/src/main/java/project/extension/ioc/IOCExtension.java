@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author LCTR
  * @date 2022-05-27
  */
-@Component
+@Component("IOCExtension")
 public class IOCExtension {
     public IOCExtension(ApplicationContext _applicationContext) {
         applicationContext = _applicationContext;

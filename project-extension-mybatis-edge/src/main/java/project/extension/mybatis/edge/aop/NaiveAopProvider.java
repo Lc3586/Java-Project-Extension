@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.aop;
 import org.springframework.stereotype.Component;
 import project.extension.action.IAction1;
 import project.extension.func.IFunc0;
-import project.extension.mybatis.edge.aop.*;
 import project.extension.mybatis.edge.model.CurdType;
 
 import java.util.ArrayList;
@@ -123,9 +122,7 @@ public class NaiveAopProvider
                                            String sql,
                                            Map<String, Object> parameter,
                                            Class<?> entityType,
-                                           Class<?> dtoType)
-            throws
-            Exception {
+                                           Class<?> dtoType) {
         CurdBeforeEventArgs beforeEventArg =
                 this.curdBefore(new CurdBeforeEventArgs(type,
                                                         entityType,

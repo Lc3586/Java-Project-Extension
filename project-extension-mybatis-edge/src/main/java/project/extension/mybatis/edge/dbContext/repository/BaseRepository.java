@@ -17,28 +17,22 @@ import java.util.Collection;
 
 /**
  * 数据仓储基础实现类
- * <p>1、事务由springframework进行管理</p>
- * <p>2、在需要使用事务的方法上请添加注解 org.springframework.transaction.annotation.Transactional</p>
- * <p>3、在使用事务时，请调用withTransactional()方法指定当前操作在事务下运行</p>
  *
- * @param <T> 数据类型
+ * @param <TEntity> 数据类型
  * @author LCTR
  * @date 2022-03-29
  */
-public class BaseRepository<T>
-        implements IBaseRepository<T> {
+public class BaseRepository<TEntity>
+        implements IBaseRepository<TEntity> {
     /**
      * @param entityType 实体类型
-     * @param dbProvider 基础构造器
      */
     public BaseRepository(INaiveSql orm,
-                          Class<T> entityType,
-                          IBaseDbProvider<T> dbProvider) {
+                          Class<TEntity> entityType) {
         this.ormScoped = DbContextScopedNaiveSql.create(orm,
                                                         this::getDb,
                                                         this::getUnitOfWork);
         this.setting = new DynamicSqlSetting<>(entityType);
-        this.dbProvider = dbProvider;
     }
 
     protected DbContextScopedNaiveSql ormScoped;
@@ -47,8 +41,7 @@ public class BaseRepository<T>
 
     protected IUnitOfWork unitOfWork;
 
-    protected final DynamicSqlSetting<T> setting;
-    protected final IBaseDbProvider<T> dbProvider;
+    protected final DynamicSqlSetting<TEntity> setting;
 
     private RepositoryDbContext getDb() {
         if (this.db == null)
@@ -114,178 +107,162 @@ public class BaseRepository<T>
     }
 
     @Override
-    public ISelect<T> select() {
-        return dbProvider.createSelect(setting.getEntityType(),
-                                       this.ormScoped.getAdo());
+    public ISelect<TEntity> select() {
+        return getOrm().select(setting.getEntityType());
     }
 
     @Override
-    public <T2> void insert(T2 data)
+    public void insert(TEntity data)
             throws
             Exception {
-        if (dbProvider.createInsert(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .appendData(data)
-                      .executeAffrows() <= 0)
+        if (getOrm().insert(setting.getEntityType(),
+                            data)
+                    .executeAffrows() <= 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void insert(T2 data,
-                            Class<T2> dtoType,
-                            Integer mainTagLevel)
+    public <TDto> void insert(TDto data,
+                              Class<TDto> dtoType,
+                              Integer mainTagLevel)
             throws
             Exception {
-        if (dbProvider.createInsert(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .appendData(data)
-                      .asDto(dtoType)
-                      .mainTagLevel(mainTagLevel)
-                      .executeAffrows() <= 0)
+        if (getOrm().insert(setting.getEntityType(),
+                            data,
+                            dtoType,
+                            mainTagLevel)
+                    .executeAffrows() <= 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchInsert(Collection<T2> data)
+    public void batchInsert(Collection<TEntity> data)
             throws
             Exception {
-        if (dbProvider.createInsert(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .appendData(data)
-                      .executeAffrows() != data.size())
+        if (getOrm().batchInsert(setting.getEntityType(),
+                                 data)
+                    .executeAffrows() != data.size())
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchInsert(Collection<T2> data,
-                                 Class<T2> dtoType,
-                                 Integer mainTagLevel)
+    public <TDto> void batchInsert(Collection<TDto> data,
+                                   Class<TDto> dtoType,
+                                   Integer mainTagLevel)
             throws
             Exception {
-        if (dbProvider.createInsert(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .appendData(data)
-                      .asDto(dtoType)
-                      .mainTagLevel(mainTagLevel)
-                      .executeAffrows() != data.size())
+        if (getOrm().batchInsert(setting.getEntityType(),
+                                 data,
+                                 dtoType,
+                                 mainTagLevel)
+                    .executeAffrows() != data.size())
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public IInsert<T> insertDiy() {
-        return dbProvider.createInsert(setting.getEntityType(),
-                                       this.ormScoped.getAdo());
+    public IInsert<TEntity> insertDiy() {
+        return getOrm().insert(setting.getEntityType());
     }
 
     @Override
-    public <T2> void update(T2 data)
+    public void update(TEntity data)
             throws
             Exception {
-        if (dbProvider.createUpdate(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .executeAffrows() < 0)
+        if (getOrm().update(setting.getEntityType(),
+                            data)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void update(T2 data,
-                            Class<T2> dtoType,
-                            Integer mainTagLevel)
+    public <TDto> void update(TDto data,
+                              Class<TDto> dtoType,
+                              Integer mainTagLevel)
             throws
             Exception {
-        if (dbProvider.createUpdate(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .asDto(dtoType)
-                      .mainTagLevel(mainTagLevel)
-                      .executeAffrows() < 0)
+        if (getOrm().update(setting.getEntityType(),
+                            data,
+                            dtoType,
+                            mainTagLevel)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchUpdate(Collection<T2> data)
+    public void batchUpdate(Collection<TEntity> data)
             throws
             Exception {
-        if (dbProvider.createUpdate(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .executeAffrows() < 0)
+        if (getOrm().batchUpdate(setting.getEntityType(),
+                                 data)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchUpdate(Collection<T2> data,
-                                 Class<T2> dtoType,
-                                 Integer mainTagLevel)
+    public <TDto> void batchUpdate(Collection<TDto> data,
+                                   Class<TDto> dtoType,
+                                   Integer mainTagLevel)
             throws
             Exception {
-        if (dbProvider.createUpdate(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .asDto(dtoType)
-                      .mainTagLevel(mainTagLevel)
-                      .executeAffrows() < 0)
+        if (getOrm().batchUpdate(setting.getEntityType(),
+                                 data,
+                                 dtoType,
+                                 mainTagLevel)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public IUpdate<T> updateDiy() {
-        return dbProvider.createUpdate(setting.getEntityType(),
-                                       this.ormScoped.getAdo());
+    public IUpdate<TEntity> updateDiy() {
+        return getOrm().update(setting.getEntityType());
     }
 
     @Override
-    public <T2> void delete(T2 data)
+    public void delete(TEntity data)
             throws
             Exception {
-        if (dbProvider.createDelete(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .executeAffrows() < 0)
+        if (getOrm().delete(setting.getEntityType(),
+                            data)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void delete(T2 data,
-                            Class<T2> dtoType)
+    public <TDto> void delete(TDto data,
+                              Class<TDto> dtoType)
             throws
             Exception {
-        if (dbProvider.createDelete(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .asDto(dtoType)
-                      .executeAffrows() < 0)
+        if (getOrm().delete(setting.getEntityType(),
+                            data,
+                            dtoType)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchDelete(Collection<T2> data)
+    public void batchDelete(Collection<TEntity> data)
             throws
             Exception {
-        if (dbProvider.createDelete(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .executeAffrows() < 0)
+        if (getOrm().batchDelete(setting.getEntityType(),
+                                 data)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public <T2> void batchDelete(Collection<T> data,
-                                 Class<T2> dtoType)
+    public <TDto> void batchDelete(Collection<TDto> data,
+                                   Class<TDto> dtoType)
             throws
             Exception {
-        if (dbProvider.createDelete(setting.getEntityType(),
-                                    this.ormScoped.getAdo())
-                      .setSource(data)
-                      .asDto(dtoType)
-                      .executeAffrows() < 0)
+        if (getOrm().batchDelete(setting.getEntityType(),
+                                 data,
+                                 dtoType)
+                    .executeAffrows() < 0)
             throw new Exception("执行操作失败");
     }
 
     @Override
-    public IDelete<T> deleteDiy() {
-        return dbProvider.createDelete(setting.getEntityType(),
-                                       this.ormScoped.getAdo());
+    public IDelete<TEntity> deleteDiy() {
+        return getOrm().delete(setting.getEntityType());
     }
 }
