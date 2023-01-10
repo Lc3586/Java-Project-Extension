@@ -5,6 +5,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
@@ -16,7 +17,10 @@ import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple2;
 
+import java.sql.Connection;
+import java.sql.Savepoint;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -128,6 +132,16 @@ public class UnitOfWork
     protected TraceBeforeEventArgs uowBefore;
 
     /**
+     * 当前连接
+     */
+    private Connection connection;
+
+    /**
+     * 还原点
+     */
+    private Savepoint savepoint;
+
+    /**
      * 使用完毕后归还对象
      */
     private void returnObject() {
@@ -219,16 +233,23 @@ public class UnitOfWork
     }
 
     @Override
-    public TransactionStatus getOrBeginTransaction() {
+    public Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction() {
         return this.getOrBeginTransaction(true);
     }
 
     @Override
-    public TransactionStatus getOrBeginTransaction(boolean isCreate) {
+    public Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction(boolean isCreate) {
         if (this.transactionStatus != null)
-            return this.transactionStatus;
-        if (!isCreate)
+            return new Tuple2<>(this.transactionStatus,
+                                getIsolationLevel());
+
+        if (!isCreate) {
+            if (TransactionSynchronizationManager.isActualTransactionActive())
+                return new Tuple2<>(this.dataSourceTransactionManager.getTransaction(this.transactionDefinition),
+                                    getIsolationLevel());
             return null;
+        }
+
         if (!this.enable)
             return null;
 
@@ -244,6 +265,14 @@ public class UnitOfWork
                                     seed.incrementAndGet());
             debugBeingUsed.putIfAbsent(this.getId(),
                                        this);
+
+            //创建新连接并禁用自动提交
+            this.connection = getOrm().getAdo()
+                                      .getOrCreateSqlSession()
+                                      .getConnection();
+            this.connection.setAutoCommit(false);
+            //创建还原点
+            this.savepoint = this.connection.setSavepoint();
         } catch (Exception ex) {
             this.returnObject();
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
@@ -253,7 +282,8 @@ public class UnitOfWork
                                       ex);
         }
 
-        return this.transactionStatus;
+        return new Tuple2<>(this.transactionStatus,
+                            getIsolationLevel());
     }
 
     @Override
@@ -265,6 +295,11 @@ public class UnitOfWork
                 this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                             "提交",
                                                             null));
+            }
+
+            if (this.connection != null) {
+                connection.commit();
+                connection.close();
             }
         } catch (Exception ex) {
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
@@ -287,6 +322,14 @@ public class UnitOfWork
                 this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                             "回滚",
                                                             null));
+            }
+
+            if (this.connection != null) {
+                if (this.savepoint != null)
+                    connection.rollback(this.savepoint);
+                else
+                    connection.rollback();
+                connection.close();
             }
         } catch (Exception ex) {
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,

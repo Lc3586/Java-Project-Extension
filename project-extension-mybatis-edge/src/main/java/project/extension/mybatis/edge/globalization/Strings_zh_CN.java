@@ -77,6 +77,8 @@ public class Strings_zh_CN {
                        "未在{0}实体中找到{1}字段");
             values.put("DataUndefined",
                        "数据不存在或已被移除");
+            values.put("UseMasterOrmMethod",
+                       "请使用getMasterOrm方法获取主库ORM");
         }
 
         return values.get(code);

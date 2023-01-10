@@ -3,17 +3,14 @@ package project.extension.mybatis.edge.core.ado;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.*;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import project.extension.func.IFunc0;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.mapper.MappedStatementHandler;
-import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.standard.exception.ModuleException;
@@ -35,26 +32,25 @@ public class NaiveAdoProvider
     /**
      * @param dataSource 数据源
      */
-    public NaiveAdoProvider(DataSource dataSource)
+    public NaiveAdoProvider(String dataSource)
             throws
             ModuleException {
+        this.dataSourceName = dataSource;
         this.mappedStatementHandler = IOCExtension.applicationContext.getBean(MappedStatementHandler.class);
-        this.dataSource = dataSource;
-        final SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
-        sqlSessionFactory.setDataSource(dataSource);
-        sqlSessionFactory.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
-                                                                                               .getConfigLocation()));
-        try {
-            this.sqlSessionFactory = sqlSessionFactory.getObject();
-        } catch (Exception ex) {
-            throw new ModuleException(DbContextStrings.getSqlSessionFactoryFailed());
-        }
+        final INaiveDataSourceProvider naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
+        this.dataSource = naiveDataSourceProvider.getDataSources(dataSource);
+        this.sqlSessionFactory = naiveDataSourceProvider.getSqlSessionFactory(dataSource);
     }
 
     /**
      * MappedStatement处理类
      */
     private final MappedStatementHandler mappedStatementHandler;
+
+    /**
+     * 数据源名称
+     */
+    private final String dataSourceName;
 
     /**
      * 数据源
@@ -69,7 +65,7 @@ public class NaiveAdoProvider
     /**
      * 解析事务的方法
      */
-    private IFunc0<TransactionStatus> resolveTransaction;
+    private IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction;
 
     /**
      * 获取执行器类型
@@ -144,21 +140,13 @@ public class NaiveAdoProvider
         //else 未启用Spring事务管理器
     }
 
-    /**
-     * 获取解析事务的方法
-     *
-     * @return 解析事务的方法
-     */
-    protected IFunc0<TransactionStatus> getResolveTransaction() {
+    @Override
+    public IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> getResolveTransaction() {
         return this.resolveTransaction;
     }
 
-    /**
-     * 设置解析事务的方法
-     *
-     * @param resolveTransaction 解析事务的方法
-     */
-    protected void setResolveTransaction(IFunc0<TransactionStatus> resolveTransaction) {
+    @Override
+    public void setResolveTransaction(IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction) {
         this.resolveTransaction = resolveTransaction;
     }
 
@@ -173,6 +161,11 @@ public class NaiveAdoProvider
     }
 
     @Override
+    public String getDataSourceName() {
+        return this.dataSourceName;
+    }
+
+    @Override
     public DataSource getDataSource() {
         return this.dataSource;
     }
@@ -181,7 +174,48 @@ public class NaiveAdoProvider
     public SqlSession getOrCreateSqlSession()
             throws
             ModuleException {
-        return getOrCreateSqlSession(null);
+        Tuple2<Boolean, SqlSession> currentSqlSession1 = currentSqlSession();
+        if (currentSqlSession1.a)
+            return currentSqlSession1.b;
+
+        //开启事务
+        Tuple2<TransactionStatus, TransactionIsolationLevel> transaction = null;
+        if (getResolveTransaction() != null) {
+            try {
+                transaction = getResolveTransaction().invoke();
+            } catch (Exception ex) {
+                throw new ModuleException(DbContextStrings.getResolveTransactionFailed(),
+                                          ex);
+            }
+        }
+
+        Tuple2<Boolean, SqlSession> currentSqlSession2 = currentSqlSession();
+        if (currentSqlSession2.a)
+            return currentSqlSession2.b;
+
+        //创建新的Sql会话
+        ExecutorType executorType = getExecutorType();
+        SqlSession session = transaction == null
+                             ? sqlSessionFactory.openSession(executorType,
+                                                             true)
+                             : sqlSessionFactory.openSession(executorType,
+                                                             transaction.b);
+
+        registerSessionHolder(this.sqlSessionFactory,
+                              executorType,
+                              session);
+        return session;
+    }
+
+    @Override
+    public Tuple2<Boolean, SqlSession> currentSqlSession() {
+        ExecutorType executorType = getExecutorType();
+        SqlSessionHolder holder = (SqlSessionHolder) TransactionSynchronizationManager.getResource(this.sqlSessionFactory);
+
+        SqlSession session = sessionHolder(executorType,
+                                           holder);
+        return new Tuple2<>(session != null,
+                            session);
     }
 
     @Override
@@ -233,48 +267,6 @@ public class NaiveAdoProvider
             throws
             ModuleException {
         sqlSession.close();
-    }
-
-    @Override
-    public SqlSession getOrCreateSqlSession(TransactionIsolationLevel level)
-            throws
-            ModuleException {
-        Tuple2<Boolean, SqlSession> currentSqlSession = currentSqlSession();
-        if (currentSqlSession.a)
-            return currentSqlSession.b;
-
-        //开启事务
-        if (getResolveTransaction() != null) {
-            try {
-                getResolveTransaction().invoke();
-            } catch (Exception ex) {
-                throw new ModuleException(DbContextStrings.getResolveTransactionFailed(),
-                                          ex);
-            }
-        }
-
-        //创建新的Sql会话
-        ExecutorType executorType = getExecutorType();
-        SqlSession session = level == null
-                             ? sqlSessionFactory.openSession(executorType)
-                             : sqlSessionFactory.openSession(executorType,
-                                                             level);
-
-        registerSessionHolder(this.sqlSessionFactory,
-                              executorType,
-                              session);
-        return session;
-    }
-
-    @Override
-    public Tuple2<Boolean, SqlSession> currentSqlSession() {
-        ExecutorType executorType = getExecutorType();
-        SqlSessionHolder holder = (SqlSessionHolder) TransactionSynchronizationManager.getResource(this.sqlSessionFactory);
-
-        SqlSession session = sessionHolder(executorType,
-                                           holder);
-        return new Tuple2<>(session != null,
-                            session);
     }
 
     @Override

@@ -4,11 +4,12 @@ import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import project.extension.action.IAction0;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
-import project.extension.mybatis.edge.core.ado.NaiveDataSource;
 import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key;
@@ -23,30 +24,39 @@ import project.extension.tuple.Tuple2;
 import java.util.Collection;
 
 /**
- * 数据仓储构造器
+ * ORM构造器
  *
  * @author LCTR
  * @date 2022-03-28
  */
 @Component
 @DependsOn("IOCExtension")
-public class BaseProvider
+public class OrmProvider
         implements INaiveSql {
-    public BaseProvider(NaiveDataSource naiveDataSource,
-                        INaiveAop aop) {
-        this.ado = new NaiveAdoProvider(naiveDataSource.getResolvedDataSources()
-                                                       .get(CommonUtils.getConfig()
-                                                                       .getDataSource()));
-        this.aop = aop;
+    public OrmProvider() {
+        this(CommonUtils.getConfig()
+                        .getDataSource());
     }
+
+    public OrmProvider(String dataSource) {
+        this.dataSourceConfig = CommonUtils.getConfig()
+                                           .getDataSourceConfig(dataSource);
+        this.uow = new UnitOfWork(this);
+        this.ado = new NaiveAdoProvider(dataSource);
+        this.ado.setResolveTransaction(() -> uow.getOrBeginTransaction(false));
+        this.aop = IOCExtension.applicationContext.getBean(INaiveAop.class);
+    }
+
+    private final DataSourceConfig dataSourceConfig;
+
+    private final IUnitOfWork uow;
 
     private final INaiveAdo ado;
 
     private final INaiveAop aop;
 
     private IBaseDbProvider createDbProvider() {
-        return DbProvider.getDbProvider(CommonUtils.getConfig()
-                                                   .getDataSourceConfig());
+        return DbProvider.getDbProvider(this.dataSourceConfig);
     }
 
     @Override
@@ -206,24 +216,18 @@ public class BaseProvider
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
-        IUnitOfWork uow = new UnitOfWork(this);
         try {
-            getAdo().commit();
             if (isolationLevel != null)
-                uow.setIsolationLevel(isolationLevel);
-            uow.getOrBeginTransaction();
+                this.uow.setIsolationLevel(isolationLevel);
+            this.uow.getOrBeginTransaction();
             handler.invoke();
-            uow.commit();
-            getAdo().commit();
+            this.uow.commit();
             return new Tuple2<>(true,
                                 null);
         } catch (Exception ex) {
-            uow.rollback();
-            getAdo().rollback();
+            this.uow.rollback();
             return new Tuple2<>(false,
                                 ex);
-        } finally {
-            getAdo().close();
         }
     }
 

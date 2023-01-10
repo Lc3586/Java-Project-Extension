@@ -5,6 +5,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.TransactionStatus;
+import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
@@ -22,6 +24,20 @@ import java.util.Map;
  */
 public interface INaiveAdo {
     /**
+     * 获取解析事务的方法
+     *
+     * @return 解析事务的方法
+     */
+    IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> getResolveTransaction();
+
+    /**
+     * 设置解析事务的方法
+     *
+     * @param resolveTransaction 解析事务的方法
+     */
+    void setResolveTransaction(IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction);
+
+    /**
      * 获取SqlSession工厂类
      */
     SqlSessionFactory getSqlSessionFactory();
@@ -30,6 +46,13 @@ public interface INaiveAdo {
      * 获取配置
      */
     Configuration getConfiguration();
+
+    /**
+     * 获取数据源名称
+     *
+     * @return 数据源名称
+     */
+    String getDataSourceName();
 
     /**
      * 获取数据源
@@ -46,6 +69,13 @@ public interface INaiveAdo {
     SqlSession getOrCreateSqlSession()
             throws
             ModuleException;
+
+    /**
+     * 获取当前的Sql会话
+     *
+     * @return Sql会话
+     */
+    Tuple2<Boolean, SqlSession> currentSqlSession();
 
     /**
      * 提交当前的Sql会话
@@ -94,23 +124,6 @@ public interface INaiveAdo {
     void close(SqlSession sqlSession)
             throws
             ModuleException;
-
-    /**
-     * 获取或创建Sql会话
-     *
-     * @param level 事务隔离等级
-     * @return Sql会话
-     */
-    SqlSession getOrCreateSqlSession(TransactionIsolationLevel level)
-            throws
-            ModuleException;
-
-    /**
-     * 获取当前的Sql会话
-     *
-     * @return Sql会话
-     */
-    Tuple2<Boolean, SqlSession> currentSqlSession();
 
     /**
      * 查询单条记录

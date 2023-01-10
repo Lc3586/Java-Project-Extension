@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge;
+package project.extension.mybatis.edge.common;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

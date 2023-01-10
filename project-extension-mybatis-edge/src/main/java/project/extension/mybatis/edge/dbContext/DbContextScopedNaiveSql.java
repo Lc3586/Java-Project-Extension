@@ -52,11 +52,32 @@ public class DbContextScopedNaiveSql
     private final IFunc0<IUnitOfWork> resolveUnitOfWork;
 
     /**
+     * 工作单元
+     */
+    private IUnitOfWork uow;
+
+    /**
      * 数据库访问对象
      */
     private final INaiveAdo ado;
 
+    /**
+     * AOP编程对象
+     */
     private final INaiveAop aop;
+
+    /**
+     * 获取工作单元
+     */
+    private IUnitOfWork getUow() {
+        if (resolveUnitOfWork != null)
+            this.uow = resolveUnitOfWork.invoke();
+
+        if (this.uow == null)
+            this.uow = new UnitOfWork(getOriginalOrm());
+
+        return this.uow;
+    }
 
     /**
      * 创建
@@ -77,7 +98,7 @@ public class DbContextScopedNaiveSql
                                                resolveDbContext,
                                                resolveUnitOfWork,
                                                new ScopeTransactionAdo(orm.getAdo()
-                                                                          .getDataSource(),
+                                                                          .getDataSourceName(),
                                                                        () -> {
                                                                            if (resolveDbContext != null) {
                                                                                DbContext dbContext = resolveDbContext.invoke();
@@ -294,29 +315,20 @@ public class DbContextScopedNaiveSql
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
-        IUnitOfWork uow;
-        if (this.resolveUnitOfWork != null)
-            uow = this.resolveUnitOfWork.invoke();
-        else
-            uow = new UnitOfWork(getOriginalOrm());
+        IUnitOfWork uow = getUow();
 
         try {
-            getAdo().commit();
             if (isolationLevel != null)
                 uow.setIsolationLevel(isolationLevel);
             uow.getOrBeginTransaction();
             handler.invoke();
             uow.commit();
-            getAdo().commit();
             return new Tuple2<>(true,
                                 null);
         } catch (Exception ex) {
             uow.rollback();
-            getAdo().rollback();
             return new Tuple2<>(false,
                                 ex);
-        } finally {
-            getAdo().close();
         }
     }
 

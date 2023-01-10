@@ -1,9 +1,11 @@
 package project.extension.mybatis.edge.dbContext;
 
+import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.transaction.TransactionStatus;
 import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.core.ado.NaiveAdoProvider;
 import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple2;
 
 import javax.sql.DataSource;
 
@@ -18,8 +20,8 @@ public class ScopeTransactionAdo
     /**
      * @param dataSource 数据源
      */
-    protected ScopeTransactionAdo(DataSource dataSource,
-                                  IFunc0<TransactionStatus> resolveTransaction)
+    protected ScopeTransactionAdo(String dataSource,
+                                  IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction)
             throws
             ModuleException {
         super(dataSource);

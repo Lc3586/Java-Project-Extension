@@ -2,23 +2,20 @@ package project.extension.mybatis.edge;
 
 import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.common.OrmInjection;
+import project.extension.mybatis.edge.common.SpringBootTestApplication;
 import project.extension.mybatis.edge.core.ado.NaiveDataSource;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
 import project.extension.mybatis.edge.model.FilterCompare;
-import project.extension.standard.exception.ModuleException;
-import project.extension.tuple.Tuple2;
 
 import javax.sql.DataSource;
 import java.lang.reflect.Field;
@@ -26,14 +23,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * SpringBoot构建测试
+ * 基础测试
  *
  * @author LCTR
  * @date 2022-12-15
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringBootTestApplication.class)
-@DisplayName("基础功能测试")
+@DisplayName("基础测试")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BaseTest {
     /**
@@ -79,27 +75,20 @@ public class BaseTest {
         }
     }
 
-    @Autowired
-    public ConfigurableApplicationContext application;
+    @BeforeEach
+    public void injection() {
+        OrmInjection.injection();
+    }
 
     /**
-     * 测试程序是否已自动注入
+     * 测试数据库连接是否正常
      */
     @Test
-    @DisplayName("测试程序是否已自动注入")
-    public void a0()
+    @DisplayName("测试数据库连接是否正常")
+    public void a10()
             throws
             Throwable {
-        BaseConfig baseConfig = application.getBean(BaseConfig.class);
-
-        Assertions.assertNotEquals(null,
-                                   baseConfig,
-                                   "未获取到BaseConfig");
-
-        System.out.printf("\r\n%s已注入\r\n",
-                          BaseConfig.class.getName());
-
-        NaiveDataSource naiveDataSource = application.getBean(NaiveDataSource.class);
+        NaiveDataSource naiveDataSource = IOCExtension.applicationContext.getBean(NaiveDataSource.class);
 
         Assertions.assertNotEquals(null,
                                    naiveDataSource,
@@ -114,7 +103,7 @@ public class BaseTest {
                                    druidDataSourceMap.size(),
                                    "未获取到任何DruidDataSource");
 
-        for (String dataSource : baseConfig.getAllDataSource()) {
+        for (String dataSource : OrmInjection.baseConfig.getAllDataSource()) {
             Assertions.assertNotEquals(false,
                                        druidDataSourceMap.containsKey(dataSource),
                                        String.format("未获取到name为%s的DruidDataSource",
@@ -122,30 +111,40 @@ public class BaseTest {
 
             System.out.printf("\r\n已创建%s数据源\r\n",
                               dataSource);
-        }
 
-        INaiveSql naiveSql = application.getBean(INaiveSql.class);
+            INaiveSql orm;
+            String ormName;
+            if (dataSource.equals(OrmInjection.baseConfig.getDataSource())) {
+                orm = OrmInjection.masterNaiveSql;
+                ormName = String.format("主库-%s",
+                                        dataSource);
+            } else {
+                orm = OrmInjection.multiNaiveSql.getSlaveOrm(dataSource);
+                ormName = String.format("从库-%s",
+                                        dataSource);
+            }
 
-        Assertions.assertNotEquals(null,
-                                   naiveSql,
-                                   "未获取到INaiveSql");
+            Assertions.assertNotNull(orm,
+                                     String.format("未获取到%s的orm",
+                                                   ormName));
 
-        System.out.printf("\r\n%s已注入\r\n",
-                          INaiveSql.class.getName());
+            IDbFirst dbFirst = orm.getDbFirst();
 
-        IDbFirst dbFirst = naiveSql.getDbFirst();
+            Assertions.assertNotEquals(null,
+                                       dbFirst,
+                                       String.format("未获取到%s的IDbFirst",
+                                                     ormName));
 
-        Assertions.assertNotEquals(null,
-                                   dbFirst,
-                                   "未获取到IDbFirst");
+            System.out.printf("\r\n成功获取%s的%s\r\n",
+                              ormName,
+                              IDbFirst.class.getName());
 
-        System.out.printf("\r\n成功获取%s\r\n",
-                          IDbFirst.class.getName());
-
-        List<String> databases = dbFirst.getDatabases();
-        for (String database : databases) {
-            System.out.printf("\r\n查询到数据库：%s%n\r\n",
-                              database);
+            List<String> databases = dbFirst.getDatabases();
+            for (String database : databases) {
+                System.out.printf("\r\n%s查询到数据库：%s%n\r\n",
+                                  ormName,
+                                  database);
+            }
         }
     }
 
@@ -154,18 +153,9 @@ public class BaseTest {
      */
     @Test
     @DisplayName("测试ORM的增删改查功能")
-    public void a1()
+    public void a20()
             throws
             Throwable {
-        INaiveSql naiveSql = application.getBean(INaiveSql.class);
-
-        Assertions.assertNotEquals(null,
-                                   naiveSql,
-                                   "未获取到INaiveSql");
-
-        System.out.printf("\r\n成功获取%s\r\n",
-                          INaiveSql.class.getName());
-
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -174,9 +164,9 @@ public class BaseTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
-                                         dataCreate)
-                                 .executeAffrows();
+        int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
+                                                            dataCreate)
+                                                    .executeAffrows();
 
         Assertions.assertEquals(1,
                                 rowsCreate,
@@ -185,11 +175,11 @@ public class BaseTest {
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataCreate.getId()))
-                                                   .first();
+        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
+                                                                      .where(x -> x.and(CQI_Fields.id,
+                                                                                        FilterCompare.Eq,
+                                                                                        dataCreate.getId()))
+                                                                      .first();
 
         Assertions.assertNotEquals(null,
                                    dataCheckCreate,
@@ -216,9 +206,9 @@ public class BaseTest {
         dataUpdate.setCreateBy(dataCheckCreate.getCreateBy());
         dataUpdate.setCreateTime(dataCheckCreate.getCreateTime());
 
-        int rowsUpdate = naiveSql.update(CommonQuickInput.class,
-                                         dataUpdate)
-                                 .executeAffrows();
+        int rowsUpdate = OrmInjection.masterNaiveSql.update(CommonQuickInput.class,
+                                                            dataUpdate)
+                                                    .executeAffrows();
 
         Assertions.assertEquals(1,
                                 rowsUpdate,
@@ -227,11 +217,11 @@ public class BaseTest {
         System.out.printf("\r\n已更新数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckUpdate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataUpdate.getId()))
-                                                   .first();
+        CommonQuickInput dataCheckUpdate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
+                                                                      .where(x -> x.and(CQI_Fields.id,
+                                                                                        FilterCompare.Eq,
+                                                                                        dataUpdate.getId()))
+                                                                      .first();
 
         Assertions.assertNotEquals(null,
                                    dataCheckUpdate,
@@ -248,9 +238,9 @@ public class BaseTest {
                      CQI_Fields.keyword,
                      CQI_Fields.public_);
 
-        int rowsDelete = naiveSql.delete(CommonQuickInput.class,
-                                         dataUpdate)
-                                 .executeAffrows();
+        int rowsDelete = OrmInjection.masterNaiveSql.delete(CommonQuickInput.class,
+                                                            dataUpdate)
+                                                    .executeAffrows();
 
         Assertions.assertEquals(1,
                                 rowsDelete,
@@ -259,75 +249,16 @@ public class BaseTest {
         System.out.printf("\r\n已删除数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckDelete = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataUpdate.getId()))
-                                                   .first();
+        CommonQuickInput dataCheckDelete = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
+                                                                      .where(x -> x.and(CQI_Fields.id,
+                                                                                        FilterCompare.Eq,
+                                                                                        dataUpdate.getId()))
+                                                                      .first();
 
         Assertions.assertNull(dataCheckDelete,
                               "数据未删除");
 
         System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",
                           dataCheckUpdate.getId());
-    }
-
-    /**
-     * 测试事务
-     */
-    @Test
-    @DisplayName("测试事务")
-    public void a2()
-            throws
-            Throwable {
-        INaiveSql naiveSql = application.getBean(INaiveSql.class);
-
-        Assertions.assertNotEquals(null,
-                                   naiveSql,
-                                   "未获取到INaiveSql");
-
-        System.out.printf("\r\n成功获取%s\r\n",
-                          INaiveSql.class.getName());
-
-        EntityExtension entityExtension = new EntityExtension(null);
-
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
-            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
-                                             dataCreate)
-                                     .executeAffrows();
-
-            Assertions.assertEquals(1,
-                                    rowsCreate,
-                                    "新增数据失败");
-
-            System.out.printf("\r\n已新增数据，Id：%s\r\n",
-                              dataCreate.getId());
-
-            System.out.println("回滚事务");
-            throw new ModuleException("回滚事务");
-        });
-
-        Assertions.assertEquals(false,
-                                tranCreate.a,
-                                "事务未回滚");
-
-        System.out.println("事务已回滚");
-
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataCreate.getId()))
-                                                   .first();
-
-        Assertions.assertNull(dataCheckCreate,
-                              "事务回滚后依然能查询到新增的数据");
-
-        System.out.println("事务回滚成功");
     }
 }

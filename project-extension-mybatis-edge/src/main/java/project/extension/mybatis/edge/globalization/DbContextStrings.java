@@ -299,11 +299,17 @@ public class DbContextStrings {
                          fieldName);
     }
 
-
     /**
      * 数据不存在或已被移除
      */
     public static String getDataUndefined() {
         return getString("DataUndefined");
+    }
+
+    /**
+     * 请使用getMasterOrm方法获取主库ORM
+     */
+    public static String getUseMasterOrmMethod() {
+        return getString("UseMasterOrmMethod");
     }
 }

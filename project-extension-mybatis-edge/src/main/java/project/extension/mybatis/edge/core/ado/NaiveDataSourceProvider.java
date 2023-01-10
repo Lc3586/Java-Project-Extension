@@ -2,12 +2,18 @@ package project.extension.mybatis.edge.core.ado;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.config.DruidConfig;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.DbContextStrings;
 import project.extension.standard.exception.ModuleException;
 
@@ -25,6 +31,8 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties({BaseConfig.class,
                                 DruidConfig.class})
+@DependsOn("IOCExtension")
+@EnableTransactionManagement
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
     public NaiveDataSourceProvider(BaseConfig baseConfig,
@@ -44,6 +52,10 @@ public class NaiveDataSourceProvider
      */
     private final DruidConfig druidConfig;
 
+    private final Map<String, DataSource> dataSourceMap = new HashMap<>();
+
+    private final Map<String, SqlSessionFactory> sqlSessionFactoryMap = new HashMap<>();
+
     @Override
     public String defaultDataSource() {
         return this.baseConfig.getDataSource();
@@ -58,23 +70,47 @@ public class NaiveDataSourceProvider
     public Map<String, DataSource> loadAllDataSources()
             throws
             ModuleException {
-        Map<String, DataSource> dataSourceMap = new HashMap<>();
-        for (String dataSource : baseConfig.getAllDataSource()) {
-            DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
-            DruidDataSource druidDataSource;
-            try {
-                druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
-            } catch (Exception ex) {
-                throw new ModuleException(DbContextStrings.getCreateDataSourceFailed(dataSource),
-                                          ex);
+        if (dataSourceMap.size() == 0) {
+            for (String dataSource : baseConfig.getAllDataSource()) {
+                DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
+                DruidDataSource druidDataSource;
+                try {
+                    druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
+                } catch (Exception ex) {
+                    throw new ModuleException(DbContextStrings.getCreateDataSourceFailed(dataSource),
+                                              ex);
+                }
+                druidConfig.applyConfig(druidDataSource,
+                                        dataSourceConfig.getDbType());
+                dataSourceMap.put(
+                        dataSourceConfig.getName(),
+                        druidDataSource);
+
+                final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+                sqlSessionFactoryBean.setDataSource(druidDataSource);
+                sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
+                                                                                                           .getConfigLocation()));
+                SqlSessionFactory sqlSessionFactory;
+                try {
+                    sqlSessionFactory = sqlSessionFactoryBean.getObject();
+                } catch (Exception ex) {
+                    throw new ModuleException(DbContextStrings.getSqlSessionFactoryFailed());
+                }
+                sqlSessionFactoryMap.put(dataSourceConfig.getName(),
+                                         sqlSessionFactory);
             }
-            druidConfig.applyConfig(druidDataSource,
-                                    dataSourceConfig.getDbType());
-            dataSourceMap.put(
-                    dataSourceConfig.getName(),
-                    druidDataSource);
         }
 
         return dataSourceMap;
+    }
+
+    @Override
+    public DataSource getDataSources(String dataSource) {
+        return loadAllDataSources().get(dataSource);
+    }
+
+    @Override
+    public SqlSessionFactory getSqlSessionFactory(String dataSource) {
+        return sqlSessionFactoryMap.get(dataSource);
     }
 }
