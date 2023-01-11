@@ -5,7 +5,7 @@ import dm.jdbc.driver.DmDriver;
 import oracle.jdbc.driver.OracleDriver;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.standard.exception.ModuleException;
 
@@ -71,7 +71,7 @@ public class CommonUtils {
                 try {
                     return new com.mysql.cj.jdbc.Driver();
                 } catch (Exception ex) {
-                    throw new ModuleException(DbContextStrings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
+                    throw new ModuleException(Strings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
                                               ex);
                 }
             case JdbcSqlServer:
@@ -90,7 +90,7 @@ public class CommonUtils {
             case JdbcPostgreSQL:
                 return new org.postgresql.Driver();
             default:
-                throw new ModuleException(DbContextStrings.getUnsupportedDbType(dbType.toString()));
+                throw new ModuleException(Strings.getUnsupportedDbType(dbType.toString()));
         }
     }
 }

@@ -8,7 +8,7 @@ import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
 import project.extension.mybatis.edge.dbContext.RepositoryDbContext;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.DynamicSqlSetting;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
@@ -74,12 +74,12 @@ public class BaseRepository<TEntity>
 
     @Override
     public void asType(Class<?> entityType) {
-        throw new ModuleException(DbContextStrings.getFunctionNotImplemented());
+        throw new ModuleException(Strings.getFunctionNotImplemented());
     }
 
     @Override
     public void asTable(IFunc1<String, String> change) {
-        throw new ModuleException(DbContextStrings.getFunctionNotImplemented());
+        throw new ModuleException(Strings.getFunctionNotImplemented());
     }
 
     @Override

@@ -5,7 +5,7 @@ import project.extension.mybatis.edge.core.provider.dameng.DamengProvider;
 import project.extension.mybatis.edge.core.provider.mysql.MySqlProvider;
 import project.extension.mybatis.edge.core.provider.sqlserver.SqlServerProvider;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
 
 /**
@@ -27,8 +27,8 @@ public class DbProvider {
             case JdbcSqlServer_2012_plus:
                 return new SqlServerProvider(config);
             default:
-                throw new ModuleException(DbContextStrings.getUnsupportedDbType(config.getDbType()
-                                                                                      .toString()));
+                throw new ModuleException(Strings.getUnsupportedDbType(config.getDbType()
+                                                                             .toString()));
         }
     }
 }

@@ -1,12 +1,11 @@
 package project.extension.mybatis.edge.core.provider;
 
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import project.extension.mybatis.edge.IMultiNaiveSql;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.extention.CommonUtils;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
 
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import java.util.Map;
  * @date 2023-01-10
  */
 @Component
-@DependsOn("IOCExtension")
 public class MultiOrmProvider
         implements IMultiNaiveSql {
     public MultiOrmProvider(INaiveSql orm,
@@ -46,7 +44,7 @@ public class MultiOrmProvider
     public INaiveSql getSlaveOrm(String dataSource) {
         if (dataSource.equals(CommonUtils.getConfig()
                                          .getDataSource()))
-            throw new ModuleException(DbContextStrings.getUseMasterOrmMethod());
+            throw new ModuleException(Strings.getUseMasterOrmMethod());
 
         if (!slaveOrmMap.containsKey(dataSource))
             slaveOrmMap.put(dataSource,

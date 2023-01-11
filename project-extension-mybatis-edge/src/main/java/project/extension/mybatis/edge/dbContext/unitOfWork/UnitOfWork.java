@@ -1,11 +1,9 @@
 package project.extension.mybatis.edge.dbContext.unitOfWork;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
@@ -15,9 +13,8 @@ import project.extension.mybatis.edge.aop.TraceAfterEventArgs;
 import project.extension.mybatis.edge.aop.TraceBeforeEventArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
-import project.extension.tuple.Tuple2;
 
 import java.sql.Connection;
 import java.sql.Savepoint;
@@ -38,12 +35,11 @@ public class UnitOfWork
     public UnitOfWork(INaiveSql orm) {
         this.orm = orm;
         if (orm == null)
-            throw new ModuleException(DbContextStrings.getInstanceParamsUndefined("project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork",
+            throw new ModuleException(Strings.getInstanceParamsUndefined("project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork",
 
 
-                                                                                  "INaiveSql orm"));
+                                                                         "INaiveSql orm"));
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
-        this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(DataSourceTransactionManager.class);
         this.transactionDefinition = IOCExtension.applicationContext.getBean(TransactionDefinition.class);
         this.uowBefore = new TraceBeforeEventArgs(Operation.UnitOfWork,
                                                   null);
@@ -97,11 +93,6 @@ public class UnitOfWork
     private DbContextScopedNaiveSql ormScoped;
 
     /**
-     * 事务管理器
-     */
-    private final DataSourceTransactionManager dataSourceTransactionManager;
-
-    /**
      * 事务定义
      */
     private TransactionDefinition transactionDefinition;
@@ -132,11 +123,6 @@ public class UnitOfWork
     protected TraceBeforeEventArgs uowBefore;
 
     /**
-     * 当前连接
-     */
-    private Connection connection;
-
-    /**
      * 还原点
      */
     private Savepoint savepoint;
@@ -151,6 +137,21 @@ public class UnitOfWork
         this.transactionStatus = null;
         this.entityChangeRecord.getRecordList()
                                .clear();
+    }
+
+    /**
+     * 创建还原点
+     */
+    private void createSavepoint()
+            throws
+            Exception {
+        //创建新连接并禁用自动提交
+        Connection connection = getOrm().getAdo()
+                                        .getOrCreateSqlSession(this.isolationLevel)
+                                        .getConnection();
+        connection.setAutoCommit(false);
+        //创建还原点
+        this.savepoint = connection.setSavepoint();
     }
 
     /**
@@ -198,7 +199,7 @@ public class UnitOfWork
      */
     public void close() {
         if (this.transactionStatus != null)
-            throw new ModuleException(DbContextStrings.getTransactionHasBeenStarted());
+            throw new ModuleException(Strings.getTransactionHasBeenStarted());
 
         this.enable = false;
     }
@@ -233,22 +234,17 @@ public class UnitOfWork
     }
 
     @Override
-    public Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction() {
+    public TransactionStatus getOrBeginTransaction() {
         return this.getOrBeginTransaction(true);
     }
 
     @Override
-    public Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction(boolean isCreate) {
+    public TransactionStatus getOrBeginTransaction(boolean isCreate) {
         if (this.transactionStatus != null)
-            return new Tuple2<>(this.transactionStatus,
-                                getIsolationLevel());
+            return this.transactionStatus;
 
-        if (!isCreate) {
-            if (TransactionSynchronizationManager.isActualTransactionActive())
-                return new Tuple2<>(this.dataSourceTransactionManager.getTransaction(this.transactionDefinition),
-                                    getIsolationLevel());
+        if (!isCreate)
             return null;
-        }
 
         if (!this.enable)
             return null;
@@ -258,7 +254,12 @@ public class UnitOfWork
         this.aop.traceBefore(this.tranBefore);
 
         try {
-            this.transactionStatus = this.dataSourceTransactionManager.getTransaction(this.transactionDefinition);
+            if (getOrm().getAdo()
+                        .isTransactionAlreadyExisting())
+                throw new ModuleException(Strings.getTransactionAlreadyStarted());
+
+            this.transactionStatus = getOrm().getAdo()
+                                             .getOrCreateTransaction(this.transactionDefinition);
 
             this.id = String.format("%s_%s",
                                     new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
@@ -266,24 +267,17 @@ public class UnitOfWork
             debugBeingUsed.putIfAbsent(this.getId(),
                                        this);
 
-            //创建新连接并禁用自动提交
-            this.connection = getOrm().getAdo()
-                                      .getOrCreateSqlSession()
-                                      .getConnection();
-            this.connection.setAutoCommit(false);
-            //创建还原点
-            this.savepoint = this.connection.setSavepoint();
+//            createSavepoint();
         } catch (Exception ex) {
             this.returnObject();
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                         "失败",
                                                         ex));
-            throw new ModuleException(DbContextStrings.getTransactionBeginFailed(),
+            throw new ModuleException(Strings.getTransactionBeginFailed(),
                                       ex);
         }
 
-        return new Tuple2<>(this.transactionStatus,
-                            getIsolationLevel());
+        return this.transactionStatus;
     }
 
     @Override
@@ -291,21 +285,22 @@ public class UnitOfWork
         try {
             if (this.transactionStatus != null) {
                 if (!this.transactionStatus.isCompleted())
-                    this.dataSourceTransactionManager.commit(this.transactionStatus);
+                    getOrm().getAdo()
+                            .transactionCommit(this.transactionStatus);
                 this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                             "提交",
                                                             null));
             }
 
-            if (this.connection != null) {
-                connection.commit();
-                connection.close();
-            }
+//            if (this.sqlSession != null) {
+//                this.sqlSession.commit();
+//                this.sqlSession.close();
+//            }
         } catch (Exception ex) {
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                         "提交失败",
                                                         ex));
-            throw new ModuleException(DbContextStrings.getTransactionCommitFailed(),
+            throw new ModuleException(Strings.getTransactionCommitFailed(),
                                       ex);
         } finally {
             this.returnObject();
@@ -318,24 +313,27 @@ public class UnitOfWork
         try {
             if (this.transactionStatus != null) {
                 if (!this.transactionStatus.isCompleted())
-                    this.dataSourceTransactionManager.rollback(this.transactionStatus);
+                    getOrm().getAdo()
+                            .transactionRollback(this.transactionStatus);
                 this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                             "回滚",
                                                             null));
             }
 
-            if (this.connection != null) {
-                if (this.savepoint != null)
-                    connection.rollback(this.savepoint);
-                else
-                    connection.rollback();
-                connection.close();
-            }
+//            if (this.sqlSession != null) {
+//                if (this.savepoint != null) {
+//                    this.sqlSession.getConnection()
+//                                   .rollback(this.savepoint);
+////                    this.sqlSession.rollback();
+//                } else
+//                    this.sqlSession.rollback();
+//                this.sqlSession.close();
+//            }
         } catch (Exception ex) {
             this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
                                                         "回滚失败",
                                                         ex));
-            throw new ModuleException(DbContextStrings.getTransactionRollbackFailed(),
+            throw new ModuleException(Strings.getTransactionRollbackFailed(),
                                       ex);
         } finally {
             this.returnObject();

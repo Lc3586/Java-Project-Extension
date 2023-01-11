@@ -8,8 +8,10 @@ import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.math.BigDecimal;
@@ -308,7 +310,7 @@ public class SqlServerDbFirst
                                                       String[] tbname,
                                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("use [%s];\r\n"
                                            + "select * from ( \r\n"
                                            + "select \r\n"
@@ -390,7 +392,7 @@ public class SqlServerDbFirst
                                                        String t_v_MatcherSql,
                                                        String sp_MatcherSql)
             throws
-            Exception {
+            ModuleException {
         String sql_format = "select \r\n"
                 + "isnull(e.name,'') + '.' + isnull(d.name,'') as [F1],\r\n"
                 + "a.object_id as [F2],\r\n"
@@ -466,7 +468,7 @@ public class SqlServerDbFirst
                                                       String targetDatabase,
                                                       String t_v_MatcherSql)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("use [%s];\r\n"
                                            + "select \r\n"
                                            + "a.object_id as [F1],\r\n"
@@ -507,7 +509,7 @@ public class SqlServerDbFirst
                                                         String targetDatabase,
                                                         String t_v_MatcherSql)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("use [%s];\r\n"
                                            + "select \r\n"
                                            + "b.object_id as [F1],\r\n"
@@ -548,14 +550,14 @@ public class SqlServerDbFirst
      */
     private String getDatabase(boolean lower)
             throws
-            Exception {
+            ModuleException {
         Matcher matcher = Pattern.compile("jdbc:sqlserver://(.*?);DatabaseName=(.*?);.*?$",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(String.format("%s;",
                                                         config.getProperties()
                                                               .getProperty(DruidDataSourceFactory.PROP_URL)));
         if (!matcher.find())
-            throw new Exception("无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为 jdbc:sqlserver://(.*?);DatabaseName=(.*?);.*?$");
+            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:sqlserver://(.*?);DatabaseName=(.*?);.*?$"));
 
         if (lower)
             return matcher.group(2)
@@ -594,7 +596,7 @@ public class SqlServerDbFirst
                                         String tablename,
                                         boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         //获取当前数据库名称
         String currentDatabase = getDatabase(ignoreCase);
 
@@ -608,7 +610,8 @@ public class SqlServerDbFirst
             tbname = splitTableName(tablename,
                                     ignoreCase);
             if (tbname == null)
-                throw new Exception("tablename值无效");
+                throw new ModuleException(Strings.getUnknownValue("tablename",
+                                                                  tablename));
             if (tbname.length == 1)
                 tbname = new String[]{currentDatabase,
                                       "dbo",
@@ -1057,7 +1060,7 @@ public class SqlServerDbFirst
     @Override
     public List<String> getDatabases()
             throws
-            Exception {
+            ModuleException {
         String sql = " select name from sys.databases where name not in ('master','tempdb','model','msdb')";
         return this.ado.selectList(getSqlSession(),
                                    getMSId(MD5Utils.hash(sql)),
@@ -1073,7 +1076,7 @@ public class SqlServerDbFirst
     @Override
     public List<DbTableInfo> getTablesByDatabase(String... database)
             throws
-            Exception {
+            ModuleException {
         return getTables(database,
                          null,
                          false);
@@ -1083,7 +1086,7 @@ public class SqlServerDbFirst
     public DbTableInfo getTableByName(String name,
                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         return CollectionsExtension.firstOrDefault(getTables(null,
                                                              name,
                                                              ignoreCase));
@@ -1093,11 +1096,12 @@ public class SqlServerDbFirst
     public boolean existsTable(String name,
                                boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String[] tbname = splitTableName(name,
                                          ignoreCase);
         if (tbname == null)
-            throw new Exception("name值无效");
+            throw new ModuleException(Strings.getUnknownValue("name",
+                                                              name));
 
         //获取当前数据库名称
         String currentDatabase = getDatabase(ignoreCase);

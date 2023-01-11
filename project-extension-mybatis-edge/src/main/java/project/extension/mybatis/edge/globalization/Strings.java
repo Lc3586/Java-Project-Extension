@@ -5,12 +5,12 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import java.util.Locale;
 
 /**
- * DbContext功能模块部分所使用的字符串资源
+ * 字符串资源
  *
  * @author LCTR
  * @date 2022-12-19
  */
-public class DbContextStrings {
+public class Strings {
     /**
      * 本土化信息
      */
@@ -22,7 +22,7 @@ public class DbContextStrings {
      * @return 本土化信息
      */
     public static Locale getLocale() {
-        return DbContextStrings.locale;
+        return Strings.locale;
     }
 
     /**
@@ -33,7 +33,7 @@ public class DbContextStrings {
      * @param locale 本土化信息
      */
     public static void setLocale(Locale locale) {
-        DbContextStrings.locale = locale;
+        Strings.locale = locale;
     }
 
     /**
@@ -71,6 +71,13 @@ public class DbContextStrings {
      */
     public static String getTransactionHasBeenStarted() {
         return getString("TransactionHasBeenStarted");
+    }
+
+    /**
+     * 事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction
+     */
+    public static String getTransactionAlreadyStarted() {
+        return getString("TransactionAlreadyStarted");
     }
 
     /**
@@ -212,6 +219,35 @@ public class DbContextStrings {
     }
 
     /**
+     * 格式化日期失败
+     *
+     * @param value  日期值
+     * @param format 格式
+     */
+    public static String getFormatDateFailed(String value,
+                                             String format) {
+        return getString("FormatDateFailed",
+                         value,
+                         format);
+    }
+
+    /**
+     * 日期格式不规范
+     *
+     * @param object 指定对象
+     * @param value  指定值
+     * @param format 格式
+     */
+    public static String getDateFormatNonStandard(String object,
+                                                  String value,
+                                                  String format) {
+        return getString("DateFormatNonStandard",
+                         object,
+                         value,
+                         format);
+    }
+
+    /**
      * 不支持的主键数据类型
      *
      * @param typeName 类型名称
@@ -300,6 +336,75 @@ public class DbContextStrings {
     }
 
     /**
+     * 获取对象中指定字段的值失败
+     *
+     * @param typeName  类型名称
+     * @param fieldName 字段名称
+     */
+    public static String getGetObjectFieldValueFailed(String typeName,
+                                                      String fieldName) {
+        return getString("GetObjectFieldValueFailed",
+                         typeName,
+                         fieldName);
+    }
+
+    /**
+     * 无效的值
+     *
+     * @param name  值名称
+     * @param value 值
+     */
+    public static String getUnknownValue(String name,
+                                         String value) {
+        return getString("UnknownValue",
+                         name,
+                         value);
+    }
+
+    /**
+     * 指定类型的字段只支持此操作
+     *
+     * @param typeField 类型字段
+     * @param operation 操作
+     */
+    public static String getTypeFieldOnlySupportOperation(String typeField,
+                                                          String operation) {
+        return getString("TypeFieldOnlySupportOperation",
+                         typeField,
+                         operation);
+    }
+
+    /**
+     * 不支持此操作
+     *
+     * @param operation 操作
+     */
+    public static String getUnSupportOperation(String operation) {
+        return getString("UnSupportOperation",
+                         operation);
+    }
+
+    /**
+     * 不支持此操作符
+     *
+     * @param operation 操作
+     */
+    public static String getUnSupportOperationSymbol(String operation) {
+        return getString("UnSupportOperationSymbol",
+                         operation);
+    }
+
+    /**
+     * 不支持此目标操作类型
+     *
+     * @param type 类型
+     */
+    public static String getUnSupportTargetType(String type) {
+        return getString("UnSupportTargetType",
+                         type);
+    }
+
+    /**
      * 数据不存在或已被移除
      */
     public static String getDataUndefined() {
@@ -312,4 +417,67 @@ public class DbContextStrings {
     public static String getUseMasterOrmMethod() {
         return getString("UseMasterOrmMethod");
     }
+
+    /**
+     * 数据库受影响行数有误
+     *
+     * @param rows 数据库受影响行数
+     */
+    public static String getRowsDataException(int rows) {
+        return getString("RowsDataException",
+                         rows);
+    }
+
+    /**
+     * 查询数据失败
+     */
+    public static String getQueryDataFailed() {
+        return getString("QueryDataFailed");
+    }
+
+    /**
+     * 插入数据失败
+     */
+    public static String getInsertDataFailed() {
+        return getString("InsertDataFailed");
+    }
+
+    /**
+     * 更新数据失败
+     */
+    public static String getUpdateDataFailed() {
+        return getString("UpdateDataFailed");
+    }
+
+    /**
+     * 删除数据失败
+     */
+    public static String getDeleteDataFailed() {
+        return getString("DeleteDataFailed");
+    }
+
+    /**
+     * 删除数据时如果未设置数据源，那么则必须设置WHERE条件
+     */
+    public static String getDeleteOperationNeedDataOrCondition() {
+        return getString("DeleteOperationNeedDataOrCondition");
+    }
+
+    /**
+     * 无法从连接字符串中获取数据库名称
+     *
+     * @param pattern 使用的正则表达式
+     */
+    public static String getCanNotGetDbNameFromUrl(String pattern) {
+        return getString("CanNotGetDbNameFromUrl",
+                         pattern);
+    }
+
+    /**
+     * 在SQL Server数据库种进行分页查询时必须指定ORDER BY语句
+     */
+    public static String getSqlServerRequireOrderBy4Paging() {
+        return getString("SqlServerRequireOrderBy4Paging");
+    }
+
 }

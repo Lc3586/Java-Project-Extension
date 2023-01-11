@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.standard;
 
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
@@ -211,7 +212,7 @@ public interface IUpdate<T>
      */
     List<String> toSqlWithNoParameter()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回将会执行的sql语句
@@ -220,7 +221,7 @@ public interface IUpdate<T>
      */
     List<Tuple2<String, Map<String, Object>>> toSql()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 执行sql语句，并返回影响的行数
@@ -229,5 +230,5 @@ public interface IUpdate<T>
      */
     int executeAffrows()
             throws
-            Exception;
+            ModuleException;
 }

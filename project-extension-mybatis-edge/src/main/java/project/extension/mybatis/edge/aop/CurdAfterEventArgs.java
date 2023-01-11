@@ -20,8 +20,10 @@ public class CurdAfterEventArgs
               beforeEventData.getSql(),
               beforeEventData.getParameter(),
               beforeEventData.getStates());
-        super.getWatch()
-             .stop();
+        if (super.getWatch()
+                 .isStarted())
+            super.getWatch()
+                 .stop();
         this.costtime = super.getWatch()
                              .getTime();
         this.exception = exception;

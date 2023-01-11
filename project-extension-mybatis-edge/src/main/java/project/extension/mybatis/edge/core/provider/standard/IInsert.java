@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.standard;
 
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
@@ -98,19 +99,25 @@ public interface IInsert<T> {
      *
      * @return Sql语句
      */
-    List<String> toSqlWithNoParameter() throws Exception;
+    List<String> toSqlWithNoParameter()
+            throws
+            ModuleException;
 
     /**
      * 返回将会执行的sql语句
      *
      * @return a: Sql语句, b: 参数
      */
-    List<Tuple2<String, Map<String, Object>>> toSql() throws Exception;
+    List<Tuple2<String, Map<String, Object>>> toSql()
+            throws
+            ModuleException;
 
     /**
      * 执行sql语句，并返回影响的行数
      *
      * @return 影响的行数
      */
-    int executeAffrows() throws Exception;
+    int executeAffrows()
+            throws
+            ModuleException;
 }

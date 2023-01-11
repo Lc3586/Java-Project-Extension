@@ -12,8 +12,10 @@ import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.SetProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.UpdaterDTO;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.*;
@@ -95,7 +97,7 @@ public abstract class Update<T>
     protected String currentScript(boolean noParameter,
                                    Object data)
             throws
-            Exception {
+            ModuleException {
         updater.getParameter()
                .clear();
         updater.setDynamicFilter(where.getDynamicFilters());
@@ -310,7 +312,7 @@ public abstract class Update<T>
     @Override
     public List<String> toSqlWithNoParameter()
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         if (updater.getDataList()
                    .size() > 0) {
@@ -330,7 +332,7 @@ public abstract class Update<T>
     @Override
     public List<Tuple2<String, Map<String, Object>>> toSql()
             throws
-            Exception {
+            ModuleException {
         List<Tuple2<String, Map<String, Object>>> sqlList = new ArrayList<>();
         if (updater.getDataList()
                    .size() > 0) {
@@ -352,7 +354,7 @@ public abstract class Update<T>
     @Override
     public int executeAffrows()
             throws
-            Exception {
+            ModuleException {
         int rows = 0;
 
         if (updater.getDataList()
@@ -379,7 +381,7 @@ public abstract class Update<T>
                                                     updater.getEntityType(),
                                                     updater.getDtoType());
                 if (currentRows < 0) {
-                    throw new Exception("数据更新失败");
+                    throw new ModuleException(Strings.getRowsDataException(currentRows));
                 } else if (currentRows > 0) rows++;
             }
         } else if (CollectionsExtension.anyPlus(updater.getCustomSetByFieldName())
@@ -389,7 +391,7 @@ public abstract class Update<T>
                        .size() == 0
                     && where.getDynamicFilters()
                             .size() == 0)
-                throw new Exception("更新指定列时，必须设置WHERE条件");
+                throw new ModuleException(Strings.getDeleteOperationNeedDataOrCondition());
 
             String script = currentScript(false,
                                           null);

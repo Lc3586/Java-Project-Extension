@@ -8,6 +8,7 @@ import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.normal.Select;
 import project.extension.mybatis.edge.model.OrderMethod;
+import project.extension.standard.exception.ModuleException;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -86,7 +87,7 @@ public class SqlServerSelect<T>
     @Override
     public List<T> toList()
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.toList();
@@ -95,7 +96,7 @@ public class SqlServerSelect<T>
     @Override
     public <T2> List<T2> toList(Class<T2> dtoType)
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.toList(dtoType);
@@ -104,7 +105,7 @@ public class SqlServerSelect<T>
     @Override
     public List<Map<String, Object>> toMapList()
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.toMapList();
@@ -113,7 +114,7 @@ public class SqlServerSelect<T>
     @Override
     public T first()
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.first();
@@ -122,7 +123,7 @@ public class SqlServerSelect<T>
     @Override
     public <T2> T2 first(Class<T2> dtoType)
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.first(dtoType);
@@ -132,7 +133,7 @@ public class SqlServerSelect<T>
     public <C> C first(String fieldName,
                        Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(fieldName);
 
         return super.first(fieldName,
@@ -142,7 +143,7 @@ public class SqlServerSelect<T>
     @Override
     public Map<String, Object> firstMap()
             throws
-            Exception {
+            ModuleException {
         checkAndSetDefaultOrderBy(null);
 
         return super.firstMap();

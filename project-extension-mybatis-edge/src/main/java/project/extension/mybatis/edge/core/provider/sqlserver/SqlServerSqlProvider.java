@@ -3,7 +3,9 @@ package project.extension.mybatis.edge.core.provider.sqlserver;
 import org.springframework.util.StringUtils;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.DbType;
+import project.extension.standard.exception.ModuleException;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -43,7 +45,7 @@ public class SqlServerSqlProvider
                                        int offset,
                                        int count)
             throws
-            Exception {
+            ModuleException {
         if (above2012Version)
             return String.format("%s \r\nOFFSET %s ROWS FETCH NEXT %s ROWS ONLY",
                                  originalSql,
@@ -65,7 +67,7 @@ public class SqlServerSqlProvider
             originalSql = matcher.replaceAll(" ");
 
             if (!StringUtils.hasText(orderBySql))
-                throw new Exception("在SQL Server数据库种进行分页查询时必须指定ORDER BY语句");
+                throw new ModuleException(Strings.getSqlServerRequireOrderBy4Paging());
 
             String alias1 = getValueWithCharacter(String.format("t1_%s",
                                                                 UUID.randomUUID()));

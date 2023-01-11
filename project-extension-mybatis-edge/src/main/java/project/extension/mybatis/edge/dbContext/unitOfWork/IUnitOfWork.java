@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.dbContext.unitOfWork;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.transaction.TransactionStatus;
 import project.extension.mybatis.edge.INaiveSql;
-import project.extension.tuple.Tuple2;
 
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public interface IUnitOfWork {
      *
      * @return 事务对象
      */
-    Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction();
+    TransactionStatus getOrBeginTransaction();
 
     /**
      * 开启事务，或者返回已开启的事务
@@ -35,7 +34,7 @@ public interface IUnitOfWork {
      * @param isCreate 若未开启事务，则开启
      * @return 事务对象
      */
-    Tuple2<TransactionStatus, TransactionIsolationLevel> getOrBeginTransaction(boolean isCreate);
+    TransactionStatus getOrBeginTransaction(boolean isCreate);
 
     /**
      * 获取事务隔离等级

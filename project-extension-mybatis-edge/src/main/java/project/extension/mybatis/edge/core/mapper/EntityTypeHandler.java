@@ -10,7 +10,7 @@ import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.*;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.extention.SqlExtension;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.annotations.OpenApiMainTag;
 import project.extension.openapi.annotations.OpenApiMainTags;
@@ -230,7 +230,7 @@ public class EntityTypeHandler {
                                       Class<?> entityType,
                                       NameConvertType nameConvertType)
             throws
-            NoSuchFieldException {
+            ModuleException {
         return getFieldByColumn(column,
                                 entityType,
                                 nameConvertType).getName();
@@ -272,8 +272,8 @@ public class EntityTypeHandler {
         }
 
         if (result == null)
-            throw new ModuleException(DbContextStrings.getEntityField4ColumnUndefined(entityType.getTypeName(),
-                                                                                      column));
+            throw new ModuleException(Strings.getEntityField4ColumnUndefined(entityType.getTypeName(),
+                                                                             column));
 
         return result;
     }
@@ -472,8 +472,8 @@ public class EntityTypeHandler {
                 try {
                     entityField = entityType.getDeclaredField(entityFieldName);
                 } catch (NoSuchFieldException ex) {
-                    throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityType.getTypeName(),
-                                                                                       entityFieldName),
+                    throw new ModuleException(Strings.getEntityFieldUndefined(entityType.getTypeName(),
+                                                                              entityFieldName),
                                               ex);
                 }
             }
@@ -482,8 +482,8 @@ public class EntityTypeHandler {
             try {
                 entityField = entityType.getDeclaredField(entityFieldName);
             } catch (NoSuchFieldException ex) {
-                throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityType.getTypeName(),
-                                                                                   entityFieldName),
+                throw new ModuleException(Strings.getEntityFieldUndefined(entityType.getTypeName(),
+                                                                          entityFieldName),
                                           ex);
             }
         }
@@ -553,8 +553,8 @@ public class EntityTypeHandler {
                 try {
                     mappingField = entityMappingType.getDeclaredField(fieldName);
                 } catch (NoSuchFieldException ex2) {
-                    throw new ModuleException(DbContextStrings.getEntityFieldUndefined(entityMappingType.getTypeName(),
-                                                                                       fieldName),
+                    throw new ModuleException(Strings.getEntityFieldUndefined(entityMappingType.getTypeName(),
+                                                                              fieldName),
                                               ex2);
                 }
                 Optional<Field> optionalField = getColumnField(mappingField,
@@ -564,8 +564,8 @@ public class EntityTypeHandler {
                 if (optionalField.isPresent()) return optionalField.get();
             }
 
-            throw new ModuleException(DbContextStrings.getEntityFieldUndefined(modelType.getTypeName(),
-                                                                               fieldName),
+            throw new ModuleException(Strings.getEntityFieldUndefined(modelType.getTypeName(),
+                                                                      fieldName),
                                       ex1);
         }
     }
@@ -764,7 +764,7 @@ public class EntityTypeHandler {
 
         Class<?> superClassz = type.getSuperclass();
         if (superClassz.equals(Object.class) || superClassz.equals(type))
-            throw new ModuleException(DbContextStrings.getEntityUndefined(type.getTypeName()));
+            throw new ModuleException(Strings.getEntityUndefined(type.getTypeName()));
         return getEntityType(superClassz);
     }
 }

@@ -25,6 +25,8 @@ public class Strings_en_US {
                        "方法尚未实现");
             values.put("TransactionHasBeenStarted",
                        "Transaction opened, unit of work cannot be disabled");
+            values.put("TransactionAlreadyStarted",
+                       "事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction，或是嵌套了多层事务");
             values.put("TransactionBeginFailed",
                        "开启事务失败");
             values.put("TransactionCommitFailed",
@@ -57,6 +59,10 @@ public class Strings_en_US {
                        "{0}构造函数{1}参数不可为空");
             values.put("UnsupportedDateType",
                        "暂不支持{0}类型的日期");
+            values.put("FormatDateFailed",
+                       "格式化日期{0}到{1}格式失败");
+            values.put("DateFormatNonStandard",
+                       "{0} 要求 {1} 格式必须为：{2}其中一种");
             values.put("UnsupportedDataType4PrimaryKey",
                        "暂不支持设置{0}数据类型的主键");
             values.put("SetupOperatorTimeFailed",
@@ -75,10 +81,40 @@ public class Strings_en_US {
                        "未在{0}实体中找到{1}列对应的字段");
             values.put("EntityFieldUndefined",
                        "未在{0}实体中找到{1}字段");
+            values.put("GetObjectFieldValueFailed",
+                       "未在{0}实体中找到{1}字段");
+            values.put("UnknownValue",
+                       "{0}的值{1}无效");
+            values.put("TypeFieldOnlySupportOperation",
+                       "{0}类型的字段只支持{1}操作");
+            values.put("UnSupportOperation",
+                       "不支持{0}操作");
+            values.put("UnSupportOperationSymbol",
+                       "不支持{0}操作符");
+            values.put("UnSupportTargetType",
+                       "不支持{0}目标操作类型");
             values.put("DataUndefined",
                        "数据不存在或已被移除");
             values.put("UseMasterOrmMethod",
                        "请使用getMasterOrm方法获取主库ORM");
+
+
+            values.put("RowsDataException",
+                       "rows data exception，{0}");
+            values.put("QueryDataFailed",
+                       "query data failed");
+            values.put("InsertDataFailed",
+                       "insert data failed");
+            values.put("UpdateDataFailed",
+                       "update data failed");
+            values.put("DeleteDataFailed",
+                       "delete data failed");
+            values.put("DeleteOperationNeedDataOrCondition",
+                       "delete operation needs to set data or where condition");
+            values.put("CanNotGetDbNameFromUrl",
+                       "无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为：{0}");
+            values.put("SqlServerRequireOrderBy4Paging",
+                       "在SQL Server数据库种进行分页查询时必须指定ORDER BY语句");
         }
         return values.get(code);
     }

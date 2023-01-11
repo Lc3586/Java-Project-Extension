@@ -9,8 +9,10 @@ import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.InserterDTO;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.*;
@@ -89,7 +91,7 @@ public abstract class Insert<T>
     protected String currentScript(boolean noParameter,
                                    Object data)
             throws
-            Exception {
+            ModuleException {
         inserter.getParameter()
                 .clear();
         return sqlProvider.inserter2Script(inserter,
@@ -177,7 +179,7 @@ public abstract class Insert<T>
     @Override
     public List<String> toSqlWithNoParameter()
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         for (Object data : inserter.getDataList()) {
             sqlList.add(currentScript(true,
@@ -189,7 +191,7 @@ public abstract class Insert<T>
     @Override
     public List<Tuple2<String, Map<String, Object>>> toSql()
             throws
-            Exception {
+            ModuleException {
         List<Tuple2<String, Map<String, Object>>> sqlList = new ArrayList<>();
         for (Object data : inserter.getDataList()) {
             sqlList.add(new Tuple2<>(currentScript(true,
@@ -202,7 +204,7 @@ public abstract class Insert<T>
     @Override
     public int executeAffrows()
             throws
-            Exception {
+            ModuleException {
         if (inserter.getDataList()
                     .size() == 0)
             return 0;
@@ -231,7 +233,7 @@ public abstract class Insert<T>
                                                 inserter.getEntityType(),
                                                 inserter.getDtoType());
             if (currentRows < 0) {
-                return currentRows;
+                throw new ModuleException(Strings.getRowsDataException(currentRows));
             } else if (currentRows > 0) rows++;
         }
 

@@ -6,12 +6,14 @@ import org.apache.ibatis.session.*;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
 import org.springframework.dao.TransientDataAccessResourceException;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import project.extension.func.IFunc0;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.mapper.MappedStatementHandler;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
@@ -40,6 +42,8 @@ public class NaiveAdoProvider
         final INaiveDataSourceProvider naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
         this.dataSource = naiveDataSourceProvider.getDataSources(dataSource);
         this.sqlSessionFactory = naiveDataSourceProvider.getSqlSessionFactory(dataSource);
+        this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class)
+                                                                           .getTransactionManager(dataSource);
     }
 
     /**
@@ -58,6 +62,11 @@ public class NaiveAdoProvider
     private final DataSource dataSource;
 
     /**
+     * 事务管理器
+     */
+    private final DataSourceTransactionManager dataSourceTransactionManager;
+
+    /**
      * Sql会话工厂
      */
     private final SqlSessionFactory sqlSessionFactory;
@@ -65,7 +74,7 @@ public class NaiveAdoProvider
     /**
      * 解析事务的方法
      */
-    private IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction;
+    private IFunc0<TransactionStatus> resolveTransaction;
 
     /**
      * 获取执行器类型
@@ -132,7 +141,7 @@ public class NaiveAdoProvider
                 holder.requested();
             } else {
                 if (TransactionSynchronizationManager.getResource(environment.getDataSource()) != null)
-                    throw new ModuleException(DbContextStrings.getNoneSpringManagedTransactionFactory());
+                    throw new ModuleException(Strings.getNoneSpringManagedTransactionFactory());
 
                 //Sql会话未同步事务
             }
@@ -141,12 +150,12 @@ public class NaiveAdoProvider
     }
 
     @Override
-    public IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> getResolveTransaction() {
+    public IFunc0<TransactionStatus> getResolveTransaction() {
         return this.resolveTransaction;
     }
 
     @Override
-    public void setResolveTransaction(IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction) {
+    public void setResolveTransaction(IFunc0<TransactionStatus> resolveTransaction) {
         this.resolveTransaction = resolveTransaction;
     }
 
@@ -171,20 +180,54 @@ public class NaiveAdoProvider
     }
 
     @Override
-    public SqlSession getOrCreateSqlSession()
+    public boolean isTransactionAlreadyExisting()
+            throws
+            ModuleException {
+        return TransactionSynchronizationManager.isActualTransactionActive();
+    }
+
+    @Override
+    public TransactionStatus getOrCreateTransaction(TransactionDefinition transactionDefinition)
+            throws
+            ModuleException {
+        return this.dataSourceTransactionManager.getTransaction(transactionDefinition);
+    }
+
+    @Override
+    public void transactionCommit(TransactionStatus transactionStatus)
+            throws
+            ModuleException {
+        this.dataSourceTransactionManager.commit(transactionStatus);
+    }
+
+    @Override
+    public void transactionRollback(TransactionStatus transactionStatus)
+            throws
+            ModuleException {
+        this.dataSourceTransactionManager.rollback(transactionStatus);
+    }
+
+    @Override
+    public SqlSession getOrCreateSqlSession() {
+        return getOrCreateSqlSession(null);
+    }
+
+    @Override
+    public SqlSession getOrCreateSqlSession(TransactionIsolationLevel isolationLevel)
             throws
             ModuleException {
         Tuple2<Boolean, SqlSession> currentSqlSession1 = currentSqlSession();
         if (currentSqlSession1.a)
             return currentSqlSession1.b;
 
-        //开启事务
-        Tuple2<TransactionStatus, TransactionIsolationLevel> transaction = null;
-        if (getResolveTransaction() != null) {
+        //事务
+        boolean isActualTransactionActive = TransactionSynchronizationManager.isActualTransactionActive();
+        TransactionStatus transaction = null;
+        if (!isActualTransactionActive && getResolveTransaction() != null) {
             try {
                 transaction = getResolveTransaction().invoke();
             } catch (Exception ex) {
-                throw new ModuleException(DbContextStrings.getResolveTransactionFailed(),
+                throw new ModuleException(Strings.getResolveTransactionFailed(),
                                           ex);
             }
         }
@@ -197,9 +240,9 @@ public class NaiveAdoProvider
         ExecutorType executorType = getExecutorType();
         SqlSession session = transaction == null
                              ? sqlSessionFactory.openSession(executorType,
-                                                             true)
+                                                             !isActualTransactionActive)
                              : sqlSessionFactory.openSession(executorType,
-                                                             transaction.b);
+                                                             isolationLevel);
 
         registerSessionHolder(this.sqlSessionFactory,
                               executorType,

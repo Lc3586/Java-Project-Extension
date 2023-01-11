@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.core.provider;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import project.extension.action.IAction0;
 import project.extension.ioc.IOCExtension;
@@ -15,7 +14,6 @@ import project.extension.mybatis.edge.dbContext.repository.DefaultRepository;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
-import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
 import project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork;
 import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.standard.exception.ModuleException;
@@ -30,7 +28,6 @@ import java.util.Collection;
  * @date 2022-03-28
  */
 @Component
-@DependsOn("IOCExtension")
 public class OrmProvider
         implements INaiveSql {
     public OrmProvider() {
@@ -41,15 +38,11 @@ public class OrmProvider
     public OrmProvider(String dataSource) {
         this.dataSourceConfig = CommonUtils.getConfig()
                                            .getDataSourceConfig(dataSource);
-        this.uow = new UnitOfWork(this);
         this.ado = new NaiveAdoProvider(dataSource);
-        this.ado.setResolveTransaction(() -> uow.getOrBeginTransaction(false));
         this.aop = IOCExtension.applicationContext.getBean(INaiveAop.class);
     }
 
     private final DataSourceConfig dataSourceConfig;
-
-    private final IUnitOfWork uow;
 
     private final INaiveAdo ado;
 
@@ -216,18 +209,21 @@ public class OrmProvider
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
+        UnitOfWork uow = new UnitOfWork(this);
         try {
             if (isolationLevel != null)
-                this.uow.setIsolationLevel(isolationLevel);
-            this.uow.getOrBeginTransaction();
+                uow.setIsolationLevel(isolationLevel);
+            uow.getOrBeginTransaction();
             handler.invoke();
-            this.uow.commit();
+            uow.commit();
             return new Tuple2<>(true,
                                 null);
         } catch (Exception ex) {
-            this.uow.rollback();
+            uow.rollback();
             return new Tuple2<>(false,
                                 ex);
+        } finally {
+            uow.close();
         }
     }
 

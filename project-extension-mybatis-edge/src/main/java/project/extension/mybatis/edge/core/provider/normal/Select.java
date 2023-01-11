@@ -15,6 +15,7 @@ import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.DynamicFilter;
 import project.extension.mybatis.edge.model.ExecutorDTO;
 import project.extension.mybatis.edge.model.Pagination;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.*;
@@ -106,7 +107,7 @@ public abstract class Select<T>
      */
     protected String paging()
             throws
-            Exception {
+            ModuleException {
         if (needPaging()) {
             executor.getPagination()
                     .setRecordCount(count());
@@ -187,7 +188,7 @@ public abstract class Select<T>
                                    boolean noParameter,
                                    boolean withoutOrderBy)
             throws
-            Exception {
+            ModuleException {
         setupExecutor();
         return sqlProvider.executor2Sql(executor,
                                         paging,
@@ -443,7 +444,7 @@ public abstract class Select<T>
     @Override
     public Boolean any()
             throws
-            Exception {
+            ModuleException {
         executor.setDtoType(entityType);
         executor.setAllColumns(true);
 
@@ -487,7 +488,7 @@ public abstract class Select<T>
     @Override
     public List<T> toList()
             throws
-            Exception {
+            ModuleException {
         executor.setDtoType(entityType);
         executor.setAllColumns(false);
         String sql = paging();
@@ -513,7 +514,7 @@ public abstract class Select<T>
     @Override
     public <T2> List<T2> toList(Class<T2> dtoType)
             throws
-            Exception {
+            ModuleException {
         executor.setDtoType(dtoType);
         executor.setAllColumns(false);
         String sql = paging();
@@ -540,7 +541,7 @@ public abstract class Select<T>
     @Override
     public List<Map<String, Object>> toMapList()
             throws
-            Exception {
+            ModuleException {
         executor.setAllColumns(false);
         String sql = paging();
 
@@ -565,7 +566,7 @@ public abstract class Select<T>
     @Override
     public T first()
             throws
-            Exception {
+            ModuleException {
         executor.setDtoType(entityType);
         executor.setAllColumns(false);
         String sql = sqlProvider.originalSql2LimitSql(currentScript(false,
@@ -595,7 +596,7 @@ public abstract class Select<T>
     @Override
     public <T2> T2 first(Class<T2> dtoType)
             throws
-            Exception {
+            ModuleException {
         executor.setDtoType(dtoType);
         executor.setAllColumns(false);
         String sql = sqlProvider.originalSql2LimitSql(currentScript(false,
@@ -627,7 +628,7 @@ public abstract class Select<T>
     public <C> C first(String fieldName,
                        Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         executor.setAllColumns(false);
         executor.getCustomFieldNames()
                 .clear();
@@ -662,7 +663,7 @@ public abstract class Select<T>
     @Override
     public Map<String, Object> firstMap()
             throws
-            Exception {
+            ModuleException {
         executor.setAllColumns(false);
         String sql = sqlProvider.originalSql2LimitSql(currentScript(false,
                                                                     false,
@@ -691,7 +692,7 @@ public abstract class Select<T>
     @Override
     public Long count()
             throws
-            Exception {
+            ModuleException {
         setupExecutor(true,
                       true,
                       false);
@@ -723,7 +724,7 @@ public abstract class Select<T>
     public <C> C max(String fieldName,
                      Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         executor.getCustomFieldNames()
                 .clear();
         executor.getCustomFieldNames()
@@ -760,7 +761,7 @@ public abstract class Select<T>
     public <C> C min(String fieldName,
                      Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         executor.getCustomFieldNames()
                 .clear();
         executor.getCustomFieldNames()
@@ -797,7 +798,7 @@ public abstract class Select<T>
     public <C> C avg(String fieldName,
                      Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         executor.getCustomFieldNames()
                 .clear();
         executor.getCustomFieldNames()
@@ -833,7 +834,7 @@ public abstract class Select<T>
     public <C> C sum(String fieldName,
                      Class<C> memberType)
             throws
-            Exception {
+            ModuleException {
         executor.getCustomFieldNames()
                 .clear();
         executor.getCustomFieldNames()
@@ -898,7 +899,7 @@ public abstract class Select<T>
     @Override
     public String toSqlWithNoParameter()
             throws
-            Exception {
+            ModuleException {
         return currentScript(true,
                              true,
                              false);
@@ -907,7 +908,7 @@ public abstract class Select<T>
     @Override
     public Tuple2<String, Map<String, Object>> toSql()
             throws
-            Exception {
+            ModuleException {
         return new Tuple2<>(currentScript(true,
                                           false,
                                           false),

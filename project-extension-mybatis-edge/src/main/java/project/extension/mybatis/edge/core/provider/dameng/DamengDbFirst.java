@@ -8,8 +8,10 @@ import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.math.BigDecimal;
@@ -337,7 +339,7 @@ public class DamengDbFirst
                                                       String[] tbname,
                                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "a.owner || '.' || a.table_name as \"F1\",\r\n"
                                            + "a.owner as \"F2\",\r\n"
@@ -410,7 +412,7 @@ public class DamengDbFirst
                                                        String tablesMatcher,
                                                        boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "a.owner || '.' || a.table_name as \"F1\",\r\n"
                                            + "a.column_name as \"F2\",\r\n"
@@ -455,7 +457,7 @@ public class DamengDbFirst
                                                       String tablesMatcher,
                                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "a.table_owner || '.' || a.table_name as \"F1\",\r\n"
                                            + "c.column_name as \"F2\",\r\n"
@@ -500,7 +502,7 @@ public class DamengDbFirst
                                                         String tablesMatcher,
                                                         boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "a.owner || '.' || a.table_name as \"F1\",\r\n"
                                            + "c.column_name as \"F2\",\r\n"
@@ -558,7 +560,7 @@ public class DamengDbFirst
      */
     private String getUserIdFromDatabase()
             throws
-            Exception {
+            ModuleException {
         //从数据库中查询
         String sql = " select username from user_users";
         return this.ado.selectOne(getSqlSession(),
@@ -580,13 +582,13 @@ public class DamengDbFirst
      */
     private String getUserIdFromConnectionString(boolean lower)
             throws
-            Exception {
+            ModuleException {
         Matcher matcher = Pattern.compile("jdbc:dm://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(config.getProperties()
                                                 .getProperty(DruidDataSourceFactory.PROP_URL));
         if (!matcher.find())
-            throw new Exception("无法从连接字符串中获取用户标识，匹配所使用的正则表达式为 jdbc:dm://(.*?)/(.*?)\\?");
+            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:dm://(.*?)/(.*?)\\?"));
 
         if (lower)
             return matcher.group(2)
@@ -678,7 +680,7 @@ public class DamengDbFirst
                                         String tablename,
                                         boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         //所有的表结构信息
         List<DbTableInfo> tables = new ArrayList<>();
 
@@ -694,7 +696,8 @@ public class DamengDbFirst
             tbname = splitTableName(tablename,
                                     ignoreCase);
             if (tbname == null)
-                throw new Exception("tablename值无效");
+                throw new ModuleException(Strings.getUnknownValue("tablename",
+                                                                  tablename));
             if (tbname.length == 1) {
                 String userId = getUserIdFromDatabase();
                 if (!StringUtils.hasText(userId))
@@ -1154,7 +1157,7 @@ public class DamengDbFirst
     @Override
     public List<String> getDatabases()
             throws
-            Exception {
+            ModuleException {
         String sql = " select username from all_users";
         return this.ado.selectList(getSqlSession(),
                                    getMSId(MD5Utils.hash(sql)),
@@ -1170,7 +1173,7 @@ public class DamengDbFirst
     @Override
     public List<DbTableInfo> getTablesByDatabase(String... database)
             throws
-            Exception {
+            ModuleException {
         return getTables(database,
                          null,
                          false);
@@ -1180,7 +1183,7 @@ public class DamengDbFirst
     public DbTableInfo getTableByName(String name,
                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         return CollectionsExtension.firstOrDefault(getTables(null,
                                                              name,
                                                              ignoreCase));
@@ -1190,11 +1193,12 @@ public class DamengDbFirst
     public boolean existsTable(String name,
                                boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String[] tbname = splitTableName(name,
                                          ignoreCase);
         if (tbname == null)
-            throw new Exception("name值无效");
+            throw new ModuleException(Strings.getUnknownValue("name",
+                                                              name));
 
         //获取当前模式名，也就是用户标识
         if (tbname.length == 1) {

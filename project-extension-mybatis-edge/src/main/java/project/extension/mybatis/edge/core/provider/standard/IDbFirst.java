@@ -2,6 +2,7 @@ package project.extension.mybatis.edge.core.provider.standard;
 
 import project.extension.mybatis.edge.model.DbColumnInfo;
 import project.extension.mybatis.edge.model.DbTableInfo;
+import project.extension.standard.exception.ModuleException;
 
 import java.sql.JDBCType;
 import java.util.List;
@@ -28,7 +29,7 @@ public interface IDbFirst {
      */
     List<String> getDatabases()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取指定数据库的表信息，包括表、列详情、主键、唯一键、索引、外键、备注
@@ -38,7 +39,7 @@ public interface IDbFirst {
      */
     List<DbTableInfo> getTablesByDatabase(String... database)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取指定单表信息，包括列详情、主键、唯一键、索引、备注
@@ -50,7 +51,7 @@ public interface IDbFirst {
     DbTableInfo getTableByName(String name,
                                boolean ignoreCase)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 判断表是否存在
@@ -62,7 +63,7 @@ public interface IDbFirst {
     boolean existsTable(String name,
                         boolean ignoreCase)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取列对应的JDBC类型

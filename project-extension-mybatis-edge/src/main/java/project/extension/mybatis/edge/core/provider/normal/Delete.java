@@ -10,8 +10,10 @@ import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.DeleterDTO;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.*;
@@ -93,7 +95,7 @@ public abstract class Delete<T>
     protected String currentScript(boolean noParameter,
                                    Object data)
             throws
-            Exception {
+            ModuleException {
         deleter.getParameter()
                .clear();
         deleter.setDynamicFilter(where.getDynamicFilters());
@@ -202,7 +204,7 @@ public abstract class Delete<T>
     @Override
     public List<String> toSqlWithNoParameter()
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         if (deleter.getDataList()
                    .size() > 0) {
@@ -225,7 +227,7 @@ public abstract class Delete<T>
     @Override
     public List<Tuple2<String, Map<String, Object>>> toSql()
             throws
-            Exception {
+            ModuleException {
         List<Tuple2<String, Map<String, Object>>> sqlList = new ArrayList<>();
         if (deleter.getDataList()
                    .size() > 0) {
@@ -250,7 +252,7 @@ public abstract class Delete<T>
     @Override
     public int executeAffrows()
             throws
-            Exception {
+            ModuleException {
         int rows = 0;
 
         if (deleter.getDataList()
@@ -277,7 +279,7 @@ public abstract class Delete<T>
                                                     deleter.getDtoType());
 
                 if (currentRows < 0) {
-                    throw new Exception("数据删除失败");
+                    throw new ModuleException(Strings.getRowsDataException(currentRows));
                 } else if (currentRows > 0) rows++;
             }
         } else {
@@ -286,7 +288,7 @@ public abstract class Delete<T>
                        .size() == 0
                     && where.getDynamicFilters()
                             .size() == 0)
-                throw new Exception("删除数据时如果未设置数据源，那么则必须设置WHERE条件");
+                throw new ModuleException(Strings.getDeleteOperationNeedDataOrCondition());
 
             String script = currentScript(false,
                                           null);

@@ -2,6 +2,7 @@ package project.extension.mybatis.edge.core.provider.standard;
 
 import project.extension.mybatis.edge.model.DynamicFilter;
 import project.extension.mybatis.edge.model.Pagination;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
@@ -307,7 +308,7 @@ public interface ISelect<T>
      */
     Boolean any()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 指定查询列名
@@ -330,7 +331,7 @@ public interface ISelect<T>
      */
     List<T> toList()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回数据集合
@@ -341,7 +342,7 @@ public interface ISelect<T>
      */
     <T2> List<T2> toList(Class<T2> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回键值对映射数据集合
@@ -350,7 +351,7 @@ public interface ISelect<T>
      */
     List<Map<String, Object>> toMapList()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回首条数据
@@ -359,7 +360,7 @@ public interface ISelect<T>
      */
     T first()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回首条数据
@@ -370,7 +371,7 @@ public interface ISelect<T>
      */
     <T2> T2 first(Class<T2> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回首条数据
@@ -383,7 +384,7 @@ public interface ISelect<T>
     <C> C first(String fieldName,
                 Class<C> memberType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回首条键值对映射数据
@@ -392,7 +393,7 @@ public interface ISelect<T>
      */
     Map<String, Object> firstMap()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回总数
@@ -401,7 +402,7 @@ public interface ISelect<T>
      */
     Long count()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回指定列的最大值
@@ -414,7 +415,7 @@ public interface ISelect<T>
     <C> C max(String fieldName,
               Class<C> memberType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回指定列的最小值
@@ -427,7 +428,7 @@ public interface ISelect<T>
     <C> C min(String fieldName,
               Class<C> memberType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回指定列的平均值
@@ -440,7 +441,7 @@ public interface ISelect<T>
     <C> C avg(String fieldName,
               Class<C> memberType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回指定列的合计值
@@ -453,7 +454,7 @@ public interface ISelect<T>
     <C> C sum(String fieldName,
               Class<C> memberType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 指定表名
@@ -498,7 +499,7 @@ public interface ISelect<T>
      */
     String toSqlWithNoParameter()
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 返回将会执行的sql语句
@@ -507,5 +508,5 @@ public interface ISelect<T>
      */
     Tuple2<String, Map<String, Object>> toSql()
             throws
-            Exception;
+            ModuleException;
 }

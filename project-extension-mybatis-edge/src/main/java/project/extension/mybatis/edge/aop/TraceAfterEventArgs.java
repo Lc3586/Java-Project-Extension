@@ -16,8 +16,10 @@ public class TraceAfterEventArgs
               beforeEventData.getOperation(),
               beforeEventData.getValue(),
               beforeEventData.getStates());
-        super.getWatch()
-             .stop();
+        if (super.getWatch()
+                 .isStarted())
+            super.getWatch()
+                 .stop();
         this.costtime = super.getWatch()
                              .getTime();
         this.remark = remark;

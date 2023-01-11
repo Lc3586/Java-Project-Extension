@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.model.NameConvertType;
@@ -28,14 +29,14 @@ public interface INaiveAdo {
      *
      * @return 解析事务的方法
      */
-    IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> getResolveTransaction();
+    IFunc0<TransactionStatus> getResolveTransaction();
 
     /**
      * 设置解析事务的方法
      *
      * @param resolveTransaction 解析事务的方法
      */
-    void setResolveTransaction(IFunc0<Tuple2<TransactionStatus, TransactionIsolationLevel>> resolveTransaction);
+    void setResolveTransaction(IFunc0<TransactionStatus> resolveTransaction);
 
     /**
      * 获取SqlSession工厂类
@@ -62,11 +63,62 @@ public interface INaiveAdo {
     DataSource getDataSource();
 
     /**
+     * 是否已开启事务
+     *
+     * @return true：是
+     */
+    boolean isTransactionAlreadyExisting()
+            throws
+            ModuleException;
+
+    /**
+     * 获取或创建事务
+     *
+     * @param transactionDefinition 事务定义
+     * @return 事务
+     */
+    TransactionStatus getOrCreateTransaction(
+            @Nullable
+                    TransactionDefinition transactionDefinition)
+            throws
+            ModuleException;
+
+    /**
+     * 提交事务
+     *
+     * @param transactionStatus 事务
+     */
+    void transactionCommit(TransactionStatus transactionStatus)
+            throws
+            ModuleException;
+
+    /**
+     * 回滚事务
+     *
+     * @param transactionStatus 事务
+     */
+    void transactionRollback(TransactionStatus transactionStatus)
+            throws
+            ModuleException;
+
+    /**
      * 获取或创建Sql会话
      *
      * @return Sql会话
      */
     SqlSession getOrCreateSqlSession()
+            throws
+            ModuleException;
+
+    /**
+     * 获取或创建Sql会话
+     *
+     * @param isolationLevel 事务隔离等级
+     * @return Sql会话
+     */
+    SqlSession getOrCreateSqlSession(
+            @Nullable
+                    TransactionIsolationLevel isolationLevel)
             throws
             ModuleException;
 

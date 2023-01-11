@@ -7,8 +7,10 @@ import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.extention.CacheExtension;
 import project.extension.mybatis.edge.extention.SqlExtension;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.*;
 import project.extension.mybatis.edge.model.OrderMethod;
+import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.lang.reflect.Field;
@@ -122,7 +124,7 @@ public abstract class SqlProvider {
                                    Map<String, Object> customParameter,
                                    boolean noParameter)
             throws
-            ParseException {
+            ModuleException {
         for (String key : customParameter.keySet()) {
             Pattern pattern = Pattern.compile(String.format("@%s",
                                                             key),
@@ -184,7 +186,7 @@ public abstract class SqlProvider {
                                      Object data,
                                      boolean dataIsValue)
             throws
-            Exception {
+            ModuleException {
         return field2ValueSql(EntityTypeHandler.getFieldByFieldName(fieldName,
                                                                     entityType,
                                                                     null),
@@ -203,14 +205,22 @@ public abstract class SqlProvider {
                                  Object data,
                                  boolean dataIsValue)
             throws
-            Exception {
-        field.setAccessible(true);
-        return value2ValueSql(field.getType(),
-                              data == null
-                              ? null
-                              : dataIsValue
-                                ? data
-                                : field.get(data));
+            ModuleException {
+        try {
+            field.setAccessible(true);
+            return value2ValueSql(field.getType(),
+                                  data == null
+                                  ? null
+                                  : dataIsValue
+                                    ? data
+                                    : field.get(data));
+        } catch (IllegalAccessException ex) {
+            throw new ModuleException(Strings.getGetObjectFieldValueFailed(data == null
+                                                                           ? "null"
+                                                                           : data.getClass()
+                                                                                 .getTypeName(),
+                                                                           field.getName()));
+        }
     }
 
     /**
@@ -260,7 +270,7 @@ public abstract class SqlProvider {
                                          Map<String, Object> parameter,
                                          Object data)
             throws
-            Exception {
+            ModuleException {
         List<String> valuesSqlList = new ArrayList<>();
         for (String fieldName : fieldNames) {
             if (noParameter) valuesSqlList.add(fieldName2ValueSql(fieldName,
@@ -296,7 +306,7 @@ public abstract class SqlProvider {
                                                          boolean dataIsValue,
                                                          boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         return field2ParameterSql(EntityTypeHandler.getFieldByFieldName(fieldName,
                                                                         entityType,
                                                                         null),
@@ -318,7 +328,7 @@ public abstract class SqlProvider {
                                          Class<?> entityType,
                                          Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         return field2ParameterSql(EntityTypeHandler.getFieldByFieldName(fieldName,
                                                                         entityType,
                                                                         null),
@@ -371,17 +381,24 @@ public abstract class SqlProvider {
                                                      boolean dataIsValue,
                                                      boolean ignoreCase)
             throws
-            Exception {
-        field.setAccessible(true);
-        return value2ParameterSql(field.getType(),
-                                  field.getName(),
-                                  data == null
-                                  ? null
-                                  : dataIsValue
-                                    ? data
-                                    : field.get(data),
-                                  parameter,
-                                  ignoreCase);
+            ModuleException {
+        try {
+            field.setAccessible(true);
+            return value2ParameterSql(field.getType(),
+                                      field.getName(),
+                                      data == null
+                                      ? null
+                                      : dataIsValue
+                                        ? data
+                                        : field.get(data),
+                                      parameter,
+                                      ignoreCase);
+        } catch (IllegalAccessException ex) {
+            throw new ModuleException(Strings.getGetObjectFieldValueFailed(data.getClass()
+                                                                               .getTypeName(),
+                                                                           field.getName()),
+                                      ex);
+        }
     }
 
     /**
@@ -419,7 +436,7 @@ public abstract class SqlProvider {
                                                      Map<String, Object> parameter,
                                                      boolean ignoreCase)
             throws
-            ParseException {
+            ModuleException {
         if (value == null) return new Tuple2<>(parameterName,
                                                "NULL");
 
@@ -435,9 +452,14 @@ public abstract class SqlProvider {
             else if (type.equals(Double.class)) value = Double.parseDouble(value.toString());
             else if (type.equals(Float.class)) value = Float.parseFloat(value.toString());
             else if (type.equals(BigDecimal.class)) value = new BigDecimal(value.toString());
-            else if (type.equals(Date.class))
-                value = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.toString());
-            else if (type.equals(Time.class)) value = new Time(Long.parseLong(value.toString()));
+            else if (type.equals(Date.class)) {
+                try {
+                    value = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value.toString());
+                } catch (ParseException ex) {
+                    throw new ModuleException(Strings.getFormatDateFailed(value.toString(),
+                                                                          "yyyy-MM-dd HH:mm:ss"));
+                }
+            } else if (type.equals(Time.class)) value = new Time(Long.parseLong(value.toString()));
             else if (type.equals(java.sql.Date.class)) value = new java.sql.Date(Long.parseLong(value.toString()));
             else if (type.equals(java.sql.Timestamp.class))
                 value = new java.sql.Timestamp(Long.parseLong(value.toString()));
@@ -496,7 +518,7 @@ public abstract class SqlProvider {
                                                   boolean noParameter,
                                                   Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         for (String fieldName : customSetByFieldNames.keySet()) {
             Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
@@ -536,7 +558,7 @@ public abstract class SqlProvider {
                                            boolean noParameter,
                                            Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         for (DynamicSetter setter : setters) {
             Field field = EntityTypeHandler.getFieldByFieldName(setter.getFieldName(),
@@ -571,9 +593,10 @@ public abstract class SqlProvider {
     public String operationSymbol2Sql(Class<?> memberType,
                                       OperationSymbol operationSymbol)
             throws
-            Exception {
+            ModuleException {
         if (memberType.equals(String.class) && !operationSymbol.equals(OperationSymbol.Plus))
-            throw new Exception("String类型的字段只支持OperationSymbol.Plus操作");
+            throw new ModuleException(Strings.getTypeFieldOnlySupportOperation("String",
+                                                                               "OperationSymbol.Plus"));
 
         switch (operationSymbol) {
             case Plus:
@@ -588,8 +611,7 @@ public abstract class SqlProvider {
             case Remainder:
                 return "% ";
             default:
-                throw new Exception(String.format("不支持此操作符%s",
-                                                  operationSymbol));
+                throw new ModuleException(Strings.getUnSupportOperationSymbol(operationSymbol.toString()));
         }
     }
 
@@ -607,7 +629,7 @@ public abstract class SqlProvider {
                                                Class<?> memberType,
                                                DynamicSetterTarget target)
             throws
-            Exception {
+            ModuleException {
         switch (target.getType()) {
             case FieldName:
                 return getNameWithAlias(EntityTypeHandler.getColumnByFieldName(target.getFieldName(),
@@ -623,8 +645,8 @@ public abstract class SqlProvider {
                                                                       memberType,
                                                                       target.getExpression()));
             default:
-                throw new Exception(String.format("不支持此操作目标类型%s",
-                                                  target.getType()));
+                throw new ModuleException(Strings.getUnSupportTargetType(target.getType()
+                                                                               .toString()));
         }
     }
 
@@ -644,7 +666,7 @@ public abstract class SqlProvider {
                                                    DynamicSetterTarget target,
                                                    Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         switch (target.getType()) {
             case FieldName:
                 return getNameWithAlias(EntityTypeHandler.getColumnByFieldName(target.getFieldName(),
@@ -665,8 +687,8 @@ public abstract class SqlProvider {
                                                                           target.getExpression(),
                                                                           parameter));
             default:
-                throw new Exception(String.format("不支持此操作目标类型%s",
-                                                  target.getType()));
+                throw new ModuleException(Strings.getUnSupportTargetType(target.getType()
+                                                                               .toString()));
         }
     }
 
@@ -684,7 +706,7 @@ public abstract class SqlProvider {
                                                    Class<?> memberType,
                                                    DynamicSetterExpression expression)
             throws
-            Exception {
+            ModuleException {
         StringBuilder sb = new StringBuilder();
 
         sb.append(dynamicSetterTarget2ValueSql(entityType,
@@ -715,7 +737,7 @@ public abstract class SqlProvider {
                                                   Class<?> memberType,
                                                   List<DynamicSetterOperation> setterOperations)
             throws
-            Exception {
+            ModuleException {
         StringBuilder sb = new StringBuilder();
         for (DynamicSetterOperation setterOperation : setterOperations) {
             sb.append(operationSymbol2Sql(memberType,
@@ -744,7 +766,7 @@ public abstract class SqlProvider {
                                                        DynamicSetterExpression expression,
                                                        Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         StringBuilder sb = new StringBuilder();
 
         sb.append(dynamicSetterTarget2ParameterSql(entityType,
@@ -779,7 +801,7 @@ public abstract class SqlProvider {
                                                       List<DynamicSetterOperation> setterOperations,
                                                       Map<String, Object> parameter)
             throws
-            Exception {
+            ModuleException {
         StringBuilder sb = new StringBuilder();
         for (DynamicSetterOperation setterOperation : setterOperations) {
             sb.append(operationSymbol2Sql(memberType,
@@ -811,7 +833,7 @@ public abstract class SqlProvider {
                                              Map<String, Object> parameter,
                                              Object data)
             throws
-            Exception {
+            ModuleException {
         List<String> sqlList = new ArrayList<>();
         for (String fieldName : fieldWithColumns.keySet()) {
             Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
@@ -852,7 +874,7 @@ public abstract class SqlProvider {
                                                       Map<String, Object> parameter,
                                                       Object data)
             throws
-            Exception {
+            ModuleException {
         List<String> where = new ArrayList<>();
         for (String fieldName : primaryKeyFieldWithColumns.keySet()) {
             Field field = EntityTypeHandler.getFieldByFieldName(fieldName,
@@ -919,7 +941,7 @@ public abstract class SqlProvider {
                                          boolean withOutPrimaryKey,
                                          boolean inherit)
             throws
-            NoSuchFieldException {
+            ModuleException {
         //读取缓存
         String cacheKey = String.format("%s:%s",
                                         entityType.getTypeName(),
@@ -1034,7 +1056,7 @@ public abstract class SqlProvider {
                                                        boolean withOutPrimaryKey,
                                                        boolean inherit)
             throws
-            NoSuchFieldException {
+            ModuleException {
         //读取缓存
         String cacheKey = String.format("%s:%s:%s",
                                         entityType.getTypeName(),
@@ -1091,7 +1113,7 @@ public abstract class SqlProvider {
                                                              Collection<String> tempKeyColumns,
                                                              boolean check)
             throws
-            Exception {
+            ModuleException {
         Map<String, String> primaryKeyFieldWithColumns = new HashMap<>();
 
         if (CollectionsExtension.anyPlus(tempKeyFieldNames)) {
@@ -1118,7 +1140,7 @@ public abstract class SqlProvider {
                                                                                                   config.getNameConvertType()));
 
         if (check && primaryKeyFieldWithColumns.size() == 0)
-            throw new Exception("需要在实体上使用@ColumnSetting注解设置主键，或使用手动设置临时主键");
+            throw new ModuleException(Strings.getEntityPrimaryKeyUndefined());
 
         return primaryKeyFieldWithColumns;
     }
@@ -1186,7 +1208,7 @@ public abstract class SqlProvider {
                                     Class<?> entityType,
                                     Class<?> dtoType)
             throws
-            Exception {
+            ModuleException {
         if (filters == null || filters.size() == 0) return "";
 
         //sql语句
@@ -1660,52 +1682,89 @@ public abstract class SqlProvider {
                                     if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d?$",
                                                         valueList.get(1)
                                                                  .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
-                                                                                                             .toString()));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
+                                                                                                                 .toString()));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                         calendar_1.add(Calendar.DAY_OF_MONTH,
                                                        1);
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?$",
                                                                valueList.get(1)
                                                                         .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
-                                                                                                             .toString()
-                                                                                                            + "-01"));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
+                                                                                                                 .toString()
+                                                                                                                + "-01"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                         calendar_1.add(Calendar.MONTH,
                                                        1);
                                     } else if (Pattern.matches("^\\d\\d\\d\\d$",
                                                                valueList.get(1)
                                                                         .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
-                                                                                                             .toString()
-                                                                                                            + "-01-01"));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(1)
+                                                                                                                 .toString()
+                                                                                                                + "-01-01"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                         calendar_1.add(Calendar.YEAR,
                                                        1);
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?$",
                                                                valueList.get(1)
                                                                         .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
-                                                valueList.get(1)
-                                                         .toString() + ":00:00"));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
+                                                    valueList.get(1)
+                                                             .toString() + ":00:00"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
                                         calendar_1.add(Calendar.HOUR,
                                                        1);
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?$",
                                                                valueList.get(1)
                                                                         .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
-                                                valueList.get(1)
-                                                         .toString() + ":00"));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
+                                                    valueList.get(1)
+                                                             .toString() + ":00"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
                                         calendar_1.add(Calendar.MINUTE,
                                                        1);
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?:\\d\\d?$",
                                                                valueList.get(1)
                                                                         .toString())) {
-                                        calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(valueList.get(1)
-                                                                                                                      .toString()));
+                                        try {
+                                            calendar_1.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(valueList.get(1)
+                                                                                                                          .toString()));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(1)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
                                         calendar_1.add(Calendar.SECOND,
                                                        1);
                                     } else
-                                        throw new ParseException("DateRange 要求 Value[1] 格式必须为：yyyy、yyyy-MM、yyyy-MM-dd、yyyy-MM-dd HH、yyyy、yyyy-MM-dd HH:mm、yyyy-MM-dd HH:mm:ss其中一种",
-                                                                 0);
+                                        throw new ModuleException(Strings.getDateFormatNonStandard("DateRange",
+                                                                                                   "Value[1]",
+                                                                                                   "yyyy、yyyy-MM、yyyy-MM-dd、yyyy-MM-dd HH、yyyy、yyyy-MM-dd HH:mm、yyyy-MM-dd HH:mm:ss"));
                                 }
 
                                 Calendar calendar_0 = Calendar.getInstance();
@@ -1717,35 +1776,72 @@ public abstract class SqlProvider {
                                     if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d?$",
                                                         valueList.get(0)
                                                                  .toString())) {
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
-                                                                                                             .toString()));
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
+                                                                                                                 .toString()));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?$",
                                                                valueList.get(0)
                                                                         .toString())) {
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
-                                                                                                             .toString()
-                                                                                                            + "-01"));
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
+                                                                                                                 .toString()
+                                                                                                                + "-01"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                     } else if (Pattern.matches("^\\d\\d\\d\\d$",
                                                                valueList.get(0)
                                                                         .toString())) {
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
-                                                                                                             .toString()
-                                                                                                            + "-01-01"));
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(valueList.get(0)
+                                                                                                                 .toString()
+                                                                                                                + "-01-01"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd"));
+                                        }
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?$",
                                                                valueList.get(0)
                                                                         .toString())) {
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
-                                                valueList.get(0)
-                                                         .toString() + ":00:00"));
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
+                                                    valueList.get(0)
+                                                             .toString() + ":00:00"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
                                     } else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?$",
                                                                valueList.get(0)
                                                                         .toString())) {
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
-                                                valueList.get(0)
-                                                         .toString() + ":00"));
-                                    } else
-                                        calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(valueList.get(0)
-                                                                                                                      .toString()));
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(
+                                                    valueList.get(0)
+                                                             .toString() + ":00"));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
+                                    } else {
+                                        try {
+                                            calendar_0.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(valueList.get(0)
+                                                                                                                          .toString()));
+                                        } catch (ParseException ex) {
+                                            throw new ModuleException(Strings.getFormatDateFailed(valueList.get(0)
+                                                                                                           .toString(),
+                                                                                                  "yyyy-MM-dd HH:mm:ss"));
+                                        }
+                                    }
                                 }
 
                                 if (noParameter) {
@@ -1824,7 +1920,7 @@ public abstract class SqlProvider {
                                    Class<?> entityType,
                                    Class<?> dtoType)
             throws
-            Exception {
+            ModuleException {
         if (order == null) return "";
 
         //数据表别名
@@ -1880,7 +1976,7 @@ public abstract class SqlProvider {
                                     Class<?> entityType,
                                     Class<?> dtoType)
             throws
-            Exception {
+            ModuleException {
         if (orders == null || orders.size() == 0) return "";
 
         StringBuilder sql = new StringBuilder();
@@ -1942,7 +2038,7 @@ public abstract class SqlProvider {
                                                 int offset,
                                                 int count)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 原始Sql语句转为获取总数的Sql语句
@@ -1967,7 +2063,7 @@ public abstract class SqlProvider {
     public String pagination2Sql(Pagination pagination,
                                  String originalSql)
             throws
-            Exception {
+            ModuleException {
         if (pagination == null || pagination.getNope() || pagination.getUserPageHelper()) return originalSql;
         return originalSql2LimitSql(originalSql,
                                     (pagination.getPageNum() - 1) * pagination.getPageSize(),
@@ -1988,7 +2084,7 @@ public abstract class SqlProvider {
                                boolean noParameter,
                                boolean withoutOrderBy)
             throws
-            Exception {
+            ModuleException {
         String sql = executor2Sql(executor,
                                   noParameter,
                                   withoutOrderBy,
@@ -2026,7 +2122,7 @@ public abstract class SqlProvider {
                                String customGroupBySql,
                                String customOrderBySql)
             throws
-            Exception {
+            ModuleException {
         String alias = executor.getAlias();
         if (!StringUtils.hasText(alias)) alias = "a";
 
@@ -2143,7 +2239,7 @@ public abstract class SqlProvider {
                                     boolean noParameter,
                                     boolean withoutOrderBy)
             throws
-            Exception {
+            ModuleException {
         return executor2Sql(executor,
                             noParameter,
                             withoutOrderBy,
@@ -2165,7 +2261,7 @@ public abstract class SqlProvider {
                                   boolean noParameter,
                                   boolean withoutOrderBy)
             throws
-            Exception {
+            ModuleException {
         return executor2Sql(executor,
                             noParameter,
                             withoutOrderBy,
@@ -2192,7 +2288,7 @@ public abstract class SqlProvider {
                                   boolean noParameter,
                                   boolean withoutOrderBy)
             throws
-            Exception {
+            ModuleException {
         return executor2Sql(executor,
                             noParameter,
                             withoutOrderBy,
@@ -2218,7 +2314,7 @@ public abstract class SqlProvider {
     public String executor2AvgSql(ExecutorDTO executor,
                                   boolean noParameter)
             throws
-            Exception {
+            ModuleException {
         return executor2Sql(executor,
                             noParameter,
                             true,
@@ -2244,7 +2340,7 @@ public abstract class SqlProvider {
     public String executor2SumSql(ExecutorDTO executor,
                                   boolean noParameter)
             throws
-            Exception {
+            ModuleException {
         return executor2Sql(executor,
                             noParameter,
                             true,
@@ -2272,7 +2368,7 @@ public abstract class SqlProvider {
                                   boolean noParameter,
                                   Object data)
             throws
-            Exception {
+            ModuleException {
         //表名
         String tableName = tableName2Sql(inserter.getSchema(),
                                          inserter.getTableName());
@@ -2359,7 +2455,7 @@ public abstract class SqlProvider {
                                  boolean noParameter,
                                  Object data)
             throws
-            Exception {
+            ModuleException {
         //别名
         String alias = updater.getAlias();
 
@@ -2478,7 +2574,7 @@ public abstract class SqlProvider {
                                  boolean noParameter,
                                  Object data)
             throws
-            Exception {
+            ModuleException {
         //别名
         String alias = deleter.getAlias();
 

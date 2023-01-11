@@ -5,7 +5,7 @@ import org.springframework.lang.Nullable;
 import project.extension.Identity.SnowFlake;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.authentication.IAuthenticationService;
 import project.extension.standard.entity.Base_Fields;
 import project.extension.standard.entity.IEntityExtension;
@@ -115,7 +115,7 @@ public class EntityExtension
             return DateExtension.format(field,
                                         date);
         } else
-            throw new ModuleException(DbContextStrings.getUnsupportedDateType(fieldType.getTypeName()));
+            throw new ModuleException(Strings.getUnsupportedDateType(fieldType.getTypeName()));
     }
 
     /**
@@ -140,7 +140,7 @@ public class EntityExtension
                             field.set(entity,
                                       newLongId());
                         } catch (IllegalAccessException ex) {
-                            throw new ModuleException(DbContextStrings.getEntityInitializationFailed(),
+                            throw new ModuleException(Strings.getEntityInitializationFailed(),
                                                       ex);
                         }
                     } else if (fieldType.equals(String.class)) {
@@ -150,11 +150,11 @@ public class EntityExtension
                                       ? newStringId()
                                       : newStringId("O"));
                         } catch (Throwable ex) {
-                            throw new ModuleException(DbContextStrings.getEntityInitializationFailed(),
+                            throw new ModuleException(Strings.getEntityInitializationFailed(),
                                                       ex);
                         }
                     } else
-                        throw new ModuleException(DbContextStrings.getUnsupportedDataType4PrimaryKey(fieldType.getTypeName()));
+                        throw new ModuleException(Strings.getUnsupportedDataType4PrimaryKey(fieldType.getTypeName()));
                 }
             }
 
@@ -201,7 +201,7 @@ public class EntityExtension
                                   getDateValue(field,
                                                new Date()));
                     } catch (IllegalAccessException ex) {
-                        throw new ModuleException(DbContextStrings.getSetupOperatorTimeFailed(),
+                        throw new ModuleException(Strings.getSetupOperatorTimeFailed(),
                                                   ex);
                     }
                 }

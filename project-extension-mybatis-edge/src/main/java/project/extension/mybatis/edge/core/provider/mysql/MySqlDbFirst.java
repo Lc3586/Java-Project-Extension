@@ -9,7 +9,9 @@ import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.*;
+import project.extension.standard.exception.ModuleException;
 
 import java.math.BigDecimal;
 import java.sql.JDBCType;
@@ -304,7 +306,7 @@ public class MySqlDbFirst
                                                       String[] tbname,
                                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "concat(a.table_schema, '.', a.table_name) `F1`,\r\n"
                                            + "a.table_schema as `F2`,\r\n"
@@ -350,7 +352,7 @@ public class MySqlDbFirst
                                                        String tablesMatcher,
                                                        boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "concat(a.table_schema, '.', a.table_name) as `F1`,\r\n"
                                            + "a.column_name as `F2`,\r\n"
@@ -392,7 +394,7 @@ public class MySqlDbFirst
                                                       String tablesMatcher,
                                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "concat(a.table_schema, '.', a.table_name) as `F1`,\r\n"
                                            + "a.column_name as `F2`,\r\n"
@@ -432,7 +434,7 @@ public class MySqlDbFirst
                                                         String tablesMatcher,
                                                         boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String sql = String.format("select \r\n"
                                            + "concat(a.constraint_schema, '.', a.table_name) as `F1`,\r\n"
                                            + "a.column_name as `F2`,\r\n"
@@ -468,14 +470,14 @@ public class MySqlDbFirst
      */
     private String getDatabase(boolean lower)
             throws
-            Exception {
+            ModuleException {
         Matcher matcher = Pattern.compile("jdbc:mysql://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(String.format("%s;",
                                                         config.getProperties()
                                                               .getProperty(DruidDataSourceFactory.PROP_URL)));
         if (!matcher.find())
-            throw new Exception("无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为 jdbc:mysql://(.*?)/(.*?)\\?");
+            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:mysql://(.*?)/(.*?)\\?"));
 
         if (lower)
             return matcher.group(2)
@@ -514,7 +516,7 @@ public class MySqlDbFirst
                                         String tablename,
                                         boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         //所有的表结构信息
         List<DbTableInfo> tables = new ArrayList<>();
 
@@ -530,7 +532,8 @@ public class MySqlDbFirst
             tbname = splitTableName(tablename,
                                     ignoreCase);
             if (tbname == null)
-                throw new Exception("tablename值无效");
+                throw new ModuleException(Strings.getUnknownValue("tablename",
+                                                                  tablename));
             if (tbname.length == 1) {
                 String db = getDatabase(ignoreCase);
                 if (!StringUtils.hasText(db))
@@ -976,7 +979,7 @@ public class MySqlDbFirst
     @Override
     public List<String> getDatabases()
             throws
-            Exception {
+            ModuleException {
         String sql = " select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'mysql', 'performance_schema')";
         return super.ado.selectList(getSqlSession(),
                                     getMSId(MD5Utils.hash(sql)),
@@ -992,7 +995,7 @@ public class MySqlDbFirst
     @Override
     public List<DbTableInfo> getTablesByDatabase(String... database)
             throws
-            Exception {
+            ModuleException {
         return getTables(database,
                          null,
                          false);
@@ -1002,7 +1005,7 @@ public class MySqlDbFirst
     public DbTableInfo getTableByName(String name,
                                       boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         return CollectionsExtension.firstOrDefault(getTables(null,
                                                              name,
                                                              ignoreCase));
@@ -1012,11 +1015,12 @@ public class MySqlDbFirst
     public boolean existsTable(String name,
                                boolean ignoreCase)
             throws
-            Exception {
+            ModuleException {
         String[] tbname = splitTableName(name,
                                          ignoreCase);
         if (tbname == null)
-            throw new Exception("name值无效");
+            throw new ModuleException(Strings.getUnknownValue("name",
+                                                              name));
 
         //获取当前模式名，也就是用户标识
         if (tbname.length == 1) {

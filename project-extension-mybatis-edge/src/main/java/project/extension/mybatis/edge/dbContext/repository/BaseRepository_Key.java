@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.dbContext.repository;
 import project.extension.collections.TupleExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.model.NullResultException;
 import project.extension.standard.exception.ModuleException;
@@ -25,7 +25,7 @@ public class BaseRepository_Key<TEntity, TKey>
         implements IBaseRepository_Key<TEntity, TKey> {
     private final List<Field> keyFields;
     private final Class<TKey> keyType;
-    private final String defaultNullErrorMessage = DbContextStrings.getDataUndefined();
+    private final String defaultNullErrorMessage = Strings.getDataUndefined();
 
     /**
      * @param orm        orm
@@ -40,9 +40,9 @@ public class BaseRepository_Key<TEntity, TKey>
         super(orm,
               entityType);
         this.keyFields = EntityTypeHandler.getPrimaryKeyField(entityType);
-        if (this.keyFields.size() == 0) throw new ModuleException(DbContextStrings.getEntityPrimaryKeyUndefined());
+        if (this.keyFields.size() == 0) throw new ModuleException(Strings.getEntityPrimaryKeyUndefined());
         if (keyFields.size() > 1 && !ITuple.class.isAssignableFrom(keyType))
-            throw new ModuleException(DbContextStrings.getEntityCompositePrimaryKeyMustBeTupleType());
+            throw new ModuleException(Strings.getEntityCompositePrimaryKeyMustBeTupleType());
         this.keyType = keyType;
     }
 

@@ -4,17 +4,19 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.config.DruidConfig;
 import project.extension.mybatis.edge.extention.CommonUtils;
-import project.extension.mybatis.edge.globalization.DbContextStrings;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
 
 import javax.sql.DataSource;
@@ -32,12 +34,10 @@ import java.util.Map;
 @EnableConfigurationProperties({BaseConfig.class,
                                 DruidConfig.class})
 @DependsOn("IOCExtension")
-@EnableTransactionManagement
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
     public NaiveDataSourceProvider(BaseConfig baseConfig,
-                                   DruidConfig druidConfig,
-                                   ApplicationContext applicationContext) {
+                                   DruidConfig druidConfig) {
         this.baseConfig = baseConfig;
         this.druidConfig = druidConfig;
     }
@@ -55,6 +55,8 @@ public class NaiveDataSourceProvider
     private final Map<String, DataSource> dataSourceMap = new HashMap<>();
 
     private final Map<String, SqlSessionFactory> sqlSessionFactoryMap = new HashMap<>();
+
+    private final Map<String, DataSourceTransactionManager> transactionManagerMap = new HashMap<>();
 
     @Override
     public String defaultDataSource() {
@@ -77,7 +79,7 @@ public class NaiveDataSourceProvider
                 try {
                     druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
                 } catch (Exception ex) {
-                    throw new ModuleException(DbContextStrings.getCreateDataSourceFailed(dataSource),
+                    throw new ModuleException(Strings.getCreateDataSourceFailed(dataSource),
                                               ex);
                 }
                 druidConfig.applyConfig(druidDataSource,
@@ -86,6 +88,21 @@ public class NaiveDataSourceProvider
                         dataSourceConfig.getName(),
                         druidDataSource);
 
+                //容器
+                DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) IOCExtension.applicationContext).getBeanFactory();
+
+                //事务管理器
+                final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+                dataSourceTransactionManager.setDataSource(druidDataSource);
+                transactionManagerMap.put(dataSourceConfig.getName(),
+                                          dataSourceTransactionManager);
+                defaultListableBeanFactory.registerSingleton(
+                        String.format("%s%s",
+                                      INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix,
+                                      dataSourceConfig.getName()),
+                        dataSourceTransactionManager);
+
+                //Sql会话工厂
                 final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
                 sqlSessionFactoryBean.setDataSource(druidDataSource);
                 sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
@@ -93,11 +110,18 @@ public class NaiveDataSourceProvider
                 SqlSessionFactory sqlSessionFactory;
                 try {
                     sqlSessionFactory = sqlSessionFactoryBean.getObject();
+                    if (sqlSessionFactory == null)
+                        throw new Exception("method SqlSessionFactoryBean.getObject() result null");
                 } catch (Exception ex) {
-                    throw new ModuleException(DbContextStrings.getSqlSessionFactoryFailed());
+                    throw new ModuleException(Strings.getSqlSessionFactoryFailed());
                 }
                 sqlSessionFactoryMap.put(dataSourceConfig.getName(),
                                          sqlSessionFactory);
+                defaultListableBeanFactory.registerSingleton(
+                        String.format("%s%s",
+                                      INaiveDataSourceProvider.SqlSessionFactoryIOCPrefix,
+                                      dataSourceConfig.getName()),
+                        sqlSessionFactory);
             }
         }
 
@@ -107,6 +131,11 @@ public class NaiveDataSourceProvider
     @Override
     public DataSource getDataSources(String dataSource) {
         return loadAllDataSources().get(dataSource);
+    }
+
+    @Override
+    public DataSourceTransactionManager getTransactionManager(String dataSource) {
+        return transactionManagerMap.get(dataSource);
     }
 
     @Override
