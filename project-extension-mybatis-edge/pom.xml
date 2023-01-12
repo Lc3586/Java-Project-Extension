@@ -126,6 +126,9 @@
         </dependency>
 
         <!-- Oracle驱动 -->
+        <!--    在项目根目录下执行此命令将ojdbc14.jar安装到本地仓库
+                mvn install:install-file -Dfile="project-extension-mybatis-edge\src\main\resources\ojdbc14-10.2.0.4.0\ojdbc14.jar" -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion="10.2.0.4.0" -Dpackaging=jar
+                接着将project-extension-common\src\main\resources\jacob-1.20目录下的jacob01.20.dll文件放至jdk\bin和jre\bin目录中-->
         <dependency>
             <groupId>com.oracle</groupId>
             <artifactId>ojdbc14</artifactId>

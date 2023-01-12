@@ -1,10 +1,10 @@
 package project.extension.file;
 
 import project.extension.tuple.Tuple2;
-import sun.misc.BASE64Decoder;
+
+import java.util.Base64;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
@@ -20,11 +20,9 @@ public class ImageHelper {
      * @param base64 Base64编码
      * @return 文件数据输入流
      */
-    public static Tuple2<InputStream, Integer> getBase64Image(String base64)
-            throws
-            IOException {
-        byte[] buffer = new BASE64Decoder().decodeBuffer(base64);
+    public static Tuple2<InputStream, Integer> getBase64Image(String base64) {
+        byte[] buffer = Base64.getDecoder().decode(base64);
         return new Tuple2<>(new ByteArrayInputStream(buffer),
-                            buffer.length);
+                buffer.length);
     }
 }
