@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Configuration
 @EnableConfigurationProperties({BaseConfig.class,
-                                DruidConfig.class})
+        DruidConfig.class})
 @DependsOn("IOCExtension")
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
@@ -76,39 +76,41 @@ public class NaiveDataSourceProvider
      */
     private void loadDataSource(String dataSource) {
         DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
+        if (!dataSourceConfig.isEnable())
+            return;
 
         DruidDataSource druidDataSource;
         try {
             druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
         } catch (Exception ex) {
             throw new ModuleException(Strings.getCreateDataSourceFailed(dataSourceConfig.getName()),
-                                      ex);
+                    ex);
         }
         druidConfig.applyConfig(druidDataSource,
-                                dataSourceConfig.getDbType());
+                dataSourceConfig.getDbType());
         dataSourceMap.put(
                 dataSourceConfig.getName(),
                 druidDataSource);
 
         if (dataSourceConfig.getName()
-                            .equals(defaultDataSource()))
+                .equals(defaultDataSource()))
             getBeanFactory().registerSingleton(
                     INaiveDataSourceProvider.DEFAULT_DATA_SOURCE_IOC_NAME,
                     druidDataSource);
 
         getBeanFactory().registerSingleton(
                 String.format("%s%s",
-                              INaiveDataSourceProvider.DATA_SOURCE_IOC_PREFIX,
-                              dataSourceConfig.getName()),
+                        INaiveDataSourceProvider.DATA_SOURCE_IOC_PREFIX,
+                        dataSourceConfig.getName()),
                 druidDataSource);
 
         //事务管理器
         loadTransactionManager(dataSource,
-                               druidDataSource);
+                druidDataSource);
 
         //Sql会话工厂
         loadSqlSessionFactory(dataSource,
-                              druidDataSource);
+                druidDataSource);
     }
 
     /**
@@ -122,7 +124,7 @@ public class NaiveDataSourceProvider
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
         dataSourceTransactionManager.setDataSource(dataSource);
         transactionManagerMap.put(name,
-                                  dataSourceTransactionManager);
+                dataSourceTransactionManager);
 
         if (name.equals(defaultDataSource()))
             getBeanFactory().registerSingleton(
@@ -131,8 +133,8 @@ public class NaiveDataSourceProvider
 
         getBeanFactory().registerSingleton(
                 String.format("%s%s",
-                              INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
-                              name),
+                        INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
+                        name),
                 dataSourceTransactionManager);
     }
 
@@ -147,7 +149,7 @@ public class NaiveDataSourceProvider
         final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
-                                                                                                   .getConfigLocation()));
+                .getConfigLocation()));
         SqlSessionFactory sqlSessionFactory;
         try {
             sqlSessionFactory = sqlSessionFactoryBean.getObject();
@@ -157,7 +159,7 @@ public class NaiveDataSourceProvider
             throw new ModuleException(Strings.getSqlSessionFactoryFailed());
         }
         sqlSessionFactoryMap.put(name,
-                                 sqlSessionFactory);
+                sqlSessionFactory);
 
         if (name.equals(defaultDataSource()))
             getBeanFactory().registerSingleton(
@@ -166,8 +168,8 @@ public class NaiveDataSourceProvider
 
         getBeanFactory().registerSingleton(
                 String.format("%s%s",
-                              INaiveDataSourceProvider.SQL_SESSION_FACTORY_IOC_PREFIX,
-                              name),
+                        INaiveDataSourceProvider.SQL_SESSION_FACTORY_IOC_PREFIX,
+                        name),
                 sqlSessionFactory);
     }
 
