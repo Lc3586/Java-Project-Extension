@@ -84,26 +84,14 @@ public class BaseRepository<TEntity>
 
     @Override
     public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
-        return transaction(null,
-                           handler);
+        return getOrm().transaction(handler);
     }
 
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
-        try {
-            if (isolationLevel != null)
-                getUnitOfWork().setIsolationLevel(isolationLevel);
-            getUnitOfWork().getOrBeginTransaction();
-            handler.invoke();
-            getUnitOfWork().commit();
-            return new Tuple2<>(true,
-                                null);
-        } catch (Exception ex) {
-            getUnitOfWork().rollback();
-            return new Tuple2<>(false,
-                                ex);
-        }
+        return getOrm().transaction(isolationLevel,
+                                    handler);
     }
 
     @Override
@@ -114,11 +102,11 @@ public class BaseRepository<TEntity>
     @Override
     public void insert(TEntity data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().insert(setting.getEntityType(),
                             data)
                     .executeAffrows() <= 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getInsertDataFailed());
     }
 
     @Override
@@ -126,23 +114,23 @@ public class BaseRepository<TEntity>
                               Class<TDto> dtoType,
                               Integer mainTagLevel)
             throws
-            Exception {
-        if (getOrm().insert(setting.getEntityType(),
-                            data,
-                            dtoType,
-                            mainTagLevel)
-                    .executeAffrows() <= 0)
-            throw new Exception("执行操作失败");
+            ModuleException {
+        if (this.ormScoped.insert(setting.getEntityType(),
+                                  data,
+                                  dtoType,
+                                  mainTagLevel)
+                          .executeAffrows() <= 0)
+            throw new ModuleException(Strings.getInsertDataFailed());
     }
 
     @Override
     public void batchInsert(Collection<TEntity> data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchInsert(setting.getEntityType(),
                                  data)
                     .executeAffrows() != data.size())
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getInsertDataFailed());
     }
 
     @Override
@@ -150,13 +138,13 @@ public class BaseRepository<TEntity>
                                    Class<TDto> dtoType,
                                    Integer mainTagLevel)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchInsert(setting.getEntityType(),
                                  data,
                                  dtoType,
                                  mainTagLevel)
                     .executeAffrows() != data.size())
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getInsertDataFailed());
     }
 
     @Override
@@ -167,11 +155,11 @@ public class BaseRepository<TEntity>
     @Override
     public void update(TEntity data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().update(setting.getEntityType(),
                             data)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getUpdateDataFailed());
     }
 
     @Override
@@ -179,23 +167,23 @@ public class BaseRepository<TEntity>
                               Class<TDto> dtoType,
                               Integer mainTagLevel)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().update(setting.getEntityType(),
                             data,
                             dtoType,
                             mainTagLevel)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getUpdateDataFailed());
     }
 
     @Override
     public void batchUpdate(Collection<TEntity> data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchUpdate(setting.getEntityType(),
                                  data)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getUpdateDataFailed());
     }
 
     @Override
@@ -203,13 +191,13 @@ public class BaseRepository<TEntity>
                                    Class<TDto> dtoType,
                                    Integer mainTagLevel)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchUpdate(setting.getEntityType(),
                                  data,
                                  dtoType,
                                  mainTagLevel)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getUpdateDataFailed());
     }
 
     @Override
@@ -220,45 +208,45 @@ public class BaseRepository<TEntity>
     @Override
     public void delete(TEntity data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().delete(setting.getEntityType(),
                             data)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getDeleteDataFailed());
     }
 
     @Override
     public <TDto> void delete(TDto data,
                               Class<TDto> dtoType)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().delete(setting.getEntityType(),
                             data,
                             dtoType)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getDeleteDataFailed());
     }
 
     @Override
     public void batchDelete(Collection<TEntity> data)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchDelete(setting.getEntityType(),
                                  data)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getDeleteDataFailed());
     }
 
     @Override
     public <TDto> void batchDelete(Collection<TDto> data,
                                    Class<TDto> dtoType)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().batchDelete(setting.getEntityType(),
                                  data,
                                  dtoType)
                     .executeAffrows() < 0)
-            throw new Exception("执行操作失败");
+            throw new ModuleException(Strings.getDeleteDataFailed());
     }
 
     @Override

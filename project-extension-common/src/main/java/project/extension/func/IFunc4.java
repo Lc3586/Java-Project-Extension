@@ -18,7 +18,5 @@ public interface IFunc4<TParameter1, TParameter2, TParameter3, TParameter4, TRes
     TResult invoke(TParameter1 parameter1,
                    TParameter2 parameter2,
                    TParameter3 parameter3,
-                   TParameter4 parameter4)
-            throws
-            Exception;
+                   TParameter4 parameter4);
 }

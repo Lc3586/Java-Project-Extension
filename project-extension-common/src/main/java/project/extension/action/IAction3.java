@@ -16,7 +16,5 @@ public interface IAction3<TParameter1, TParameter2, TParameter3> {
      */
     void invoke(TParameter1 parameter1,
                 TParameter2 parameter2,
-                TParameter3 parameter3)
-            throws
-            Exception;
+                TParameter3 parameter3);
 }

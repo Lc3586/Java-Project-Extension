@@ -4,6 +4,7 @@ import project.extension.mybatis.edge.core.provider.standard.IDelete;
 import project.extension.mybatis.edge.core.provider.standard.IInsert;
 import project.extension.mybatis.edge.core.provider.standard.ISelect;
 import project.extension.mybatis.edge.core.provider.standard.IUpdate;
+import project.extension.standard.exception.ModuleException;
 
 import java.util.Collection;
 
@@ -28,7 +29,7 @@ public interface IBaseRepository<TEntity>
      */
     void insert(TEntity data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 插入一条记录
@@ -42,7 +43,7 @@ public interface IBaseRepository<TEntity>
                        Class<TDto> dtoType,
                        Integer mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量插入记录
@@ -51,7 +52,7 @@ public interface IBaseRepository<TEntity>
      */
     void batchInsert(Collection<TEntity> data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量插入记录
@@ -65,7 +66,7 @@ public interface IBaseRepository<TEntity>
                             Class<TDto> dtoType,
                             Integer mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 数据插入对象
@@ -79,7 +80,7 @@ public interface IBaseRepository<TEntity>
      */
     void update(TEntity data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 更新一条记录
@@ -93,7 +94,7 @@ public interface IBaseRepository<TEntity>
                        Class<TDto> dtoType,
                        Integer mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量更新记录
@@ -102,7 +103,7 @@ public interface IBaseRepository<TEntity>
      */
     void batchUpdate(Collection<TEntity> data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量更新记录
@@ -116,7 +117,7 @@ public interface IBaseRepository<TEntity>
                             Class<TDto> dtoType,
                             Integer mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 数据更新对象
@@ -130,7 +131,7 @@ public interface IBaseRepository<TEntity>
      */
     void delete(TEntity data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 删除一条记录
@@ -142,7 +143,7 @@ public interface IBaseRepository<TEntity>
     <TDto> void delete(TDto data,
                        Class<TDto> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量删除记录
@@ -151,7 +152,7 @@ public interface IBaseRepository<TEntity>
      */
     void batchDelete(Collection<TEntity> data)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 批量删除记录
@@ -163,7 +164,7 @@ public interface IBaseRepository<TEntity>
     <TDto> void batchDelete(Collection<TDto> data,
                             Class<TDto> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 数据删除对象

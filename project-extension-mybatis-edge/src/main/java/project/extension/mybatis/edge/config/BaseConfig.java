@@ -128,7 +128,7 @@ public class BaseConfig {
             if (this.getMultiDataSource() == null || this.getMultiDataSource()
                                                          .size() == 0) {
                 //设置默认数据源为master
-                this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATASOURCE);
+                this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATA_SOURCE);
             } else {
                 //设置默认数据源为多库中的第一个
                 DataSourceConfig firstDataSource = CollectionsExtension.firstValue(this.getMultiDataSource());
@@ -141,7 +141,7 @@ public class BaseConfig {
                         throw new ModuleException(Strings.getConfigDataSourceNameUndefined());
 
                     //设置默认数据源为master
-                    this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATASOURCE);
+                    this.setDataSource(INaiveDataSourceProvider.DEFAULT_DATA_SOURCE);
                     firstDataSource.setName(this.getDataSource());
                 }
             }

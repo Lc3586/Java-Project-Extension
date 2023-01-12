@@ -27,14 +27,22 @@ public class Strings_en_US {
                        "Transaction opened, unit of work cannot be disabled");
             values.put("TransactionAlreadyStarted",
                        "事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction，或是嵌套了多层事务");
+            values.put("BeginTransaction",
+                       "开启事务");
             values.put("TransactionBeginFailed",
                        "开启事务失败");
+            values.put("TransactionCommit",
+                       "提交事务");
             values.put("TransactionCommitFailed",
                        "提交事务失败");
+            values.put("TransactionRollback",
+                       "回滚事务");
             values.put("TransactionRollbackFailed",
                        "回滚事务失败");
             values.put("NoneSpringManagedTransactionFactory",
                        "SqlSessionFactory must be using a SpringManagedTransactionFactory in order to use Spring transaction synchronization");
+            values.put("CloseSqlSessionFailed",
+                       "关闭Sql会话失败");
             values.put("SqlSessionCheckClosedFailed",
                        "检查Sql会话是否已关闭失败");
             values.put("SqlSessionFactoryFailed",

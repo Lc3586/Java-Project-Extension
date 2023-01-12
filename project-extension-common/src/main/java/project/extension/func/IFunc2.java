@@ -14,7 +14,5 @@ public interface IFunc2<TParameter1, TParameter2, TResult> {
      * @param parameter2 参数2
      */
     TResult invoke(TParameter1 parameter1,
-                   TParameter2 parameter2)
-            throws
-            Exception;
+                   TParameter2 parameter2);
 }

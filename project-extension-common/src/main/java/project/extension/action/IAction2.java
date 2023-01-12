@@ -14,7 +14,5 @@ public interface IAction2<TParameter1, TParameter2> {
      * @param parameter2 参数2
      */
     void invoke(TParameter1 parameter1,
-                TParameter2 parameter2)
-            throws
-            Exception;
+                TParameter2 parameter2);
 }

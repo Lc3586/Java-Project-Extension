@@ -2,10 +2,8 @@ spring:
   datasource:
     # 切换Druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
-  # 资源信息
-  messages:
-    # 国际化资源文件路径
-    basename: i18n/strings
+    druid:
+      max-active: 10
 
 #项目拓展
 project:

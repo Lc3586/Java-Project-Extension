@@ -1,10 +1,12 @@
 package project.extension.file;
 
 import project.extension.action.IAction1;
+import project.extension.exception.CommonException;
 import project.extension.system.SystemInfoUtils;
 import project.extension.tuple.Tuple3;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +23,7 @@ public class ExecutableHelper {
      */
     public static String getShell()
             throws
-            Exception {
+            CommonException {
         switch (SystemInfoUtils.currentOS()) {
             case Windows:
                 return "cmd.exe";
@@ -29,8 +31,8 @@ public class ExecutableHelper {
             case OSX:
                 return System.getenv("SHELL");
             default:
-                throw new Exception(String.format("不支持在当前操作系统%s执行此操作",
-                                                  SystemInfoUtils.currentOS()));
+                throw new CommonException(String.format("不支持在当前操作系统%s执行此操作",
+                                                        SystemInfoUtils.currentOS()));
         }
     }
 
@@ -61,7 +63,7 @@ public class ExecutableHelper {
             Charset outputCharset,
             Charset errorCharset)
             throws
-            Exception {
+            CommonException {
         String[] cmd = new String[arguments == null
                                   ? 1
                                   : (arguments.length + 1)];
@@ -73,16 +75,31 @@ public class ExecutableHelper {
                                                 arguments.length);
 
         //执行命令获取进程
-        Process process = Runtime.getRuntime()
-                                 .exec(String.join(" ",
-                                                   cmd),
-                                       environments,
-                                       workingDirectory);
+        Process process;
+
+        try {
+            process = Runtime.getRuntime()
+                             .exec(String.join(" ",
+                                               cmd),
+                                   environments,
+                                   workingDirectory);
+        } catch (IOException ex) {
+            throw new CommonException("获取进程失败",
+                                      ex);
+        }
 
         //输入信息
-        if (inputWriteLine != null)
-            inputWriteLine.invoke(value -> process.getOutputStream()
-                                                  .write(value.getBytes(inputCharset)));
+        if (inputWriteLine != null) {
+            inputWriteLine.invoke(value -> {
+                try {
+                    process.getOutputStream()
+                           .write(value.getBytes(inputCharset));
+                } catch (IOException ex) {
+                    throw new CommonException("输入信息失败",
+                                              ex);
+                }
+            });
+        }
 
         //异步获取输出信息（一行行获取）
         CompletableFuture<Void> writeOutputTask = outputReadLine == null
@@ -118,10 +135,20 @@ public class ExecutableHelper {
                                                                   writeErrorTask);
 
         //等待程序运行结束
-        process.waitFor();
+        try {
+            process.waitFor();
+        } catch (InterruptedException ex) {
+            throw new CommonException("等待程序运行结束失败",
+                                      ex);
+        }
 
         //等待任务全部结束
-        allTask.get();
+        try {
+            allTask.get();
+        } catch (Exception ex) {
+            throw new CommonException("等待任务全部结束失败",
+                                      ex);
+        }
 
         return process.exitValue();
     }
@@ -149,7 +176,7 @@ public class ExecutableHelper {
             Charset outputCharset,
             Charset errorCharset)
             throws
-            Exception {
+            CommonException {
         StringBuilder output = new StringBuilder();
         StringBuilder error = new StringBuilder();
         int exitCode;
@@ -207,7 +234,7 @@ public class ExecutableHelper {
             Charset outputCharset,
             Charset errorCharset)
             throws
-            Exception {
+            CommonException {
         return simpleExec(
                 getShell(),
                 arguments,

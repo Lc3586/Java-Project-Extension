@@ -5,13 +5,16 @@ import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.*;
 import org.mybatis.spring.SqlSessionHolder;
 import org.mybatis.spring.transaction.SpringManagedTransactionFactory;
+import org.springframework.core.NamedThreadLocal;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import project.extension.func.IFunc0;
 import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.aop.*;
 import project.extension.mybatis.edge.core.mapper.MappedStatementHandler;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.NameConvertType;
@@ -38,13 +41,23 @@ public class NaiveAdoProvider
             throws
             ModuleException {
         this.dataSourceName = dataSource;
+        this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.mappedStatementHandler = IOCExtension.applicationContext.getBean(MappedStatementHandler.class);
         final INaiveDataSourceProvider naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
         this.dataSource = naiveDataSourceProvider.getDataSources(dataSource);
         this.sqlSessionFactory = naiveDataSourceProvider.getSqlSessionFactory(dataSource);
         this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class)
                                                                            .getTransactionManager(dataSource);
+        this.transactionDefinition = IOCExtension.applicationContext.getBean(TransactionDefinition.class);
     }
+
+    /**
+     * AOP编程对象
+     */
+    protected final NaiveAopProvider aop;
+
+    private static final ThreadLocal<Tuple2<TraceBeforeEventArgs, TransactionStatus>> transactionalResources =
+            new NamedThreadLocal<>("AOP Transactional Before resources");
 
     /**
      * MappedStatement处理类
@@ -75,6 +88,53 @@ public class NaiveAdoProvider
      * 解析事务的方法
      */
     private IFunc0<TransactionStatus> resolveTransaction;
+
+    /**
+     * 事务定义
+     */
+    private final TransactionDefinition transactionDefinition;
+
+    /**
+     * 结束Sql查询后执行
+     */
+    private void afterExecute(SqlSession sqlSession) {
+        if (isTransactionAlreadyExisting())
+            return;
+
+        try {
+            if (sqlSession.getConnection()
+                          .getAutoCommit()) {
+                sqlSession.commit();
+                sqlSession.close();
+            }
+        } catch (Exception ex) {
+            throw new ModuleException(Strings.getSqlSessionCheckClosedFailed());
+        }
+    }
+
+    /**
+     * 开启事务
+     *
+     * @param transactionDefinition 事务定义
+     * @return 事务
+     */
+    private TransactionStatus beginTransactionPrivate(TransactionDefinition transactionDefinition) {
+        if (isTransactionAlreadyExisting())
+            throw new ModuleException(Strings.getTransactionAlreadyStarted());
+
+        TraceBeforeEventArgs tranBefore = new TraceBeforeEventArgs(Operation.BeginTransaction,
+                                                                   transactionDefinition == null
+                                                                   ? null
+                                                                   : transactionDefinition.getIsolationLevel());
+        this.aop.traceBefore(tranBefore);
+
+        TransactionStatus transactionStatus = this.dataSourceTransactionManager.getTransaction(transactionDefinition);
+
+        transactionalResources.set(new Tuple2<>(tranBefore,
+                                                transactionStatus));
+
+        return transactionStatus;
+    }
 
     /**
      * 获取执行器类型
@@ -187,10 +247,47 @@ public class NaiveAdoProvider
     }
 
     @Override
-    public TransactionStatus getOrCreateTransaction(TransactionDefinition transactionDefinition)
+    public TransactionStatus currentTransaction()
             throws
             ModuleException {
-        return this.dataSourceTransactionManager.getTransaction(transactionDefinition);
+        if (!isTransactionAlreadyExisting())
+            return null;
+        Tuple2<TraceBeforeEventArgs, TransactionStatus> transactionalResource = transactionalResources.get();
+        return transactionalResource == null
+               ? null
+               : transactionalResource.b;
+    }
+
+    @Override
+    public TransactionStatus beginTransaction()
+            throws
+            ModuleException {
+        return beginTransactionPrivate(null);
+    }
+
+    @Override
+    public TransactionStatus beginTransaction(TransactionIsolationLevel isolationLevel)
+            throws
+            ModuleException {
+        DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(this.transactionDefinition);
+        transactionDefinition.setIsolationLevel(isolationLevel.getLevel());
+        return beginTransactionPrivate(transactionDefinition);
+    }
+
+    @Override
+    public TransactionStatus beginTransaction(TransactionDefinition transactionDefinition)
+            throws
+            ModuleException {
+        return beginTransactionPrivate(transactionDefinition);
+    }
+
+    @Override
+    public void transactionCommit()
+            throws
+            ModuleException {
+        if (!isTransactionAlreadyExisting())
+            return;
+        transactionCommit(currentTransaction());
     }
 
     @Override
@@ -198,6 +295,18 @@ public class NaiveAdoProvider
             throws
             ModuleException {
         this.dataSourceTransactionManager.commit(transactionStatus);
+        triggerAfterTransactionAop(Strings.getTransactionCommit(),
+                                   null);
+        transactionalResources.remove();
+    }
+
+    @Override
+    public void transactionRollback()
+            throws
+            ModuleException {
+        if (!isTransactionAlreadyExisting())
+            return;
+        transactionRollback(currentTransaction());
     }
 
     @Override
@@ -205,6 +314,23 @@ public class NaiveAdoProvider
             throws
             ModuleException {
         this.dataSourceTransactionManager.rollback(transactionStatus);
+        triggerAfterTransactionAop(Strings.getTransactionRollback(),
+                                   null);
+        transactionalResources.remove();
+    }
+
+    @Override
+    public void triggerAfterTransactionAop(String remark,
+                                           Exception ex)
+            throws
+            ModuleException {
+        Tuple2<TraceBeforeEventArgs, TransactionStatus> tranResource = transactionalResources.get();
+        if (tranResource == null)
+            return;
+
+        this.aop.traceAfter(new TraceAfterEventArgs(tranResource.a,
+                                                    remark,
+                                                    ex));
     }
 
     @Override
@@ -223,7 +349,7 @@ public class NaiveAdoProvider
         //事务
         boolean isActualTransactionActive = TransactionSynchronizationManager.isActualTransactionActive();
         TransactionStatus transaction = null;
-        if (!isActualTransactionActive && getResolveTransaction() != null) {
+        if (getResolveTransaction() != null) {
             try {
                 transaction = getResolveTransaction().invoke();
             } catch (Exception ex) {
@@ -333,8 +459,12 @@ public class NaiveAdoProvider
                                            resultCustomTags,
                                            nameConvertType);
 
-        return sqlSession.selectOne(msId,
-                                    parameterHashMap);
+        TResult result = sqlSession.selectOne(msId,
+                                              parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -361,8 +491,12 @@ public class NaiveAdoProvider
                                            resultCustomTags,
                                            nameConvertType);
 
-        return sqlSession.selectOne(msId,
-                                    parameter);
+        TResult result = sqlSession.selectOne(msId,
+                                              parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -386,8 +520,12 @@ public class NaiveAdoProvider
                                            resultCustomTags,
                                            nameConvertType);
 
-        return sqlSession.selectList(msId,
-                                     parameterHashMap);
+        List<TResult> result = sqlSession.selectList(msId,
+                                                     parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -414,8 +552,12 @@ public class NaiveAdoProvider
                                            resultCustomTags,
                                            nameConvertType);
 
-        return sqlSession.selectList(msId,
-                                     parameter);
+        List<TResult> result = sqlSession.selectList(msId,
+                                                     parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -437,8 +579,12 @@ public class NaiveAdoProvider
                                            resultFields,
                                            nameConvertType);
 
-        return sqlSession.selectOne(msId,
-                                    parameterHashMap);
+        Map<String, Object> result = sqlSession.selectOne(msId,
+                                                          parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -463,8 +609,12 @@ public class NaiveAdoProvider
                                            resultFields,
                                            nameConvertType);
 
-        return sqlSession.selectOne(msId,
-                                    parameter);
+        Map<String, Object> result = sqlSession.selectOne(msId,
+                                                          parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -486,8 +636,12 @@ public class NaiveAdoProvider
                                            resultFields,
                                            nameConvertType);
 
-        return sqlSession.selectList(msId,
-                                     parameterHashMap);
+        List<Map<String, Object>> result = sqlSession.selectList(msId,
+                                                                 parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -512,8 +666,12 @@ public class NaiveAdoProvider
                                            resultFields,
                                            nameConvertType);
 
-        return sqlSession.selectList(msId,
-                                     parameter);
+        List<Map<String, Object>> result = sqlSession.selectList(msId,
+                                                                 parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -534,8 +692,12 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.insert(msId,
-                                 parameterHashMap);
+        int result = sqlSession.insert(msId,
+                                       parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -559,8 +721,12 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.insert(msId,
-                                 parameter);
+        int result = sqlSession.insert(msId,
+                                       parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -581,8 +747,12 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.update(msId,
-                                 parameterHashMap);
+        int result = sqlSession.update(msId,
+                                       parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -606,8 +776,12 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.update(msId,
-                                 parameter);
+        int result = sqlSession.update(msId,
+                                       parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -628,8 +802,12 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.delete(msId,
-                                 parameterHashMap);
+        int result = sqlSession.delete(msId,
+                                       parameterHashMap);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 
     @Override
@@ -653,7 +831,11 @@ public class NaiveAdoProvider
                                            null,
                                            nameConvertType);
 
-        return sqlSession.delete(msId,
-                                 parameter);
+        int result = sqlSession.delete(msId,
+                                       parameter);
+
+        afterExecute(sqlSession);
+
+        return result;
     }
 }

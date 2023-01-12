@@ -81,10 +81,24 @@ public class Strings {
     }
 
     /**
+     * 开启事务
+     */
+    public static String getBeginTransaction() {
+        return getString("BeginTransaction");
+    }
+
+    /**
      * 开启事务失败
      */
     public static String getTransactionBeginFailed() {
         return getString("TransactionBeginFailed");
+    }
+
+    /**
+     * 提交事务
+     */
+    public static String getTransactionCommit() {
+        return getString("TransactionCommit");
     }
 
     /**
@@ -95,10 +109,24 @@ public class Strings {
     }
 
     /**
+     * 回滚事务
+     */
+    public static String getTransactionRollback() {
+        return getString("TransactionRollback");
+    }
+
+    /**
      * 回滚事务失败
      */
     public static String getTransactionRollbackFailed() {
         return getString("TransactionRollbackFailed");
+    }
+
+    /**
+     * 关闭Sql会话失败
+     */
+    public static String getCloseSqlSessionFailed() {
+        return getString("CloseSqlSessionFailed");
     }
 
     /**

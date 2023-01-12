@@ -3,9 +3,7 @@ package project.extension.mybatis.edge;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import project.extension.mybatis.edge.application.SpringBootTestApplication;
-import project.extension.mybatis.edge.test.X1ConnectBasicsTest;
-import project.extension.mybatis.edge.test.X2CurdBasicsTest;
-import project.extension.mybatis.edge.test.X3TransactionBasicsTest;
+import project.extension.mybatis.edge.test.*;
 
 /**
  * 1x至3x测试合集
@@ -36,5 +34,19 @@ public class TestCollectionFor1xTo3x {
     @DisplayName("3x.基础事务测试")
     public class ForX3TransactionBasicsTest
             extends X3TransactionBasicsTest {
+    }
+
+    @Nested
+    @Order(4)
+    @DisplayName("4x.基础Repository增删改查测试")
+    public class ForX4CurdRepositoryBasicsTest
+            extends X4CurdRepositoryBasicsTest {
+    }
+
+    @Nested
+    @Order(5)
+    @DisplayName("5x.基础Repository事务测试")
+    public class ForX5TransactionRepositoryBasicsTest
+            extends X5TransactionRepositoryBasicsTest {
     }
 }

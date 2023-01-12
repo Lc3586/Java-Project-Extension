@@ -63,7 +63,7 @@ public class BaseRepository_Key<TEntity, TKey>
     @Override
     public TEntity getById(TKey id)
             throws
-            Exception {
+            ModuleException {
         return getById(id,
                        setting.getEntityType());
     }
@@ -71,7 +71,7 @@ public class BaseRepository_Key<TEntity, TKey>
     @Override
     public TEntity getByIdAndCheckNull(TKey id)
             throws
-            Exception {
+            ModuleException {
         return getByIdAndCheckNull(id,
                                    defaultNullErrorMessage);
     }
@@ -80,9 +80,9 @@ public class BaseRepository_Key<TEntity, TKey>
     public TEntity getByIdAndCheckNull(TKey id,
                                        String nullErrorMessage)
             throws
-            Exception {
+            ModuleException {
         TEntity result = getById(id);
-        if (result == null) throw new Exception(nullErrorMessage);
+        if (result == null) throw new ModuleException(nullErrorMessage);
         return result;
     }
 
@@ -90,7 +90,7 @@ public class BaseRepository_Key<TEntity, TKey>
     public <TDto> TDto getById(TKey id,
                                Class<TDto> dtoType)
             throws
-            Exception {
+            ModuleException {
         return getById(id,
                        dtoType,
                        0);
@@ -101,7 +101,7 @@ public class BaseRepository_Key<TEntity, TKey>
                                Class<TDto> dtoType,
                                int mainTagLevel)
             throws
-            Exception {
+            ModuleException {
         List<Object> keyValues = getKeyValues(id);
         return getOrm().select(setting.getEntityType())
                        .as("a")
@@ -122,7 +122,7 @@ public class BaseRepository_Key<TEntity, TKey>
     public <TDto> TDto getByIdAndCheckNull(TKey id,
                                            Class<TDto> dtoType)
             throws
-            Exception {
+            ModuleException {
         return getByIdAndCheckNull(id,
                                    dtoType,
                                    defaultNullErrorMessage);
@@ -133,7 +133,7 @@ public class BaseRepository_Key<TEntity, TKey>
                                            Class<TDto> dtoType,
                                            int mainTagLevel)
             throws
-            Exception {
+            ModuleException {
         return getByIdAndCheckNull(id,
                                    dtoType,
                                    mainTagLevel,
@@ -145,7 +145,7 @@ public class BaseRepository_Key<TEntity, TKey>
                                            Class<TDto> dtoType,
                                            String nullErrorMessage)
             throws
-            Exception {
+            ModuleException {
         return getByIdAndCheckNull(id,
                                    dtoType,
                                    0,
@@ -158,7 +158,7 @@ public class BaseRepository_Key<TEntity, TKey>
                                            int mainTagLevel,
                                            String nullErrorMessage)
             throws
-            Exception {
+            ModuleException {
         TDto result = getById(id,
                               dtoType,
                               mainTagLevel);
@@ -169,14 +169,14 @@ public class BaseRepository_Key<TEntity, TKey>
     @Override
     public void deleteById(TKey id)
             throws
-            Exception {
+            ModuleException {
         deleteByIds(Collections.singleton(id));
     }
 
     @Override
     public void deleteByIds(Collection<TKey> ids)
             throws
-            Exception {
+            ModuleException {
         if (getOrm().delete(setting.getEntityType())
                     .where(x -> {
                         if (keyFields.size() == 1) {
@@ -202,6 +202,6 @@ public class BaseRepository_Key<TEntity, TKey>
                         }
                         return x;
                     })
-                    .executeAffrows() < 0) throw new Exception("执行操作失败");
+                    .executeAffrows() < 0) throw new ModuleException(Strings.getDeleteDataFailed());
     }
 }

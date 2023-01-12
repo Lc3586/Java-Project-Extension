@@ -58,6 +58,119 @@ public class NaiveDataSourceProvider
 
     private final Map<String, DataSourceTransactionManager> transactionManagerMap = new HashMap<>();
 
+    private DefaultListableBeanFactory beanFactory;
+
+    /**
+     * 容器工厂
+     */
+    private DefaultListableBeanFactory getBeanFactory() {
+        if (beanFactory == null)
+            beanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) IOCExtension.applicationContext).getBeanFactory();
+        return beanFactory;
+    }
+
+    /**
+     * 加载数据源、事务管理器、Sql会话工厂
+     *
+     * @param dataSource 数据源名称
+     */
+    private void loadDataSource(String dataSource) {
+        DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
+
+        DruidDataSource druidDataSource;
+        try {
+            druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
+        } catch (Exception ex) {
+            throw new ModuleException(Strings.getCreateDataSourceFailed(dataSourceConfig.getName()),
+                                      ex);
+        }
+        druidConfig.applyConfig(druidDataSource,
+                                dataSourceConfig.getDbType());
+        dataSourceMap.put(
+                dataSourceConfig.getName(),
+                druidDataSource);
+
+        if (dataSourceConfig.getName()
+                            .equals(defaultDataSource()))
+            getBeanFactory().registerSingleton(
+                    INaiveDataSourceProvider.DEFAULT_DATA_SOURCE_IOC_NAME,
+                    druidDataSource);
+
+        getBeanFactory().registerSingleton(
+                String.format("%s%s",
+                              INaiveDataSourceProvider.DATA_SOURCE_IOC_PREFIX,
+                              dataSourceConfig.getName()),
+                druidDataSource);
+
+        //事务管理器
+        loadTransactionManager(dataSource,
+                               druidDataSource);
+
+        //Sql会话工厂
+        loadSqlSessionFactory(dataSource,
+                              druidDataSource);
+    }
+
+    /**
+     * 加载事务管理器
+     *
+     * @param name       数据源名称
+     * @param dataSource 数据源
+     */
+    private void loadTransactionManager(String name,
+                                        DataSource dataSource) {
+        final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource);
+        transactionManagerMap.put(name,
+                                  dataSourceTransactionManager);
+
+        if (name.equals(defaultDataSource()))
+            getBeanFactory().registerSingleton(
+                    INaiveDataSourceProvider.DEFAULT_TRANSACTION_MANAGER_IOC_NAME,
+                    dataSourceTransactionManager);
+
+        getBeanFactory().registerSingleton(
+                String.format("%s%s",
+                              INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
+                              name),
+                dataSourceTransactionManager);
+    }
+
+    /**
+     * 加载Sql会话工厂
+     *
+     * @param name       数据源名称
+     * @param dataSource 数据源
+     */
+    private void loadSqlSessionFactory(String name,
+                                       DataSource dataSource) {
+        final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
+                                                                                                   .getConfigLocation()));
+        SqlSessionFactory sqlSessionFactory;
+        try {
+            sqlSessionFactory = sqlSessionFactoryBean.getObject();
+            if (sqlSessionFactory == null)
+                throw new Exception("method SqlSessionFactoryBean.getObject() result null");
+        } catch (Exception ex) {
+            throw new ModuleException(Strings.getSqlSessionFactoryFailed());
+        }
+        sqlSessionFactoryMap.put(name,
+                                 sqlSessionFactory);
+
+        if (name.equals(defaultDataSource()))
+            getBeanFactory().registerSingleton(
+                    INaiveDataSourceProvider.DEFAULT_SQL_SESSION_FACTORY_IOC_NAME,
+                    sqlSessionFactory);
+
+        getBeanFactory().registerSingleton(
+                String.format("%s%s",
+                              INaiveDataSourceProvider.SQL_SESSION_FACTORY_IOC_PREFIX,
+                              name),
+                sqlSessionFactory);
+    }
+
     @Override
     public String defaultDataSource() {
         return this.baseConfig.getDataSource();
@@ -74,54 +187,7 @@ public class NaiveDataSourceProvider
             ModuleException {
         if (dataSourceMap.size() == 0) {
             for (String dataSource : baseConfig.getAllDataSource()) {
-                DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
-                DruidDataSource druidDataSource;
-                try {
-                    druidDataSource = (DruidDataSource) DruidDataSourceFactory.createDataSource(dataSourceConfig.getProperties());
-                } catch (Exception ex) {
-                    throw new ModuleException(Strings.getCreateDataSourceFailed(dataSource),
-                                              ex);
-                }
-                druidConfig.applyConfig(druidDataSource,
-                                        dataSourceConfig.getDbType());
-                dataSourceMap.put(
-                        dataSourceConfig.getName(),
-                        druidDataSource);
-
-                //容器
-                DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) ((ConfigurableApplicationContext) IOCExtension.applicationContext).getBeanFactory();
-
-                //事务管理器
-                final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
-                dataSourceTransactionManager.setDataSource(druidDataSource);
-                transactionManagerMap.put(dataSourceConfig.getName(),
-                                          dataSourceTransactionManager);
-                defaultListableBeanFactory.registerSingleton(
-                        String.format("%s%s",
-                                      INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix,
-                                      dataSourceConfig.getName()),
-                        dataSourceTransactionManager);
-
-                //Sql会话工厂
-                final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-                sqlSessionFactoryBean.setDataSource(druidDataSource);
-                sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
-                                                                                                           .getConfigLocation()));
-                SqlSessionFactory sqlSessionFactory;
-                try {
-                    sqlSessionFactory = sqlSessionFactoryBean.getObject();
-                    if (sqlSessionFactory == null)
-                        throw new Exception("method SqlSessionFactoryBean.getObject() result null");
-                } catch (Exception ex) {
-                    throw new ModuleException(Strings.getSqlSessionFactoryFailed());
-                }
-                sqlSessionFactoryMap.put(dataSourceConfig.getName(),
-                                         sqlSessionFactory);
-                defaultListableBeanFactory.registerSingleton(
-                        String.format("%s%s",
-                                      INaiveDataSourceProvider.SqlSessionFactoryIOCPrefix,
-                                      dataSourceConfig.getName()),
-                        sqlSessionFactory);
+                loadDataSource(dataSource);
             }
         }
 

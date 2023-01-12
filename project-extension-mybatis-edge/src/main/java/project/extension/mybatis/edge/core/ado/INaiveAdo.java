@@ -72,14 +72,47 @@ public interface INaiveAdo {
             ModuleException;
 
     /**
-     * 获取或创建事务
+     * 获取当前事务
+     *
+     * @return 当前事务，可能为空
+     */
+    TransactionStatus currentTransaction()
+            throws
+            ModuleException;
+
+    /**
+     * 开启事务
+     *
+     * @return 事务
+     */
+    TransactionStatus beginTransaction()
+            throws
+            ModuleException;
+
+    /**
+     * 开启事务
+     *
+     * @param isolationLevel 事务隔离等级
+     * @return 事务
+     */
+    TransactionStatus beginTransaction(TransactionIsolationLevel isolationLevel)
+            throws
+            ModuleException;
+
+    /**
+     * 开启事务
      *
      * @param transactionDefinition 事务定义
      * @return 事务
      */
-    TransactionStatus getOrCreateTransaction(
-            @Nullable
-                    TransactionDefinition transactionDefinition)
+    TransactionStatus beginTransaction(TransactionDefinition transactionDefinition)
+            throws
+            ModuleException;
+
+    /**
+     * 提交事务
+     */
+    void transactionCommit()
             throws
             ModuleException;
 
@@ -94,10 +127,28 @@ public interface INaiveAdo {
 
     /**
      * 回滚事务
+     */
+    void transactionRollback()
+            throws
+            ModuleException;
+
+    /**
+     * 回滚事务
      *
      * @param transactionStatus 事务
      */
     void transactionRollback(TransactionStatus transactionStatus)
+            throws
+            ModuleException;
+
+    /**
+     * 事务结束后执行
+     *
+     * @param remark 备注
+     * @param ex     异常
+     */
+    void triggerAfterTransactionAop(String remark,
+                                    Exception ex)
             throws
             ModuleException;
 

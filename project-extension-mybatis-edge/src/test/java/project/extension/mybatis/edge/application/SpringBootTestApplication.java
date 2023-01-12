@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.application;
 
+import ch.qos.logback.core.ConsoleAppender;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
@@ -16,6 +18,11 @@ public class SpringBootTestApplication {
         System.out.printf("\033[32mSpringBootTestApplication.main\033[0m \033[33margs\033[0m : %s\r\n%n",
                           String.join(" ",
                                       args));
+
+        System.out.printf("\033[34mslf4j\033[0m ：%s%n",
+                          LoggerFactory.class.getResource(""));
+        System.out.printf("\033[34mlogback\033[0m ：%s%n",
+                          ConsoleAppender.class.getResource(""));
 
         SpringApplication.run(SpringBootTestApplication.class,
                               args);

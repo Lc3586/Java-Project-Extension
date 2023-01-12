@@ -14,8 +14,8 @@ import project.extension.mybatis.edge.dbContext.repository.DefaultRepository;
 import project.extension.mybatis.edge.dbContext.repository.DefaultRepository_Key;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
-import project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork;
 import project.extension.mybatis.edge.extention.CommonUtils;
+import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
@@ -48,7 +48,7 @@ public class OrmProvider
 
     private final INaiveAop aop;
 
-    private IBaseDbProvider createDbProvider() {
+    protected IBaseDbProvider createDbProvider() {
         return DbProvider.getDbProvider(this.dataSourceConfig);
     }
 
@@ -209,21 +209,41 @@ public class OrmProvider
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
-        UnitOfWork uow = new UnitOfWork(this);
         try {
-            if (isolationLevel != null)
-                uow.setIsolationLevel(isolationLevel);
-            uow.getOrBeginTransaction();
-            handler.invoke();
-            uow.commit();
-            return new Tuple2<>(true,
-                                null);
+            if (isolationLevel == null)
+                getAdo().beginTransaction();
+            else
+                getAdo().beginTransaction(isolationLevel);
         } catch (Exception ex) {
-            uow.rollback();
+            getAdo().triggerAfterTransactionAop(Strings.getTransactionBeginFailed(),
+                                                ex);
             return new Tuple2<>(false,
                                 ex);
-        } finally {
-            uow.close();
+        }
+
+        try {
+            handler.invoke();
+            try {
+                getAdo().transactionCommit();
+                return new Tuple2<>(true,
+                                    null);
+            } catch (Exception ex) {
+                getAdo().triggerAfterTransactionAop(Strings.getTransactionCommitFailed(),
+                                                    ex);
+                return new Tuple2<>(false,
+                                    ex);
+            }
+        } catch (Exception ex1) {
+            try {
+                getAdo().transactionRollback();
+                return new Tuple2<>(false,
+                                    ex1);
+            } catch (Exception ex2) {
+                getAdo().triggerAfterTransactionAop(Strings.getTransactionRollbackFailed(),
+                                                    ex2);
+                return new Tuple2<>(false,
+                                    ex2);
+            }
         }
     }
 

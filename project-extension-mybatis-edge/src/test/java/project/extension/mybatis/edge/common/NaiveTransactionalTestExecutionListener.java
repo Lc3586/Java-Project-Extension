@@ -37,7 +37,7 @@ public class NaiveTransactionalTestExecutionListener
         if (naiveDataSource != null)
             return super.getTransactionManager(testContext,
                                                String.format("%s%s",
-                                                             INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix,
+                                                             INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
                                                              naiveDataSource.dataSource()));
 
         return super.getTransactionManager(testContext,

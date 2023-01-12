@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.mybatis.edge.model.NullResultException;
+import project.extension.standard.exception.ModuleException;
 
 import java.util.Collection;
 
@@ -22,7 +23,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
      */
     TEntity getById(TKey id)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -34,7 +35,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
      */
     TEntity getByIdAndCheckNull(TKey id)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -47,7 +48,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
     TEntity getByIdAndCheckNull(TKey id,
                                 String nullErrorMessage)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据
@@ -60,7 +61,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
     <TDto> TDto getById(TKey id,
                         Class<TDto> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据
@@ -75,7 +76,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
                         Class<TDto> dtoType,
                         int mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -90,7 +91,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
     <TDto> TDto getByIdAndCheckNull(TKey id,
                                     Class<TDto> dtoType)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -107,7 +108,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
                                     Class<TDto> dtoType,
                                     int mainTagLevel)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -123,7 +124,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
                                     Class<TDto> dtoType,
                                     String nullErrorMessage)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 获取数据并进行非空检查
@@ -141,7 +142,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
                                     int mainTagLevel,
                                     String nullErrorMessage)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 根据 ID 删除
@@ -151,7 +152,7 @@ public interface IBaseRepository_Key<TEntity, TKey>
      */
     void deleteById(TKey id)
             throws
-            Exception;
+            ModuleException;
 
     /**
      * 根据 ID集合 删除
@@ -161,5 +162,5 @@ public interface IBaseRepository_Key<TEntity, TKey>
      */
     void deleteByIds(Collection<TKey> ids)
             throws
-            Exception;
+            ModuleException;
 }

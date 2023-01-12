@@ -1,15 +1,12 @@
 package project.extension.mybatis.edge.dbContext.unitOfWork;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.Operation;
-import project.extension.mybatis.edge.aop.TraceAfterEventArgs;
 import project.extension.mybatis.edge.aop.TraceBeforeEventArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
@@ -40,7 +37,6 @@ public class UnitOfWork
 
                                                                          "INaiveSql orm"));
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
-        this.transactionDefinition = IOCExtension.applicationContext.getBean(TransactionDefinition.class);
         this.uowBefore = new TraceBeforeEventArgs(Operation.UnitOfWork,
                                                   null);
         this.aop.traceBefore(this.uowBefore);
@@ -93,11 +89,6 @@ public class UnitOfWork
     private DbContextScopedNaiveSql ormScoped;
 
     /**
-     * 事务定义
-     */
-    private TransactionDefinition transactionDefinition;
-
-    /**
      * 事务隔离等级
      */
     private TransactionIsolationLevel isolationLevel;
@@ -111,11 +102,6 @@ public class UnitOfWork
      * 事务对象
      */
     protected TransactionStatus transactionStatus;
-
-    /**
-     * 执行事务前
-     */
-    protected TraceBeforeEventArgs tranBefore;
 
     /**
      * 执行工作单元前
@@ -228,9 +214,6 @@ public class UnitOfWork
     @Override
     public void setIsolationLevel(TransactionIsolationLevel isolationLevel) {
         this.isolationLevel = isolationLevel;
-        DefaultTransactionDefinition definition = new DefaultTransactionDefinition(this.transactionDefinition);
-        definition.setIsolationLevel(this.isolationLevel.getLevel());
-        this.transactionDefinition = definition;
     }
 
     @Override
@@ -249,17 +232,16 @@ public class UnitOfWork
         if (!this.enable)
             return null;
 
-        this.tranBefore = new TraceBeforeEventArgs(Operation.BeginTransaction,
-                                                   this.isolationLevel);
-        this.aop.traceBefore(this.tranBefore);
-
         try {
             if (getOrm().getAdo()
                         .isTransactionAlreadyExisting())
                 throw new ModuleException(Strings.getTransactionAlreadyStarted());
 
-            this.transactionStatus = getOrm().getAdo()
-                                             .getOrCreateTransaction(this.transactionDefinition);
+            this.transactionStatus = this.isolationLevel == null
+                                     ? getOrm().getAdo()
+                                               .beginTransaction()
+                                     : getOrm().getAdo()
+                                               .beginTransaction(this.isolationLevel);
 
             this.id = String.format("%s_%s",
                                     new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
@@ -270,9 +252,9 @@ public class UnitOfWork
 //            createSavepoint();
         } catch (Exception ex) {
             this.returnObject();
-            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
-                                                        "失败",
-                                                        ex));
+            getOrm().getAdo()
+                    .triggerAfterTransactionAop(Strings.getTransactionBeginFailed(),
+                                                ex);
             throw new ModuleException(Strings.getTransactionBeginFailed(),
                                       ex);
         }
@@ -287,9 +269,9 @@ public class UnitOfWork
                 if (!this.transactionStatus.isCompleted())
                     getOrm().getAdo()
                             .transactionCommit(this.transactionStatus);
-                this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
-                                                            "提交",
-                                                            null));
+                getOrm().getAdo()
+                        .triggerAfterTransactionAop(Strings.getTransactionCommit(),
+                                                    null);
             }
 
 //            if (this.sqlSession != null) {
@@ -297,14 +279,13 @@ public class UnitOfWork
 //                this.sqlSession.close();
 //            }
         } catch (Exception ex) {
-            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
-                                                        "提交失败",
-                                                        ex));
+            getOrm().getAdo()
+                    .triggerAfterTransactionAop(Strings.getTransactionCommitFailed(),
+                                                ex);
             throw new ModuleException(Strings.getTransactionCommitFailed(),
                                       ex);
         } finally {
             this.returnObject();
-            this.tranBefore = null;
         }
     }
 
@@ -315,9 +296,9 @@ public class UnitOfWork
                 if (!this.transactionStatus.isCompleted())
                     getOrm().getAdo()
                             .transactionRollback(this.transactionStatus);
-                this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
-                                                            "回滚",
-                                                            null));
+                getOrm().getAdo()
+                        .triggerAfterTransactionAop(Strings.getTransactionRollback(),
+                                                    null);
             }
 
 //            if (this.sqlSession != null) {
@@ -330,14 +311,13 @@ public class UnitOfWork
 //                this.sqlSession.close();
 //            }
         } catch (Exception ex) {
-            this.aop.traceAfter(new TraceAfterEventArgs(this.tranBefore,
-                                                        "回滚失败",
-                                                        ex));
+            getOrm().getAdo()
+                    .triggerAfterTransactionAop(Strings.getTransactionRollbackFailed(),
+                                                ex);
             throw new ModuleException(Strings.getTransactionRollbackFailed(),
                                       ex);
         } finally {
             this.returnObject();
-            this.tranBefore = null;
         }
     }
 

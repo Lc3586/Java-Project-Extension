@@ -10,7 +10,6 @@ import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
-import project.extension.mybatis.edge.dbContext.unitOfWork.UnitOfWork;
 import project.extension.object.ObjectExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
@@ -66,17 +65,18 @@ public class DbContextScopedNaiveSql
      */
     private final INaiveAop aop;
 
-    /**
-     * 获取工作单元
-     */
-    private IUnitOfWork getUow() {
-        if (resolveUnitOfWork != null)
-            this.uow = resolveUnitOfWork.invoke();
+    private void before() {
+        if (this.resolveDbContext != null) {
+            DbContext dbContext = this.resolveDbContext.invoke();
+            if (dbContext != null)
+                dbContext.flushCommand();
+        }
 
-        if (this.uow == null)
-            this.uow = new UnitOfWork(getOriginalOrm());
-
-        return this.uow;
+        if (this.resolveUnitOfWork != null) {
+            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
+            if (uow != null)
+                uow.getOrBeginTransaction();
+        }
     }
 
     /**
@@ -126,16 +126,7 @@ public class DbContextScopedNaiveSql
     public <TEntity> ISelect<TEntity> select(Class<TEntity> entityType)
             throws
             ModuleException {
-        if (this.resolveDbContext != null) {
-            DbContext dbContext = this.resolveDbContext.invoke();
-            dbContext.flushCommand();
-        }
-
-        if (this.resolveUnitOfWork != null) {
-            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
-            uow.getOrBeginTransaction();
-        }
-
+        before();
         return getOriginalOrm().select(entityType);
     }
 
@@ -143,16 +134,7 @@ public class DbContextScopedNaiveSql
     public <TEntity> IInsert<TEntity> insert(Class<TEntity> entityType)
             throws
             ModuleException {
-        if (this.resolveDbContext != null) {
-            DbContext dbContext = this.resolveDbContext.invoke();
-            dbContext.flushCommand();
-        }
-
-        if (this.resolveUnitOfWork != null) {
-            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
-            uow.getOrBeginTransaction();
-        }
-
+        before();
         return getOriginalOrm().insert(entityType);
     }
 
@@ -200,16 +182,7 @@ public class DbContextScopedNaiveSql
     public <TEntity> IUpdate<TEntity> update(Class<TEntity> entityType)
             throws
             ModuleException {
-        if (this.resolveDbContext != null) {
-            DbContext dbContext = this.resolveDbContext.invoke();
-            dbContext.flushCommand();
-        }
-
-        if (this.resolveUnitOfWork != null) {
-            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
-            uow.getOrBeginTransaction();
-        }
-
+        before();
         return getOriginalOrm().update(entityType);
     }
 
@@ -257,16 +230,7 @@ public class DbContextScopedNaiveSql
     public <TEntity> IDelete<TEntity> delete(Class<TEntity> entityType)
             throws
             ModuleException {
-        if (this.resolveDbContext != null) {
-            DbContext dbContext = this.resolveDbContext.invoke();
-            dbContext.flushCommand();
-        }
-
-        if (this.resolveUnitOfWork != null) {
-            IUnitOfWork uow = this.resolveUnitOfWork.invoke();
-            uow.getOrBeginTransaction();
-        }
-
+        before();
         return getOriginalOrm().delete(entityType);
     }
 
@@ -308,28 +272,14 @@ public class DbContextScopedNaiveSql
 
     @Override
     public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
-        return transaction(null,
-                           handler);
+        return getOriginalOrm().transaction(handler);
     }
 
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
                                                   IAction0 handler) {
-        IUnitOfWork uow = getUow();
-
-        try {
-            if (isolationLevel != null)
-                uow.setIsolationLevel(isolationLevel);
-            uow.getOrBeginTransaction();
-            handler.invoke();
-            uow.commit();
-            return new Tuple2<>(true,
-                                null);
-        } catch (Exception ex) {
-            uow.rollback();
-            return new Tuple2<>(false,
-                                ex);
-        }
+        return getOriginalOrm().transaction(isolationLevel,
+                                            handler);
     }
 
     /**

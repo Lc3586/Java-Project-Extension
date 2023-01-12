@@ -19,10 +19,10 @@ public @interface NaiveDataSource {
     /**
      * 数据源名称
      */
-    @AliasFor("dataSource") String value() default INaiveDataSourceProvider.DEFAULT_DATASOURCE;
+    @AliasFor("dataSource") String value() default INaiveDataSourceProvider.DEFAULT_DATA_SOURCE;
 
     /**
      * 数据源名称
      */
-    @AliasFor("value") String dataSource() default INaiveDataSourceProvider.DEFAULT_DATASOURCE;
+    @AliasFor("value") String dataSource() default INaiveDataSourceProvider.DEFAULT_DATA_SOURCE;
 }

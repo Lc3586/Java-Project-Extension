@@ -29,7 +29,7 @@ public class TraceBeforeEventArgs {
                                    Map<String, Object> states) {
         this.identifier = identifier;
         this.watch = watch;
-        if (!this.watch.isStarted())
+        if (!this.watch.isStarted() && !this.watch.isStopped())
             this.watch.start();
         this.operation = operation;
         this.value = value;

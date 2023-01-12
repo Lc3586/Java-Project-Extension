@@ -27,14 +27,22 @@ public class Strings_zh_CN {
                        "已开启事务，不能禁用工作单元");
             values.put("TransactionAlreadyStarted",
                        "事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction，或是嵌套了多层事务");
+            values.put("BeginTransaction",
+                       "开启事务");
             values.put("TransactionBeginFailed",
                        "开启事务失败");
+            values.put("TransactionCommit",
+                       "提交事务");
             values.put("TransactionCommitFailed",
                        "提交事务失败");
+            values.put("TransactionRollback",
+                       "回滚事务");
             values.put("TransactionRollbackFailed",
                        "回滚事务失败");
             values.put("NoneSpringManagedTransactionFactory",
                        "SqlSessionFactory必须使用SpringManagedTransactionFactory才能使用Spring事务同步");
+            values.put("CloseSqlSessionFailed",
+                       "关闭Sql会话失败");
             values.put("SqlSessionCheckClosedFailed",
                        "检查Sql会话是否已关闭失败");
             values.put("SqlSessionFactoryFailed",

@@ -10,7 +10,5 @@ public interface IAction0 {
     /**
      * 执行
      */
-    void invoke()
-            throws
-            Exception;
+    void invoke();
 }

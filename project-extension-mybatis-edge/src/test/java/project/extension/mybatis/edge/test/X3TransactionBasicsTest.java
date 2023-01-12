@@ -7,11 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import project.extension.mybatis.edge.common.ExceptionExtension;
 import project.extension.mybatis.edge.common.OrmExtension;
 import project.extension.mybatis.edge.common.OrmInjection;
-import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
 import project.extension.mybatis.edge.model.FilterCompare;
+import project.extension.standard.exception.BusinessException;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
@@ -24,6 +24,7 @@ import project.extension.tuple.Tuple2;
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@TestExecutionListeners({NaiveTransactionalTestExecutionListener.class})
+//@SpringBootTest(classes = SpringBootTestApplication.class)
 public class X3TransactionBasicsTest {
     /**
      * 临时数据
@@ -207,7 +208,8 @@ public class X3TransactionBasicsTest {
 
             System.out.println("\r\n事务2已回滚");
 
-            throw tranCreate2.b;
+            throw new BusinessException("事务2已回滚",
+                                        tranCreate2.b);
         });
 
         Assertions.assertEquals(false,
@@ -243,8 +245,7 @@ public class X3TransactionBasicsTest {
      * 测试声明式事务提交操作（提交）
      */
     @Test
-    @Transactional(INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix
-            + INaiveDataSourceProvider.DEFAULT_DATASOURCE)
+    @Transactional
     @Commit
     @DisplayName("320.测试声明式事务提交操作（提交）")
     @Order(320)
@@ -305,8 +306,7 @@ public class X3TransactionBasicsTest {
      * 测试声明式事务回滚操作（回滚）
      */
     @Test
-    @Transactional(INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix
-            + INaiveDataSourceProvider.DEFAULT_DATASOURCE)
+    @Transactional
     @Rollback
     @DisplayName("322.测试声明式事务回滚操作（回滚）")
     @Order(322)
@@ -364,8 +364,7 @@ public class X3TransactionBasicsTest {
      * <p>应抛出异常并回滚事务</p>
      */
     @Test
-    @Transactional(INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix
-            + INaiveDataSourceProvider.DEFAULT_DATASOURCE)
+    @Transactional
     @Commit
     @DisplayName("330.测试声明式事务嵌套编程式事务提交操作")
     @Order(330)
@@ -435,8 +434,7 @@ public class X3TransactionBasicsTest {
 //     * 测试声明式事务嵌套编程式事务回滚操作（回滚）
 //     */
 //    @Test
-//    @Transactional(INaiveDataSourceProvider.DataSourceTransactionManagerIOCPrefix
-//            + INaiveDataSourceProvider.DEFAULT_DATASOURCE)
+//    @Transactional
 //    @Rollback
 //    @DisplayName("测试声明式事务嵌套编程式事务回滚操作（回滚）")
 //    public void a62()

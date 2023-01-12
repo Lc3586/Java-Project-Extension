@@ -22,7 +22,5 @@ public interface IAction6<TParameter1, TParameter2, TParameter3, TParameter4, TP
                 TParameter3 parameter3,
                 TParameter4 parameter4,
                 TParameter5 parameter5,
-                TParameter6 parameter6)
-            throws
-            Exception;
+                TParameter6 parameter6);
 }

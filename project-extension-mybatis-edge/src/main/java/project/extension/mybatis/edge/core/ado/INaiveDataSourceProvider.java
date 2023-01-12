@@ -19,17 +19,37 @@ public interface INaiveDataSourceProvider {
     /**
      * 默认数据源
      */
-    String DEFAULT_DATASOURCE = "master";
+    String DEFAULT_DATA_SOURCE = "master";
 
     /**
-     * 数据源事务管理器在IOC容器中的前缀
+     * 数据源的事务管理器在IOC容器中的名称前缀
      */
-    String DataSourceTransactionManagerIOCPrefix = "DataSourceTransactionManager_";
+    String DATA_SOURCE_IOC_PREFIX = "dataSource_";
 
     /**
-     * Sql会话工厂在IOC容器中的前缀
+     * 数据源的事务管理器在IOC容器中的名称前缀
      */
-    String SqlSessionFactoryIOCPrefix = "SqlSessionFactory_";
+    String TRANSACTION_MANAGER_IOC_PREFIX = "transactionManager_";
+
+    /**
+     * 数据源的Sql会话工厂在IOC容器中的名称前缀
+     */
+    String SQL_SESSION_FACTORY_IOC_PREFIX = "sqlSessionFactory_";
+
+    /**
+     * 默认数据源在IOC容器中的名称
+     */
+    String DEFAULT_DATA_SOURCE_IOC_NAME = "dataSource";
+
+    /**
+     * 默认数据源的事务管理器在IOC容器中的名称
+     */
+    String DEFAULT_TRANSACTION_MANAGER_IOC_NAME = "transactionManager";
+
+    /**
+     * 默认数据源的Sql会话工厂在IOC容器中的名称
+     */
+    String DEFAULT_SQL_SESSION_FACTORY_IOC_NAME = "sqlSessionFactory";
 
     /**
      * 获取默认的数据源
