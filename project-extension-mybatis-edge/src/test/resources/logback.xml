@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 获取进程标识 -->
-    <conversionRule conversionWord="process_id"
-                    converterClass="project.extension.logger.ProcessIdConverter"/>
-
     <!-- 日志存放路径 -->
     <property name="log.path" value="logs"/>
     <!-- 日志输出格式 -->
     <property name="log.pattern"
-              value="%date{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) %boldMagenta(%process_id) --- [%thread] %cyan(%logger{40}) : %msg %n"/>
+              value="%date{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) %boldMagenta(${PID:- }) --- [%thread] %cyan(%logger{40}) : %msg %n"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">

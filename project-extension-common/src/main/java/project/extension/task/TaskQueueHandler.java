@@ -129,7 +129,7 @@ public abstract class TaskQueueHandler {
      *
      * @return 0: 空闲, 1: 运行中, 2: 已停止
      */
-    public int State()
+    public int getState()
             throws
             Exception {
         return cf == null

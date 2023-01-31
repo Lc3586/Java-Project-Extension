@@ -1,3 +1,9 @@
+# 日志配置
+logging:
+  level:
+    com.turuitech: debug
+    org.springframework: warn
+
 spring:
   datasource:
     # 切换Druid数据源
@@ -32,7 +38,7 @@ project:
             # 密码
             password: ENC(gWzvDGisJ96VsD6fmqhOQm/4ORkbiEF9UYaYGeWNWB4=)
         #从库
-        slave:
+        otherA:
           enable: false
           dbType: JdbcSqlServer
           nameConvertType: None
