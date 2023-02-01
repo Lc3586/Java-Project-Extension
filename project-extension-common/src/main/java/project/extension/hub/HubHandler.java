@@ -33,11 +33,11 @@ public abstract class HubHandler {
         this.messageHandler = new MessageHandler(name,
                                                  handlerThreadPoolSize,
                                                  logger);
-        messageHandler.start();
+        messageHandler.start(true);
         this.messageSender = new MessageSender(name,
                                                senderThreadPoolSize,
                                                logger);
-        messageSender.start();
+        messageSender.start(true);
     }
 
     /**

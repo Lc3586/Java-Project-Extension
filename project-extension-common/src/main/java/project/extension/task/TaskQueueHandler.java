@@ -2,6 +2,8 @@ package project.extension.task;
 
 import org.slf4j.Logger;
 import org.springframework.lang.Nullable;
+import project.extension.action.IAction0;
+import project.extension.func.IFunc0;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -40,6 +42,7 @@ public abstract class TaskQueueHandler {
                             int threadPoolSize,
                             Logger logger) {
         TaskQueueHandler.name = name;
+        this.state = TaskQueueHandlerState.STOPPED;
         this.taskQueue = new ConcurrentLinkedDeque<>();
         this.ConcurrentTaskMap = new ConcurrentHashMap<>();
         if (threadPoolSize == -1)
@@ -85,6 +88,11 @@ public abstract class TaskQueueHandler {
     private Date startTime;
 
     /**
+     * 当前状态
+     */
+    private TaskQueueHandlerState state;
+
+    /**
      * 死锁
      * <p>一个不会主动完成的任务</p>
      * <p>返回值 true: 开始处理队列 , false: 停止处理队列 </p>
@@ -127,39 +135,58 @@ public abstract class TaskQueueHandler {
     /**
      * 模块当前状态
      *
-     * @return 0: 空闲, 1: 运行中, 2: 已停止
+     * @see TaskQueueHandlerState
      */
-    public int getState()
-            throws
-            Exception {
-        return cf == null
-               ? 0
-               : cf.isDone()
-                 ? cf.get()
-                   ? 1
-                   : 2
-                 : 1;
+    public TaskQueueHandlerState getState() {
+        return this.state;
     }
 
     /**
      * 启动
+     *
+     * @param autoHandler 自动开始处理任务
      */
-    public void start() {
+    public void start(boolean autoHandler) {
+        this.state = TaskQueueHandlerState.STARTING;
+
         timer = new Timer();
 
         cf = new CompletableFuture<>();
 
         startTime = new Date();
 
+        this.state = TaskQueueHandlerState.RUNNING;
+
         //异步执行
         CompletableFuture.runAsync(this::run,
                                    Executors.newSingleThreadExecutor());
+
+        if (autoHandler)
+            handler();
+    }
+
+    /**
+     * 启动
+     *
+     * @param autoHandler 自动开始处理任务
+     * @param before      启动前要执行的方法，返回值不为true时，中止启动操作
+     */
+    public void start(boolean autoHandler,
+                      IFunc0<Boolean> before) {
+        this.state = TaskQueueHandlerState.STARTING;
+        if (!before.invoke()) {
+            this.state = TaskQueueHandlerState.STOPPED;
+            return;
+        }
+        start(autoHandler);
     }
 
     /**
      * 关停
      */
     public void shutDown() {
+        this.state = TaskQueueHandlerState.STOPPING;
+
         if (cf == null) cf = new CompletableFuture<>();
 
         startTime = null;
@@ -181,6 +208,19 @@ public abstract class TaskQueueHandler {
 
                              }
                          });
+
+        this.state = TaskQueueHandlerState.STOPPED;
+    }
+
+    /**
+     * 停止
+     *
+     * @param before 停止前要执行的方法
+     */
+    public void shutDown(IAction0 before) {
+        this.state = TaskQueueHandlerState.STOPPING;
+        before.invoke();
+        shutDown();
     }
 
     /**
@@ -246,11 +286,13 @@ public abstract class TaskQueueHandler {
             while (true) {
                 if (cf != null) {
                     if (!cf.get()) return;
+                    this.state = TaskQueueHandlerState.RUNNING;
                     cf = null;
                 }
 
                 if (taskQueue.isEmpty()) {
                     cf = new CompletableFuture<>();
+                    this.state = TaskQueueHandlerState.IDLING;
                     continue;
                 }
 

@@ -1,7 +1,7 @@
 # 日志配置
 logging:
   level:
-    com.turuitech: debug
+    project.extension.mybatis.edge: debug
     org.springframework: warn
 
 spring:
