@@ -17,11 +17,14 @@ public enum TaskQueueHandlerState {
              "STARTING"),
     /**
      * 空闲
+     * <p>队列为空</p>
+     * <p>但是可能存在要处理的异步子任务和延时子任务</p>
      */
     IDLING(1,
            "IDLING"),
     /**
      * 运行中
+     * <p>正在处理队列</p>
      */
     RUNNING(2,
             "RUNNING"),

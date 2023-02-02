@@ -3,6 +3,7 @@ package project.extension.task;
 import org.slf4j.Logger;
 import org.springframework.lang.Nullable;
 import project.extension.action.IAction0;
+import project.extension.action.IAction1;
 import project.extension.func.IFunc0;
 
 import java.util.*;
@@ -41,10 +42,11 @@ public abstract class TaskQueueHandler {
     public TaskQueueHandler(String name,
                             int threadPoolSize,
                             Logger logger) {
-        TaskQueueHandler.name = name;
+        this.name = name;
         this.state = TaskQueueHandlerState.STOPPED;
         this.taskQueue = new ConcurrentLinkedDeque<>();
         this.ConcurrentTaskMap = new ConcurrentHashMap<>();
+        this.ScheduleTaskList = new ConcurrentLinkedQueue<>();
         if (threadPoolSize == -1)
             this.concurrentTaskExecutor = Executors.newWorkStealingPool();
         else if (threadPoolSize == 0)
@@ -68,6 +70,12 @@ public abstract class TaskQueueHandler {
     private final ConcurrentMap<Object, CompletableFuture<Void>> ConcurrentTaskMap;
 
     /**
+     * 延时子任务集合
+     * <p>item：任意Key</p>
+     */
+    private final ConcurrentLinkedQueue<UUID> ScheduleTaskList;
+
+    /**
      * 并发子任务线程管理服务
      */
     private final ExecutorService concurrentTaskExecutor;
@@ -80,7 +88,7 @@ public abstract class TaskQueueHandler {
     /**
      * 名称
      */
-    private static String name;
+    private final String name;
 
     /**
      * 启动时间
@@ -107,7 +115,7 @@ public abstract class TaskQueueHandler {
     /**
      * 模块名称
      */
-    public static String getName() {
+    public String getName() {
         return name;
     }
 
@@ -130,6 +138,13 @@ public abstract class TaskQueueHandler {
      */
     public int getConcurrentTaskCount() {
         return ConcurrentTaskMap.size();
+    }
+
+    /**
+     * 延时子任务数量
+     */
+    public int getScheduleTaskCount() {
+        return ScheduleTaskList.size();
     }
 
     /**
@@ -374,14 +389,22 @@ public abstract class TaskQueueHandler {
     }
 
     /**
-     * 添加延时任务
+     * 添加延时子任务
      *
-     * @param task  任务
-     * @param delay 延时
+     * @param action    任务
+     * @param parameter 参数
+     * @param delay     延时
      */
-    protected void addScheduleTask(TimerTask task,
-                                   long delay) {
-        timer.schedule(task,
+    protected <T> void addScheduleTask(IAction1<T> action,
+                                       T parameter,
+                                       long delay) {
+        UUID key = UUID.randomUUID();
+        ScheduleTaskList.add(key);
+        timer.schedule(new ActionTimerTask<>(state -> {
+                           action.invoke(parameter);
+                           ScheduleTaskList.remove(key);
+                       },
+                                             parameter),
                        delay);
     }
 }
