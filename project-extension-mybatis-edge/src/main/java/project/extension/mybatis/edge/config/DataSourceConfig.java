@@ -4,6 +4,7 @@ import com.alibaba.druid.pool.DruidDataSourceFactory;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.mybatis.edge.model.DbType;
 
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -19,14 +20,24 @@ public class DataSourceConfig {
     private DbType dbType;
 
     /**
+     * mybatis配置文件路径
+     */
+    private String configLocation;
+
+    /**
+     * 需要扫描的存放实体类的包（包括TypeAliasesPackage）
+     */
+    private List<String> scanEntitiesPackages;
+
+    /**
+     * 需要扫描的存放Mapper配置类的包
+     */
+    private List<String> scanMapperXmlPackages;
+
+    /**
      * 实体类表名/列名命名规则
      */
     private NameConvertType nameConvertType;
-
-    /**
-     * 默认的mybatis配置文件路径
-     */
-    private String configLocation;
 
     /**
      * 启用
@@ -67,6 +78,39 @@ public class DataSourceConfig {
     }
 
     /**
+     * mybatis配置文件路径
+     */
+    public String getConfigLocation() {
+        return configLocation;
+    }
+
+    public void setConfigLocation(String configLocation) {
+        this.configLocation = configLocation;
+    }
+
+    /**
+     * 需要扫描的存放实体类的包
+     */
+    public List<String> getScanEntitiesPackages() {
+        return scanEntitiesPackages;
+    }
+
+    public void setScanEntitiesPackages(List<String> scanEntitiesPackages) {
+        this.scanEntitiesPackages = scanEntitiesPackages;
+    }
+
+    /**
+     * 需要扫描的存放Mapper配置类的包
+     */
+    public List<String> getScanMapperXmlPackages() {
+        return scanMapperXmlPackages;
+    }
+
+    public void setScanMapperXmlPackages(List<String> scanMapperXmlPackages) {
+        this.scanMapperXmlPackages = scanMapperXmlPackages;
+    }
+
+    /**
      * 实体类表名/列名命名规则
      */
     public NameConvertType getNameConvertType() {
@@ -75,17 +119,6 @@ public class DataSourceConfig {
 
     public void setNameConvertType(NameConvertType nameConvertType) {
         this.nameConvertType = nameConvertType;
-    }
-
-    /**
-     * 默认的mybatis配置文件路径
-     */
-    public String getConfigLocation() {
-        return configLocation;
-    }
-
-    public void setConfigLocation(String configLocation) {
-        this.configLocation = configLocation;
     }
 
     /**

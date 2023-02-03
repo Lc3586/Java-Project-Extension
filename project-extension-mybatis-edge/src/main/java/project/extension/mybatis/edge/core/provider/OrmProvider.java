@@ -298,4 +298,9 @@ public class OrmProvider
                                            entityType,
                                            keyType);
     }
+
+    @Override
+    public <TMapper> TMapper getMapper(Class<TMapper> mapperType) {
+        return ado.getMapper(mapperType);
+    }
 }

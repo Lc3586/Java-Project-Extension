@@ -16,4 +16,8 @@
         <!-- 使用驼峰命名法转换字段 -->
         <!-- <setting name="mapUnderscoreToCamelCase" value="true"/> -->
     </settings>
+    <!-- 添加Mapper接口类 -->
+    <mappers>
+        <mapper class="project.extension.mybatis.edge.mapper.IBaseMapper"/>
+    </mappers>
 </configuration>

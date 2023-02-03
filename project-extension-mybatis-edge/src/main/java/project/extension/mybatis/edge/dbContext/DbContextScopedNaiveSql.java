@@ -282,18 +282,11 @@ public class DbContextScopedNaiveSql
                                             handler);
     }
 
-    /**
-     * 数据库访问对象
-     *
-     * @return 数据库访问对象
-     */
+    @Override
     public INaiveAdo getAdo() {
         return this.ado;
     }
 
-    /**
-     * 获取数据库访问对象
-     */
     @Override
     public INaiveAop getAop()
             throws
@@ -301,9 +294,6 @@ public class DbContextScopedNaiveSql
         return this.aop;
     }
 
-    /**
-     * 获取DbFirst 开发模式相关功能
-     */
     @Override
     public IDbFirst getDbFirst()
             throws
@@ -311,9 +301,6 @@ public class DbContextScopedNaiveSql
         return getOriginalOrm().getDbFirst();
     }
 
-    /**
-     * 获取DbFirst 开发模式相关功能
-     */
     @Override
     public ICodeFirst getCodeFirst()
             throws
@@ -321,12 +308,6 @@ public class DbContextScopedNaiveSql
         return getOriginalOrm().getCodeFirst();
     }
 
-    /**
-     * 获取数据仓储
-     *
-     * @param entityType 实体类型
-     * @return 数据仓储
-     */
     @Override
     public <T> IBaseRepository<T> getRepository(Class<T> entityType)
             throws
@@ -334,13 +315,6 @@ public class DbContextScopedNaiveSql
         return getOriginalOrm().getRepository(entityType);
     }
 
-    /**
-     * 获取数据仓储
-     *
-     * @param entityType 实体类型
-     * @param keyType    主键类型
-     * @return 数据仓储
-     */
     @Override
     public <T, TKey> IBaseRepository_Key<T, TKey> getRepository_Key(Class<T> entityType,
                                                                     Class<TKey> keyType)
@@ -348,5 +322,10 @@ public class DbContextScopedNaiveSql
             ModuleException {
         return getOriginalOrm().getRepository_Key(entityType,
                                                   keyType);
+    }
+
+    @Override
+    public <TMapper> TMapper getMapper(Class<TMapper> mapperType) {
+        return getOriginalOrm().getMapper(mapperType);
     }
 }

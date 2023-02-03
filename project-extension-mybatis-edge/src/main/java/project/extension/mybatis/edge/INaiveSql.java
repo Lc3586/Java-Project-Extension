@@ -306,4 +306,12 @@ public interface INaiveSql {
                                                                          Class<TKey> keyType)
             throws
             ModuleException;
+
+    /**
+     * 获取Mapper
+     *
+     * @param mapperType  类型
+     * @param <TMapper>类型
+     */
+    <TMapper> TMapper getMapper(Class<TMapper> mapperType);
 }

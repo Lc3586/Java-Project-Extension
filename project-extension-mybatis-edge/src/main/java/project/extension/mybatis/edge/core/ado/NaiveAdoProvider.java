@@ -838,4 +838,9 @@ public class NaiveAdoProvider
 
         return result;
     }
+
+    @Override
+    public <TMapper> TMapper getMapper(Class<TMapper> mapperType) {
+        return getOrCreateSqlSession().getMapper(mapperType);
+    }
 }

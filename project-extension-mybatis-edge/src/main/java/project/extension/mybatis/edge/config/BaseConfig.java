@@ -25,14 +25,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 @ConfigurationProperties("project.extension.mybatis")
 public class BaseConfig {
     /**
-     * 需要扫描的存放实体类的包
+     * 默认的数据源
+     */
+    private String dataSource;
+
+    /**
+     * 默认的mybatis配置文件路径
+     */
+    private String configLocation;
+
+    /**
+     * 默认的需要扫描的存放实体类的包（包括TypeAliasesPackage）
      */
     private List<String> scanEntitiesPackages;
 
     /**
-     * 默认的数据源
+     * 需要扫描的存放Mapper配置类的包
      */
-    private String dataSource;
+    private List<String> scanMapperXmlPackages;
 
     /**
      * 默认的实体类表名/列名命名规则
@@ -40,25 +50,9 @@ public class BaseConfig {
     private NameConvertType nameConvertType = NameConvertType.None;
 
     /**
-     * mybatis配置文件路径
-     */
-    private String configLocation;
-
-    /**
      * 多数据源配置
      */
     private Map<String, DataSourceConfig> multiDataSource;
-
-    /**
-     * 需要扫描的存放实体类的包
-     */
-    public List<String> getScanEntitiesPackages() {
-        return scanEntitiesPackages;
-    }
-
-    public void setScanEntitiesPackages(List<String> scanEntitiesPackages) {
-        this.scanEntitiesPackages = scanEntitiesPackages;
-    }
 
     /**
      * 默认的数据源名称
@@ -72,17 +66,6 @@ public class BaseConfig {
     }
 
     /**
-     * 默认的实体类表明/列名命名规则
-     */
-    public NameConvertType getNameConvertType() {
-        return nameConvertType;
-    }
-
-    public void setNameConvertType(NameConvertType nameConvertType) {
-        this.nameConvertType = nameConvertType;
-    }
-
-    /**
      * mybatis配置文件路径
      */
     public String getConfigLocation() {
@@ -91,6 +74,39 @@ public class BaseConfig {
 
     public void setConfigLocation(String configLocation) {
         this.configLocation = configLocation;
+    }
+
+    /**
+     * 需要扫描的存放实体类的包
+     */
+    public List<String> getScanEntitiesPackages() {
+        return scanEntitiesPackages;
+    }
+
+    public void setScanEntitiesPackages(List<String> scanEntitiesPackages) {
+        this.scanEntitiesPackages = scanEntitiesPackages;
+    }
+
+    /**
+     * 需要扫描的存放Mapper配置类的包
+     */
+    public List<String> getScanMapperXmlPackages() {
+        return scanMapperXmlPackages;
+    }
+
+    public void setScanMapperXmlPackages(List<String> scanMapperXmlPackages) {
+        this.scanMapperXmlPackages = scanMapperXmlPackages;
+    }
+
+    /**
+     * 默认的实体类表明/列名命名规则
+     */
+    public NameConvertType getNameConvertType() {
+        return nameConvertType;
+    }
+
+    public void setNameConvertType(NameConvertType nameConvertType) {
+        this.nameConvertType = nameConvertType;
     }
 
     /**
@@ -223,6 +239,20 @@ public class BaseConfig {
         if (!StringUtils.hasText(config.getConfigLocation()))
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "configLocation"));
+
+        if (!CollectionsExtension.anyPlus(config.getScanEntitiesPackages()))
+            config.setScanEntitiesPackages(this.getScanEntitiesPackages());
+
+        if (!CollectionsExtension.anyPlus(config.getScanEntitiesPackages()))
+            throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                 "scanEntitiesPackages"));
+
+        if (!CollectionsExtension.anyPlus(config.getScanMapperXmlPackages()))
+            config.setScanMapperXmlPackages(this.getScanMapperXmlPackages());
+
+        if (!CollectionsExtension.anyPlus(config.getScanMapperXmlPackages()))
+            throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
+                                                                                 "scanMapperXmlPackages"));
 //
 //        config.getProperties()
 //              .computeIfAbsent(DruidDataSourceFactory.PROP_URL,

@@ -105,28 +105,29 @@ public class NaiveDataSourceProvider
                 druidDataSource);
 
         //事务管理器
-        loadTransactionManager(dataSource,
+        loadTransactionManager(dataSourceConfig,
                                druidDataSource);
 
         //Sql会话工厂
-        loadSqlSessionFactory(dataSource,
+        loadSqlSessionFactory(dataSourceConfig,
                               druidDataSource);
     }
 
     /**
      * 加载事务管理器
      *
-     * @param name       数据源名称
-     * @param dataSource 数据源
+     * @param dataSourceConfig 数据源配置
+     * @param dataSource       数据源
      */
-    private void loadTransactionManager(String name,
+    private void loadTransactionManager(DataSourceConfig dataSourceConfig,
                                         DataSource dataSource) {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
         dataSourceTransactionManager.setDataSource(dataSource);
-        transactionManagerMap.put(name,
+        transactionManagerMap.put(dataSourceConfig.getName(),
                                   dataSourceTransactionManager);
 
-        if (name.equals(defaultDataSource()))
+        if (dataSourceConfig.getName()
+                            .equals(defaultDataSource()))
             getBeanFactory().registerSingleton(
                     INaiveDataSourceProvider.DEFAULT_TRANSACTION_MANAGER_IOC_NAME,
                     dataSourceTransactionManager);
@@ -134,22 +135,26 @@ public class NaiveDataSourceProvider
         getBeanFactory().registerSingleton(
                 String.format("%s%s",
                               INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
-                              name),
+                              dataSourceConfig.getName()),
                 dataSourceTransactionManager);
     }
 
     /**
      * 加载Sql会话工厂
      *
-     * @param name       数据源名称
-     * @param dataSource 数据源
+     * @param dataSourceConfig 数据源配置
+     * @param dataSource       数据源
      */
-    private void loadSqlSessionFactory(String name,
+    private void loadSqlSessionFactory(DataSourceConfig dataSourceConfig,
                                        DataSource dataSource) {
         final SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setConfigLocation(new DefaultResourceLoader().getResource(CommonUtils.getConfig()
                                                                                                    .getConfigLocation()));
+        //TODO 配置Mapper
+//        sqlSessionFactoryBean.setTypeAliases(dataSourceConfig.getScanEntitiesPackages());
+//        sqlSessionFactoryBean.setMapperLocations();
+
         SqlSessionFactory sqlSessionFactory;
         try {
             sqlSessionFactory = sqlSessionFactoryBean.getObject();
@@ -159,10 +164,11 @@ public class NaiveDataSourceProvider
             throw new ModuleException(Strings.getSqlSessionFactoryFailed(),
                                       ex);
         }
-        sqlSessionFactoryMap.put(name,
+        sqlSessionFactoryMap.put(dataSourceConfig.getName(),
                                  sqlSessionFactory);
 
-        if (name.equals(defaultDataSource()))
+        if (dataSourceConfig.getName()
+                            .equals(defaultDataSource()))
             getBeanFactory().registerSingleton(
                     INaiveDataSourceProvider.DEFAULT_SQL_SESSION_FACTORY_IOC_NAME,
                     sqlSessionFactory);
@@ -170,7 +176,7 @@ public class NaiveDataSourceProvider
         getBeanFactory().registerSingleton(
                 String.format("%s%s",
                               INaiveDataSourceProvider.SQL_SESSION_FACTORY_IOC_PREFIX,
-                              name),
+                              dataSourceConfig.getName()),
                 sqlSessionFactory);
     }
 

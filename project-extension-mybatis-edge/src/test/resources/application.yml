@@ -17,10 +17,12 @@ project:
     mybatis:
       # 默认的数据源
       dataSource: master
-      # 需要扫描的存放实体类的包
-      scanEntitiesPackages: project.extension.mybatis.edge.entity.**
       # mybatis配置文件路径
       configLocation: mybatis/mybatis-config.xml
+      # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
+      scanEntitiesPackages: project.extension.mybatis.edge.entity.**
+      # 需要扫描的存放Mapper配置类的包
+      scanMapperXmlPackages: project.extension.mybatis.edge.mapper.**
       # 默认的实体类表明/列名命名规则
       nameConvertType: PascalCaseToUnderscoreWithUpper
       # 多数据源配置（单数据库时无需配置此项）
