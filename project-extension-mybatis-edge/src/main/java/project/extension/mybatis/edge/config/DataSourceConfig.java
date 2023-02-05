@@ -30,9 +30,14 @@ public class DataSourceConfig {
     private List<String> scanEntitiesPackages;
 
     /**
-     * 需要扫描的存放Mapper配置类的包
+     * 需要扫描的存放Mapper接口类的包（可选）
      */
-    private List<String> scanMapperXmlPackages;
+    private List<String> scanMapperPackages;
+
+    /**
+     * 需要扫描的存放Mapper配置文件的目录
+     */
+    private List<String> scanMapperXmlLocations;
 
     /**
      * 实体类表名/列名命名规则
@@ -100,14 +105,25 @@ public class DataSourceConfig {
     }
 
     /**
-     * 需要扫描的存放Mapper配置类的包
+     * 需要扫描的存放Mapper接口类的包（可选）
      */
-    public List<String> getScanMapperXmlPackages() {
-        return scanMapperXmlPackages;
+    public List<String> getScanMapperPackages() {
+        return scanMapperPackages;
     }
 
-    public void setScanMapperXmlPackages(List<String> scanMapperXmlPackages) {
-        this.scanMapperXmlPackages = scanMapperXmlPackages;
+    public void setScanMapperPackages(List<String> scanMapperPackages) {
+        this.scanMapperPackages = scanMapperPackages;
+    }
+
+    /**
+     * 需要扫描的存放Mapper配置文件的目录
+     */
+    public List<String> getScanMapperXmlLocations() {
+        return scanMapperXmlLocations;
+    }
+
+    public void setScanMapperXmlLocations(List<String> scanMapperXmlLocations) {
+        this.scanMapperXmlLocations = scanMapperXmlLocations;
     }
 
     /**

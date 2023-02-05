@@ -7,6 +7,7 @@ import org.springframework.test.context.transaction.TransactionalTestExecutionLi
 import org.springframework.transaction.PlatformTransactionManager;
 import project.extension.mybatis.edge.annotations.NaiveDataSource;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
+import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
 
 import java.lang.reflect.Method;
 
@@ -36,9 +37,7 @@ public class NaiveTransactionalTestExecutionListener
 
         if (naiveDataSource != null)
             return super.getTransactionManager(testContext,
-                                               String.format("%s%s",
-                                                             INaiveDataSourceProvider.TRANSACTION_MANAGER_IOC_PREFIX,
-                                                             naiveDataSource.dataSource()));
+                                               NaiveDataSourceProvider.getTransactionManagerBeanName(naiveDataSource.dataSource()));
 
         return super.getTransactionManager(testContext,
                                            qualifier);

@@ -10,6 +10,16 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       max-active: 10
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        login-username: admin
+        login-password: 123456
 
 #项目拓展
 project:
@@ -18,11 +28,13 @@ project:
       # 默认的数据源
       dataSource: master
       # mybatis配置文件路径
-      configLocation: mybatis/mybatis-config.xml
+      configLocation: classpath:mybatis/mybatis-config.xml
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
       scanEntitiesPackages: project.extension.mybatis.edge.entity.**
+      # 需要扫描的存放Mapper接口类的包（可选）
+      scanMapperPackages: project.extension.mybatis.edge.mapper.*Mapper
       # 需要扫描的存放Mapper配置类的包
-      scanMapperXmlPackages: project.extension.mybatis.edge.mapper.**
+      scanMapperXmlLocations: classpath:mapper/**/*Mapper.xml
       # 默认的实体类表明/列名命名规则
       nameConvertType: PascalCaseToUnderscoreWithUpper
       # 多数据源配置（单数据库时无需配置此项）

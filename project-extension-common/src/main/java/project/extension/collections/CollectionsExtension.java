@@ -75,6 +75,26 @@ public class CollectionsExtension {
     }
 
     /**
+     * 集合是否存在符合要求的元素
+     *
+     * @param list      集合数据
+     * @param predicate 条件表达式
+     * @param <T>       元素类型
+     * @return 判断结果
+     */
+    public static <T> boolean allPlus(Collection<T> list,
+                                      Predicate<? super T> predicate) {
+        if (list == null || list.size() == 0)
+            return false;
+
+        if (predicate == null)
+            return true;
+
+        return list.stream()
+                   .allMatch(predicate);
+    }
+
+    /**
      * 集合是否有存在元素
      *
      * @param map 集合数据

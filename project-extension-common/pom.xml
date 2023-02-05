@@ -163,7 +163,7 @@
         <dependency>
             <groupId>org.atmosphere</groupId>
             <artifactId>atmosphere-runtime</artifactId>
-            <!--      目前高版本存在问题，请勿升级      -->
+            <!--      目前不兼容更高的版本，请勿升级      -->
             <version>2.7.2</version>
         </dependency>
 
@@ -174,8 +174,8 @@
         </dependency>
         <!--    文档操作 -->
         <!--    在项目根目录下执行此命令将jacob.jar安装到本地仓库
-                mvn install:install-file -Dfile="project-extension-common\src\main\resources\jacob-1.20\jacob.jar" -DgroupId=com.jacob -DartifactId=jacob -Dversion="1.2.0" -Dpackaging=jar
-                接着将project-extension-common\src\main\resources\jacob-1.20目录下的jacob01.20.dll文件放至jdk\bin和jre\bin目录中-->
+                mvn install:install-file -Dfile="project-extension-common\lib\jacob-1.20\jacob.jar" -DgroupId=com.jacob -DartifactId=jacob -Dversion="1.2.0" -Dpackaging=jar
+                接着将project-extension-common\lib\jacob-1.20目录下的jacob01.20.dll文件放至jdk\bin和jre\bin目录中-->
         <dependency>
             <groupId>com.jacob</groupId>
             <artifactId>jacob</artifactId>

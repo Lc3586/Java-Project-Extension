@@ -24,17 +24,22 @@ public interface INaiveDataSourceProvider {
     /**
      * 数据源的事务管理器在IOC容器中的名称前缀
      */
-    String DATA_SOURCE_IOC_PREFIX = "dataSource_";
+    String DATA_SOURCE_IOC_PREFIX = "dataSource#";
 
     /**
      * 数据源的事务管理器在IOC容器中的名称前缀
      */
-    String TRANSACTION_MANAGER_IOC_PREFIX = "transactionManager_";
+    String TRANSACTION_MANAGER_IOC_PREFIX = "transactionManager#";
 
     /**
      * 数据源的Sql会话工厂在IOC容器中的名称前缀
      */
-    String SQL_SESSION_FACTORY_IOC_PREFIX = "sqlSessionFactory_";
+    String SQL_SESSION_FACTORY_IOC_PREFIX = "sqlSessionFactory#";
+
+    /**
+     * 数据源的Mapper扫描器注册类在IOC容器中的名称前缀
+     */
+    String MAPPER_SCANNER_REGISTRAR_IOC_PREFIX = "mapperScannerRegistrar#";
 
     /**
      * 默认数据源在IOC容器中的名称
@@ -50,6 +55,11 @@ public interface INaiveDataSourceProvider {
      * 默认数据源的Sql会话工厂在IOC容器中的名称
      */
     String DEFAULT_SQL_SESSION_FACTORY_IOC_NAME = "sqlSessionFactory";
+
+    /**
+     * 默认数据源的Mapper扫描器注册类在IOC容器中的名称
+     */
+    String DEFAULT_MAPPER_SCANNER_REGISTRAR_IOC_NAME = "mapperScannerRegistrar";
 
     /**
      * 获取默认的数据源
