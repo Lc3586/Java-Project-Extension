@@ -16,8 +16,10 @@
         <!-- 使用驼峰命名法转换字段 -->
         <!-- <setting name="mapUnderscoreToCamelCase" value="true"/> -->
     </settings>
-    <!-- 添加Mapper接口类 -->
-    <mappers>
-        <mapper class="project.extension.mybatis.edge.mapper.IBaseMapper"/>
-    </mappers>
+
+    <!-- 添加实体映射 -->
+    <typeAliases>
+        <!--<package name="project.extension.mybatis.edge.entity.**"/>-->
+        <typeAlias type="project.extension.mybatis.edge.entity.CommonQuickInput" alias="CommonQuickInput"/>
+    </typeAliases>
 </configuration>

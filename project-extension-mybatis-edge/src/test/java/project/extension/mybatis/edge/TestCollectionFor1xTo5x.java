@@ -16,37 +16,44 @@ import project.extension.mybatis.edge.test.*;
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
 public class TestCollectionFor1xTo5x {
     @Nested
-    @Order(1)
-    @DisplayName("1x.数据库连接测试")
-    public class ForX1ConnectBasicsTest
-            extends X1ConnectBasicsTest {
+    @Order(100)
+    @DisplayName("100.数据库连接测试")
+    public class ForX100ConnectBasicsTest
+            extends X100ConnectBasicsTest {
     }
 
     @Nested
-    @Order(2)
-    @DisplayName("2x.基础增删改查测试")
-    public class ForX2CurdBasicsTest
-            extends X2CurdBasicsTest {
+    @Order(200)
+    @DisplayName("200.基础增删改查测试")
+    public class ForX200CurdBasicsTest
+            extends X200CurdBasicsTest {
     }
 
     @Nested
-    @Order(3)
-    @DisplayName("3x.基础事务测试")
-    public class ForX3TransactionBasicsTest
-            extends X3TransactionBasicsTest {
+    @Order(210)
+    @DisplayName("210.Mapper增删改查测试")
+    public class ForX210CurdMapperTest
+            extends X210CurdMapperTest {
     }
 
     @Nested
-    @Order(4)
-    @DisplayName("4x.基础Repository增删改查测试")
-    public class ForX4CurdRepositoryBasicsTest
-            extends X4CurdRepositoryBasicsTest {
+    @Order(300)
+    @DisplayName("300.基础事务测试")
+    public class ForX300TransactionBasicsTest
+            extends X300TransactionBasicsTest {
     }
 
     @Nested
-    @Order(5)
-    @DisplayName("5x.基础Repository事务测试")
-    public class ForX5TransactionRepositoryBasicsTest
-            extends X5TransactionRepositoryBasicsTest {
+    @Order(400)
+    @DisplayName("400.基础Repository增删改查测试")
+    public class ForX400CurdRepositoryBasicsTest
+            extends X400CurdRepositoryBasicsTest {
+    }
+
+    @Nested
+    @Order(500)
+    @DisplayName("500.基础Repository事务测试")
+    public class ForX500TransactionRepositoryBasicsTest
+            extends X500TransactionRepositoryBasicsTest {
     }
 }

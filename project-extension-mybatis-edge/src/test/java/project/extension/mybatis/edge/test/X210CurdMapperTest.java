@@ -1,27 +1,38 @@
 package project.extension.mybatis.edge.test;
 
 import org.junit.jupiter.api.*;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.OrmExtension;
 import project.extension.mybatis.edge.common.OrmInjection;
-import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
+import project.extension.mybatis.edge.mapper.ICommonQuickInputMapper;
 
 /**
- * 4x.基础Repository增删改查测试
+ * 210.Mapper增删改查测试
  *
  * @author LCTR
- * @date 2023-01-12
+ * @date 2023-02-06
  */
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class X4CurdRepositoryBasicsTest {
+public class X210CurdMapperTest {
     /**
      * 临时数据
      */
     private static CommonQuickInput tempData;
+
+    /**
+     * 快捷输入Mapper
+     */
+    private static ICommonQuickInputMapper ICommonQuickInputMapper;
+
+    /**
+     * 实体类拓展方法
+     */
+    private static EntityExtension entityExtension;
 
     /**
      * 注入
@@ -29,6 +40,8 @@ public class X4CurdRepositoryBasicsTest {
     @BeforeEach
     public void injection() {
         OrmInjection.injection();
+        ICommonQuickInputMapper = IOCExtension.applicationContext.getBean(ICommonQuickInputMapper.class);
+        entityExtension = new EntityExtension(null);
     }
 
     /**
@@ -47,39 +60,32 @@ public class X4CurdRepositoryBasicsTest {
     }
 
     /**
-     * 测试新增与查询功能
+     * 测试新增功能
      */
     @Test
-    @DisplayName("400.测试新增与查询功能")
-    @Order(400)
-    public void _400()
+    @DisplayName("210.测试新增功能")
+    @Order(210)
+    public void _210()
             throws
             Throwable {
-        EntityExtension entityExtension = new EntityExtension(null);
-
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
         dataCreate.setCategory("测试分类");
         dataCreate.setContent("测试内容");
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+        int rowsCreate = ICommonQuickInputMapper.insert(dataCreate);
 
-        Assertions.assertNotNull(repository_key,
-                                 "获取Repository_Key失败");
-
-        repository_key.insert(dataCreate);
+        Assertions.assertEquals(1,
+                                rowsCreate,
+                                "新增数据失败");
 
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 
-        CommonQuickInput dataCheckCreate = repository_key.getById(dataCreate.getId());
-
-        Assertions.assertNotEquals(null,
-                                   dataCheckCreate,
-                                   "查询新增的数据失败");
+        CommonQuickInput dataCheckCreate = ICommonQuickInputMapper.getById(dataCreate.getId());
+        Assertions.assertNotNull(dataCheckCreate,
+                                 "查询新增的数据失败");
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
@@ -96,12 +102,12 @@ public class X4CurdRepositoryBasicsTest {
     }
 
     /**
-     * 测试更新与查询功能
+     * 测试更新功能
      */
     @Test
-    @DisplayName("401.测试更新与查询功能")
-    @Order(401)
-    public void _401()
+    @DisplayName("211.测试更新功能")
+    @Order(211)
+    public void _211()
             throws
             Throwable {
         CommonQuickInput dataUpdate = new CommonQuickInput();
@@ -114,23 +120,18 @@ public class X4CurdRepositoryBasicsTest {
         dataUpdate.setCreateBy(tempData.getCreateBy());
         dataUpdate.setCreateTime(tempData.getCreateTime());
 
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+        int rowsUpdate = ICommonQuickInputMapper.update(dataUpdate);
 
-        Assertions.assertNotNull(repository_key,
-                                 "获取Repository_Key失败");
-
-        repository_key.update(dataUpdate);
+        Assertions.assertEquals(1,
+                                rowsUpdate,
+                                "更新数据失败");
 
         System.out.printf("\r\n已更新数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckUpdate = repository_key.getById(dataUpdate.getId());
-
-        Assertions.assertNotEquals(null,
-                                   dataCheckUpdate,
-                                   "查询更新的数据失败");
+        CommonQuickInput dataCheckUpdate = ICommonQuickInputMapper.getById(dataUpdate.getId());
+        Assertions.assertNotNull(dataCheckUpdate,
+                                 "查询新增的数据失败");
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
@@ -140,32 +141,29 @@ public class X4CurdRepositoryBasicsTest {
                                      CQI_Fields.keyword,
                                      CQI_Fields.public_);
 
-        System.out.printf("\r\n已复查更新的数据，Id：%s\r\n",
+        System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                           dataCheckUpdate.getId());
 
         tempData = dataCheckUpdate;
     }
 
     /**
-     * 测试删除与查询功能
+     * 测试删除功能
      */
     @Test
-    @DisplayName("402.测试删除与查询功能")
-    @Order(402)
-    public void _402() {
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+    @DisplayName("212.测试删除功能")
+    @Order(212)
+    public void _212() {
+        int rowsDelete = ICommonQuickInputMapper.deleteById(tempData.getId());
 
-        Assertions.assertNotNull(repository_key,
-                                 "获取Repository_Key失败");
-
-        repository_key.delete(tempData);
+        Assertions.assertEquals(1,
+                                rowsDelete,
+                                "删除数据失败");
 
         System.out.printf("\r\n已删除数据，Id：%s\r\n",
                           tempData.getId());
 
-        CommonQuickInput dataCheckDelete = repository_key.getById(tempData.getId());
+        CommonQuickInput dataCheckDelete = ICommonQuickInputMapper.getById(tempData.getId());
 
         Assertions.assertNull(dataCheckDelete,
                               "数据未删除");

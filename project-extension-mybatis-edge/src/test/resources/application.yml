@@ -32,7 +32,7 @@ project:
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
       scanEntitiesPackages: project.extension.mybatis.edge.entity.**
       # 需要扫描的存放Mapper接口类的包（可选）
-      scanMapperPackages: project.extension.mybatis.edge.mapper.*Mapper
+      scanMapperPackages: project.extension.mybatis.edge.mapper.**
       # 需要扫描的存放Mapper配置类的包
       scanMapperXmlLocations: classpath:mapper/**/*Mapper.xml
       # 默认的实体类表明/列名命名规则
@@ -53,13 +53,13 @@ project:
             password: ENC(gWzvDGisJ96VsD6fmqhOQm/4ORkbiEF9UYaYGeWNWB4=)
         #从库
         otherA:
-          enable: false
-          dbType: JdbcSqlServer
+          enable: true
+          dbType: JdbcMySql
           nameConvertType: None
           properties:
-            url: ENC(Dg5XaaG9MyBD1Fj+y1hXkw+QNZB5NW0ictc8sx/ZggR0Fm6ny9g2vKFsMfSr66KUKgid1m3p5L8pcpMFcsEcQ/BqCyXsEce+JOrdqRxBRTE=)
-            username: ENC(vogwRMBEJysjDVFfeLjF2w==)
-            password: ENC(GSCsnpZpPvaRHdxHF07wfwGJvJmmco2l)
+            url: ENC(mXQEmcgpuR2+HSjaCPMWZusd73VAfi8TiL3SEhphcEunARvRbkCNQ2OhRj/QCX23gDG/HyyhHIh7Y6m2hK1x8mle98rwEgrVsCLCj5bp0CMqueOB4ps96GvU1a+sCkEof2kVV5m1O1K50XZP0qKc1EGkcD2BBL3XvQhtQvKnAqzYbuCH19ReZ7mNgB98oKu2h/F3tr2wvxfWue9coJTjZWIa3uQzHaLVkMrH7aWgw86p0gevhD/FCM8e4xApKeDs)
+            username: ENC(tRlRJOHygFyrX5qDhODdMg==)
+            password: ENC(/DnLfzkOVtiMh/3+fQDBl2xRZfMEct2l+rxZckIv6Ug=)
 
 jasypt:
   encryptor:

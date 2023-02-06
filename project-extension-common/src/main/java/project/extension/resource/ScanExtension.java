@@ -22,11 +22,11 @@ import java.util.List;
  * @date 2023-02-05
  */
 public class ScanExtension {
-    private static final String DEFAULT_CLASS_PATTERN = "/**/*.class";
+    public static final String DEFAULT_CLASS_PATTERN = "/**/*.class";
 
-    private static final ResourcePatternResolver RESOURCE_PATTERN_RESOLVER = new PathMatchingResourcePatternResolver();
+    public static final ResourcePatternResolver RESOURCE_PATTERN_RESOLVER = new PathMatchingResourcePatternResolver();
 
-    private static final MetadataReaderFactory METADATA_READER_FACTORY = new CachingMetadataReaderFactory(RESOURCE_PATTERN_RESOLVER);
+    public static final MetadataReaderFactory METADATA_READER_FACTORY = new CachingMetadataReaderFactory(RESOURCE_PATTERN_RESOLVER);
 
     /**
      * 获取资源
@@ -35,7 +35,8 @@ public class ScanExtension {
      * @return 资源
      */
     public static Resource getResource(String location)
-            throws CommonException {
+            throws
+            CommonException {
         try {
             return RESOURCE_PATTERN_RESOLVER.getResource(location);
         } catch (Exception ex) {
@@ -52,7 +53,8 @@ public class ScanExtension {
      * @return 资源集合
      */
     public static List<Resource> scanResourceFromLocation(String location)
-            throws CommonException {
+            throws
+            CommonException {
         return scanResourceFromLocation(Collections.singletonList(location));
     }
 
@@ -63,7 +65,8 @@ public class ScanExtension {
      * @return 资源集合
      */
     public static List<Resource> scanResourceFromLocation(List<String> locationList)
-            throws CommonException {
+            throws
+            CommonException {
         List<Resource> resourceList = new ArrayList<>();
 
         for (String location : locationList) {
@@ -87,7 +90,8 @@ public class ScanExtension {
      * @return java类集合
      */
     public static List<Class<?>> scanClassFromPackage(String packageName)
-            throws CommonException {
+            throws
+            CommonException {
         return scanClassFromPackage(Collections.singletonList(packageName),
                                     null,
                                     null,
@@ -113,7 +117,8 @@ public class ScanExtension {
                                                       boolean filterAnonymousClass,
                                                       boolean filterInterface,
                                                       boolean filterMemberClass)
-            throws CommonException {
+            throws
+            CommonException {
         return scanClassFromPackage(Collections.singletonList(packageName),
                                     superTypeList,
                                     interfaceTypeList,
@@ -129,7 +134,8 @@ public class ScanExtension {
      * @return java类集合
      */
     public static List<Class<?>> scanClassFromPackage(List<String> packageNameList)
-            throws CommonException {
+            throws
+            CommonException {
         return scanClassFromPackage(packageNameList,
                                     null,
                                     null,
@@ -155,7 +161,8 @@ public class ScanExtension {
                                                       boolean filterAnonymousClass,
                                                       boolean filterInterface,
                                                       boolean filterMemberClass)
-            throws CommonException {
+            throws
+            CommonException {
         List<Class<?>> classList = new ArrayList<>();
 
         for (String packageName : packageNameList) {

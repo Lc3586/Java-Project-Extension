@@ -16,7 +16,7 @@ import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 /**
- * 3x.基础事务测试
+ * 300.基础事务测试
  *
  * @author LCTR
  * @date 2022-12-15
@@ -25,7 +25,7 @@ import project.extension.tuple.Tuple2;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 //@TestExecutionListeners({NaiveTransactionalTestExecutionListener.class})
 //@SpringBootTest(classes = SpringBootTestApplication.class)
-public class X3TransactionBasicsTest {
+public class X300TransactionBasicsTest {
     /**
      * 临时数据
      */

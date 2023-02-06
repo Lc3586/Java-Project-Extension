@@ -4,21 +4,19 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.mapper.MapperScannerConfigurer;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.config.DruidConfig;
+import project.extension.mybatis.edge.core.mapper.NaiveMapperScanner;
 import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.resource.ScanExtension;
@@ -36,9 +34,11 @@ import java.util.Map;
  * @author LCTR
  * @date 2022-12-15
  */
+@SuppressWarnings("SpringDependsOnUnresolvedBeanInspection")
 @Configuration
 @EnableConfigurationProperties({BaseConfig.class,
                                 DruidConfig.class})
+@DependsOn("iocExtension")
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
     public NaiveDataSourceProvider(BaseConfig baseConfig,
@@ -116,7 +116,11 @@ public class NaiveDataSourceProvider
                                          druidDataSource);
 
         //Mapper扫描器注册类
-        registerMapperScannerRegistrar(dataSourceConfig);
+        if (dataSourceConfig.getName()
+                            .equals(defaultDataSource()))
+            registerMapperScannerRegistrar(dataSourceConfig);
+        //TODO 注入多数据源的Mapper扫描器注册类
+
     }
 
     /**
@@ -190,22 +194,13 @@ public class NaiveDataSourceProvider
      * @param dataSourceConfig 数据源配置
      */
     private void registerMapperScannerRegistrar(DataSourceConfig dataSourceConfig) {
-        //TODO 注入Mapper扫描器注册类
         if (!CollectionsExtension.anyPlus(dataSourceConfig.getScanMapperPackages()))
             return;
 
-        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurer.class);
-        builder.addPropertyValue("processPropertyPlaceHolders",
-                                 true);
-        builder.addPropertyValue("sqlSessionFactoryBeanName",
-                                 getSqlSessionFactoryBeanName(dataSourceConfig.getName()));
-        builder.addPropertyValue("basePackage",
-                                 StringUtils.collectionToCommaDelimitedString(dataSourceConfig.getScanMapperPackages()));
-        // for spring-native
-        builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-
-        getBeanFactory().registerBeanDefinition(getMapperScannerRegistrarBeanName(dataSourceConfig.getName()),
-                                                builder.getBeanDefinition());
+        NaiveMapperScanner scanner = new NaiveMapperScanner(getSqlSessionFactoryBeanName(dataSourceConfig.getName()),
+                                                            getBeanFactory());
+        scanner.doScan(dataSourceConfig.getScanMapperPackages()
+                                       .toArray(new String[0]));
     }
 
     /**

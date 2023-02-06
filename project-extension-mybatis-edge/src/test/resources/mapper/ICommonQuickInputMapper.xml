@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project.extension.mybatis.edge.mapper.ICommonQuickInputMapper">
+    <resultMap type="project.extension.mybatis.edge.entity.CommonQuickInput" id="CommonQuickInputResult">
+        <result property="id" column="ID"/>
+        <result property="category" column="CATEGORY"/>
+        <result property="keyword" column="KEYWORD"/>
+        <result property="content" column="CONTENT"/>
+        <result property="public_" column="PUBLIC"/>
+        <result property="createBy" column="CREATE_BY"/>
+        <result property="createTime" column="CREATE_TIME"/>
+    </resultMap>
+
+    <sql id="selectAll">
+        select *
+        from "COMMON_QUICK_INPUT"
+        where 1 = 1
+    </sql>
+
+    <select id="list" parameterType="CommonQuickInput"
+            resultMap="CommonQuickInputResult">
+        <include refid="selectAll"/>
+        <if test="category != null and category != ''">
+            AND "CATEGORY" = #{category}
+        </if>
+        <if test="keyword != null and keyword != 0">
+            AND "KEYWORD" = #{keyword}
+        </if>
+        <if test="content != null and content != ''">
+            AND CONTENT like '%#{content}%'
+        </if>
+    </select>
+
+    <select id="getById" parameterType="String" resultMap="CommonQuickInputResult">
+        <include refid="selectAll"/>
+        AND "ID" = #{id}
+    </select>
+
+    <insert id="insert" parameterType="CommonQuickInput">
+        insert into "COMMON_QUICK_INPUT"
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            "ID",
+            <if test="category != null">"CATEGORY",</if>
+            <if test="keyword != null">"KEYWORD",</if>
+            <if test="content != null">"CONTENT",</if>
+            <if test="public_ != null">"PUBLIC",</if>
+            <if test="createBy != null">"CREATE_BY",</if>
+            <if test="createTime != null">"CREATE_TIME",</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="category != null">#{category},</if>
+            <if test="keyword != null">#{keyword},</if>
+            <if test="content != null">#{content},</if>
+            <if test="public_ != null">#{public_},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="CommonQuickInput">
+        update "COMMON_QUICK_INPUT"
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="category != null">"CATEGORY"=#{category},</if>
+            <if test="keyword != null">"KEYWORD"=#{keyword},</if>
+            <if test="content != null">"CONTENT"=#{content},</if>
+            <if test="public_ != null">"PUBLIC"=#{public_},</if>
+            <if test="createBy != null">"CREATE_BY"=#{createBy},</if>
+            <if test="createTime != null">"CREATE_TIME"=#{createTime},</if>
+        </trim>
+        where "ID" = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="String">
+        delete
+        from "COMMON_QUICK_INPUT"
+        where "ID" = #{id}
+    </delete>
+
+    <delete id="deleteByIds" parameterType="String">
+        delete from "COMMON_QUICK_INPUT" where "ID" in
+        <foreach collection="array" item="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -4,20 +4,20 @@ import org.junit.jupiter.api.*;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.OrmExtension;
 import project.extension.mybatis.edge.common.OrmInjection;
+import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
-import project.extension.mybatis.edge.model.FilterCompare;
 
 /**
- * 2x.基础增删改查测试
+ * 400.基础Repository增删改查测试
  *
  * @author LCTR
- * @date 2022-12-15
+ * @date 2023-01-12
  */
 @Disabled
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class X2CurdBasicsTest {
+public class X400CurdRepositoryBasicsTest {
     /**
      * 临时数据
      */
@@ -50,9 +50,9 @@ public class X2CurdBasicsTest {
      * 测试新增与查询功能
      */
     @Test
-    @DisplayName("200.测试新增与查询功能")
-    @Order(200)
-    public void _200()
+    @DisplayName("400.测试新增与查询功能")
+    @Order(400)
+    public void _400()
             throws
             Throwable {
         EntityExtension entityExtension = new EntityExtension(null);
@@ -63,22 +63,19 @@ public class X2CurdBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                            dataCreate)
-                                                    .executeAffrows();
+        IBaseRepository_Key<CommonQuickInput, String> repository_key
+                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
+                                                                String.class);
 
-        Assertions.assertEquals(1,
-                                rowsCreate,
-                                "新增数据失败");
+        Assertions.assertNotNull(repository_key,
+                                 "获取Repository_Key失败");
+
+        repository_key.insert(dataCreate);
 
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 
-        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        dataCreate.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckCreate = repository_key.getById(dataCreate.getId());
 
         Assertions.assertNotEquals(null,
                                    dataCheckCreate,
@@ -102,9 +99,9 @@ public class X2CurdBasicsTest {
      * 测试更新与查询功能
      */
     @Test
-    @DisplayName("201.测试更新与查询功能")
-    @Order(201)
-    public void _201()
+    @DisplayName("401.测试更新与查询功能")
+    @Order(401)
+    public void _401()
             throws
             Throwable {
         CommonQuickInput dataUpdate = new CommonQuickInput();
@@ -117,22 +114,19 @@ public class X2CurdBasicsTest {
         dataUpdate.setCreateBy(tempData.getCreateBy());
         dataUpdate.setCreateTime(tempData.getCreateTime());
 
-        int rowsUpdate = OrmInjection.masterNaiveSql.update(CommonQuickInput.class,
-                                                            dataUpdate)
-                                                    .executeAffrows();
+        IBaseRepository_Key<CommonQuickInput, String> repository_key
+                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
+                                                                String.class);
 
-        Assertions.assertEquals(1,
-                                rowsUpdate,
-                                "更新数据失败");
+        Assertions.assertNotNull(repository_key,
+                                 "获取Repository_Key失败");
+
+        repository_key.update(dataUpdate);
 
         System.out.printf("\r\n已更新数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckUpdate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        dataUpdate.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckUpdate = repository_key.getById(dataUpdate.getId());
 
         Assertions.assertNotEquals(null,
                                    dataCheckUpdate,
@@ -156,25 +150,22 @@ public class X2CurdBasicsTest {
      * 测试删除与查询功能
      */
     @Test
-    @DisplayName("202.测试删除与查询功能")
-    @Order(202)
-    public void _202() {
-        int rowsDelete = OrmInjection.masterNaiveSql.delete(CommonQuickInput.class,
-                                                            tempData)
-                                                    .executeAffrows();
+    @DisplayName("402.测试删除与查询功能")
+    @Order(402)
+    public void _402() {
+        IBaseRepository_Key<CommonQuickInput, String> repository_key
+                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
+                                                                String.class);
 
-        Assertions.assertEquals(1,
-                                rowsDelete,
-                                "删除数据失败");
+        Assertions.assertNotNull(repository_key,
+                                 "获取Repository_Key失败");
+
+        repository_key.delete(tempData);
 
         System.out.printf("\r\n已删除数据，Id：%s\r\n",
                           tempData.getId());
 
-        CommonQuickInput dataCheckDelete = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        tempData.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckDelete = repository_key.getById(tempData.getId());
 
         Assertions.assertNull(dataCheckDelete,
                               "数据未删除");
