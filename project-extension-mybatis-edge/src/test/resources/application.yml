@@ -36,30 +36,65 @@ project:
       # 需要扫描的存放Mapper配置类的包
       scanMapperXmlLocations: classpath:mapper/**/*Mapper.xml
       # 默认的实体类表明/列名命名规则
-      nameConvertType: PascalCaseToUnderscoreWithUpper
+      nameConvertType: None
       # 多数据源配置（单数据库时无需配置此项）
       multiDataSource:
-        #主库
+        #主库-MySql数据库
         master:
+          # 启用
           enable: true
-          # 默认的数据库类型
-          dbType: JdbcDameng
+          # 数据库类型
+          dbType: JdbcMySql
+          nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
-            url: ENC(G4fMAaqhzJFnRF8Zcdzyv4A3YikVTm4g+FOjKdnfd8eMJFqyz+/2ZcWZT6izBFlFIrXS2m0e1UAf364h2/upJbzAeCFAaPzav0ebN0/85aHcRELTqIpK/4Md6TgqysgHrJK3WWNC4PedmPbYtevkNJ10r1iAb/64rORV3wvjRMZ+gAenTCSJQOSAkvkbmrKFADnZesf2IoJBlxMs3wK0a3fKoybwQAOClaNgOCegbilFlFE3o2NP+A==)
-            # 用户名
-            username: ENC(9WjPQynJyuYGTspUecTKAw==)
-            # 密码
-            password: ENC(gWzvDGisJ96VsD6fmqhOQm/4ORkbiEF9UYaYGeWNWB4=)
-        #从库
-        otherA:
-          enable: true
-          dbType: JdbcMySql
-          nameConvertType: None
-          properties:
             url: ENC(mXQEmcgpuR2+HSjaCPMWZusd73VAfi8TiL3SEhphcEunARvRbkCNQ2OhRj/QCX23gDG/HyyhHIh7Y6m2hK1x8mle98rwEgrVsCLCj5bp0CMqueOB4ps96GvU1a+sCkEof2kVV5m1O1K50XZP0qKc1EGkcD2BBL3XvQhtQvKnAqzYbuCH19ReZ7mNgB98oKu2h/F3tr2wvxfWue9coJTjZWIa3uQzHaLVkMrH7aWgw86p0gevhD/FCM8e4xApKeDs)
+            # 用户名
             username: ENC(tRlRJOHygFyrX5qDhODdMg==)
+            # 密码
             password: ENC(/DnLfzkOVtiMh/3+fQDBl2xRZfMEct2l+rxZckIv6Ug=)
+        #从库-SqlServer数据库
+        sqlserver:
+          enable: true
+          dbType: JdbcSqlServer
+          properties:
+            url: ENC(BD894L+rI6+OK8XPVGaN0wKQcn55jzEzHFaGQtt5CeXlfpY70U4iFlyHoFSWIHScdL1QNm1vQ4bOj6z17nLhxA==)
+            username: ENC(zRTMlLYqaRM5/Zw61wJwzQ==)
+            password: ENC(Zzv+xWGaEDS2QH+thIrLxml/p28mEtb/zktJkbJvLQ4=)
+        #从库-SqlServer数据库2012及以上版本
+        sqlserver2012:
+          enable: true
+          dbType: JdbcSqlServer_2012_plus
+          properties:
+            url: ENC(BD894L+rI6+OK8XPVGaN0wKQcn55jzEzHFaGQtt5CeXlfpY70U4iFlyHoFSWIHScdL1QNm1vQ4bOj6z17nLhxA==)
+            username: ENC(zRTMlLYqaRM5/Zw61wJwzQ==)
+            password: ENC(Zzv+xWGaEDS2QH+thIrLxml/p28mEtb/zktJkbJvLQ4=)
+        #从库-PostgreSQL数据库
+        postgresql:
+          enable: true
+          dbType: JdbcPostgreSQL
+          properties:
+            url: ENC(f5px5Tb6+AzgzG7DQDhcuMDYUat7kdnjMZYxjM65ge1qlLpW1+RMw16bxF9SqcNaW8s7NcoBmUe0QulR5vfvZQ==)
+            username: ENC(P+CXNYEqqBmBfmPvgma6Ji4h4G2wVWUi)
+            password: ENC(8KdDQptvzj8H0tRZ3x2igLpExuxnF4BdEV69iqFwmlY=)
+        #从库-Oracle数据库
+        oracle:
+          enable: true
+          dbType: JdbcOracle
+          nameConvertType: PascalCaseToUnderscoreWithUpper
+          properties:
+            url: ENC(DAW4TMgH0ivbCDUDKG/J84Xjw5FwRzG+PFf9oOLxVgWylogx/UpH9bI9u/YBOjJ+WAWgcZdaZlI=)
+            username: ENC(SvOYHPYtKARLtfURHh4jeg==)
+            password: ENC(GyWU4d549zXWKGVVN7QfaGL0/ad/sert)
+        #从库-达梦数据库
+        dameng:
+          enable: true
+          dbType: JdbcDameng
+          nameConvertType: PascalCaseToUnderscoreWithUpper
+          properties:
+            url: ENC(G4fMAaqhzJFnRF8Zcdzyv4A3YikVTm4g+FOjKdnfd8eMJFqyz+/2ZcWZT6izBFlFIrXS2m0e1UAf364h2/upJbzAeCFAaPzav0ebN0/85aHcRELTqIpK/4Md6TgqysgHrJK3WWNC4PedmPbYtevkNJ10r1iAb/64rORV3wvjRMZ+gAenTCSJQOSAkvkbmrKFADnZesf2IoJBlxMs3wK0a3fKoybwQAOClaNgOCegbilFlFE3o2NP+A==)
+            username: ENC(9WjPQynJyuYGTspUecTKAw==)
+            password: ENC(gWzvDGisJ96VsD6fmqhOQm/4ORkbiEF9UYaYGeWNWB4=)
 
 jasypt:
   encryptor:

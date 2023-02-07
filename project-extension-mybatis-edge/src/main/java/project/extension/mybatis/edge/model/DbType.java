@@ -20,7 +20,7 @@ public enum DbType {
     @OpenApiDescription("Jdbc SqlServer")
     JdbcSqlServer(1, "JdbcSqlServer"),
     /**
-     * Jdbc SqlServer 2012以上版本
+     * Jdbc SqlServer 2012及以上版本
      */
     @OpenApiDescription("Jdbc SqlServer 2012以上版本")
     JdbcSqlServer_2012_plus(2, "JdbcSqlServer_2012_plus"),
