@@ -225,6 +225,9 @@ public abstract class TaskQueueHandler {
         //取消定时任务
         timer.cancel();
 
+        //清理延时任务
+        ScheduleTaskList.clear();
+
         //清理主任务
         taskQueue.clear();
 
