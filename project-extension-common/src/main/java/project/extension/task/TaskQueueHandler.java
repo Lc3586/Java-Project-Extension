@@ -177,7 +177,7 @@ public abstract class TaskQueueHandler {
                                    Executors.newSingleThreadExecutor());
 
         if (autoHandler)
-            handler();
+            this.handler();
     }
 
     /**
@@ -193,13 +193,27 @@ public abstract class TaskQueueHandler {
             this.state = TaskQueueHandlerState.STOPPED;
             return;
         }
-        start(autoHandler);
+        this.start(autoHandler);
     }
 
     /**
      * 关停
      */
     public void shutDown() {
+        shutDown(null);
+    }
+
+    /**
+     * 停止
+     *
+     * @param before 停止前要执行的方法
+     */
+    public void shutDown(IAction0 before) {
+        this.state = TaskQueueHandlerState.STOPPING;
+
+        if (before != null)
+            before.invoke();
+
         this.state = TaskQueueHandlerState.STOPPING;
 
         if (cf == null) cf = new CompletableFuture<>();
@@ -228,24 +242,13 @@ public abstract class TaskQueueHandler {
     }
 
     /**
-     * 停止
-     *
-     * @param before 停止前要执行的方法
-     */
-    public void shutDown(IAction0 before) {
-        this.state = TaskQueueHandlerState.STOPPING;
-        before.invoke();
-        shutDown();
-    }
-
-    /**
      * 新增主任务并立即开始处理
      *
      * @param taskKey 任务标识
      */
     public void addTask(Object taskKey) {
-        addTask(taskKey,
-                true);
+        this.addTask(taskKey,
+                     true);
     }
 
     /**
@@ -259,7 +262,7 @@ public abstract class TaskQueueHandler {
         taskQueue.add(taskKey);
 
         if (handler)
-            handler();
+            this.handler();
     }
 
     /**
@@ -268,8 +271,8 @@ public abstract class TaskQueueHandler {
      * @param taskKeys 任务标识集合
      */
     public void addTasks(Collection<Object> taskKeys) {
-        addTasks(taskKeys,
-                 true);
+        this.addTasks(taskKeys,
+                      true);
     }
 
     /**
@@ -283,7 +286,7 @@ public abstract class TaskQueueHandler {
         taskQueue.addAll(taskKeys);
 
         if (handler)
-            handler();
+            this.handler();
     }
 
     /**
@@ -312,7 +315,7 @@ public abstract class TaskQueueHandler {
                 }
 
                 try {
-                    processingQueue();
+                    this.processingQueue();
                 } catch (Exception ex) {
                     logger.error(String.format("%s运行时发生异常，已跳过当前任务",
                                                name),
