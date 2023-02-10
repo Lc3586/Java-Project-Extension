@@ -2,6 +2,7 @@ package project.extension.file;
 
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
+import project.extension.exception.CommonException;
 import project.extension.number.DecimalExtension;
 import project.extension.string.StringExtension;
 
@@ -14,8 +15,12 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
+import java.util.Enumeration;
 import java.util.Locale;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -536,5 +541,70 @@ public class FileExtension {
             Exception {
         //TODO
         throw new Exception("暂未实现");
+    }
+
+    /**
+     * 提取jar文件中的资源
+     *
+     * @param targetFileInJar       文件在jar中的路径
+     * @param destinationFileInDisk 在磁盘中存储提取的文件的路径
+     */
+    public static void extractFileFromJar(String targetFileInJar,
+                                          String destinationFileInDisk)
+            throws
+            CommonException {
+        String jarFilePath = System.getProperty("java.class.path");
+
+        if (!StringUtils.hasText(jarFilePath)
+                || !jarFilePath.endsWith(".jar")) {
+            throw new CommonException("获取当前jar文件失败");
+        }
+
+        targetFileInJar = targetFileInJar.replaceAll("\\\\",
+                                                     "/");
+
+        try (JarFile jar = new JarFile(jarFilePath)) {
+            Enumeration<JarEntry> fileList = jar.entries();
+            while (fileList.hasMoreElements()) {
+                //获取条目
+                JarEntry jarEntry = fileList.nextElement();
+                //获取条目名称
+                String name = jarEntry.getName();
+
+                //判断是否为需要处理的条目
+                if (!name.equals(targetFileInJar)
+                        && !name.startsWith(targetFileInJar)) {
+                    continue;
+                }
+
+                String newName = jarEntry.getName()
+                                         .replace(targetFileInJar,
+                                                  "");
+
+                File destinationFile = Paths.get(destinationFileInDisk,
+                                                 newName)
+                                            .toFile();
+
+                if (jarEntry.isDirectory()) {
+                    //创建文件夹
+                    if (!destinationFile.exists()
+                            && !destinationFile.mkdirs())
+                        throw new CommonException(String.format("创建%s目录失败",
+                                                                destinationFileInDisk));
+                } else {
+                    //复制文件
+                    try (InputStream jarInputStream = jar.getInputStream(jar.getEntry(name));
+                         FileOutputStream disOutputStream = new FileOutputStream(destinationFile)) {
+                        FileExtension.copy(jarInputStream,
+                                           disOutputStream,
+                                           true);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            throw new CommonException(String.format("提取jar文件中的%s文件失败",
+                                                    targetFileInJar),
+                                      ex);
+        }
     }
 }

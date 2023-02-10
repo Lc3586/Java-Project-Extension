@@ -25,10 +25,13 @@ public class ExecutableHelper {
             throws
             CommonException {
         switch (SystemInfoUtils.currentOS()) {
-            case Windows:
+            case Windows_32:
+            case Windows_64:
                 return "cmd.exe";
-            case Linux:
-            case OSX:
+            case Linux_32:
+            case Linux_64:
+            case OSX_32:
+            case OSX_64:
                 return System.getenv("SHELL");
             default:
                 throw new CommonException(String.format("不支持在当前操作系统%s执行此操作",
@@ -51,17 +54,16 @@ public class ExecutableHelper {
      * @param errorCharset     输出错误字符集
      * @return 程序退出码
      */
-    public static int execFile(
-            String filename,
-            String[] arguments,
-            IAction1<IAction1<String>> inputWriteLine,
-            IAction1<String> outputReadLine,
-            IAction1<String> errorReadLine,
-            String[] environments,
-            File workingDirectory,
-            Charset inputCharset,
-            Charset outputCharset,
-            Charset errorCharset)
+    public static int execFile(String filename,
+                               String[] arguments,
+                               IAction1<IAction1<String>> inputWriteLine,
+                               IAction1<String> outputReadLine,
+                               IAction1<String> errorReadLine,
+                               String[] environments,
+                               File workingDirectory,
+                               Charset inputCharset,
+                               Charset outputCharset,
+                               Charset errorCharset)
             throws
             CommonException {
         String[] cmd = new String[arguments == null
@@ -166,49 +168,44 @@ public class ExecutableHelper {
      * @param errorCharset     输出错误字符集
      * @return a: 信息输出,b: 错误输出,c: 程序退出码
      */
-    public static Tuple3<String, String, Integer> simpleExec(
-            String filename,
-            String[] arguments,
-            String input,
-            String[] environments,
-            File workingDirectory,
-            Charset inputCharset,
-            Charset outputCharset,
-            Charset errorCharset)
+    public static Tuple3<String, String, Integer> simpleExec(String filename,
+                                                             String[] arguments,
+                                                             String input,
+                                                             String[] environments,
+                                                             File workingDirectory,
+                                                             Charset inputCharset,
+                                                             Charset outputCharset,
+                                                             Charset errorCharset)
             throws
             CommonException {
         StringBuilder output = new StringBuilder();
         StringBuilder error = new StringBuilder();
         int exitCode;
 
-        if (input != null)
-            exitCode = execFile(
-                    filename,
-                    arguments,
-                    inputWriteLine -> inputWriteLine.invoke(input),
-                    outputValue -> output.append(String.format("%s\r\n",
-                                                               outputValue)),
-                    errorValue -> error.append(String.format("%s\r\n",
-                                                             errorValue)),
-                    environments,
-                    workingDirectory,
-                    inputCharset,
-                    outputCharset,
-                    errorCharset);
-        else
-            exitCode = execFile(
-                    filename,
-                    arguments,
-                    null,
-                    outputValue -> output.append(String.format("%s\r\n",
-                                                               outputValue)),
-                    errorValue -> error.append(String.format("%s\r\n",
-                                                             errorValue)),
-                    environments,
-                    workingDirectory,
-                    inputCharset,
-                    outputCharset,
-                    errorCharset);
+        if (input != null) exitCode = execFile(filename,
+                                               arguments,
+                                               inputWriteLine -> inputWriteLine.invoke(input),
+                                               outputValue -> output.append(String.format("%s\r\n",
+                                                                                          outputValue)),
+                                               errorValue -> error.append(String.format("%s\r\n",
+                                                                                        errorValue)),
+                                               environments,
+                                               workingDirectory,
+                                               inputCharset,
+                                               outputCharset,
+                                               errorCharset);
+        else exitCode = execFile(filename,
+                                 arguments,
+                                 null,
+                                 outputValue -> output.append(String.format("%s\r\n",
+                                                                            outputValue)),
+                                 errorValue -> error.append(String.format("%s\r\n",
+                                                                          errorValue)),
+                                 environments,
+                                 workingDirectory,
+                                 inputCharset,
+                                 outputCharset,
+                                 errorCharset);
 
         return new Tuple3<>(output.toString(),
                             error.toString(),
@@ -225,30 +222,28 @@ public class ExecutableHelper {
      * @param errorCharset     输出错误字符集
      * @return a: 信息输出,b: 错误输出,c: 程序退出码
      */
-    public static Tuple3<String, String, Integer> execShell(
-            String cmd,
-            String[] arguments,
-            String[] environments,
-            File workingDirectory,
-            Charset inputCharset,
-            Charset outputCharset,
-            Charset errorCharset)
+    public static Tuple3<String, String, Integer> execShell(String cmd,
+                                                            String[] arguments,
+                                                            String[] environments,
+                                                            File workingDirectory,
+                                                            Charset inputCharset,
+                                                            Charset outputCharset,
+                                                            Charset errorCharset)
             throws
             CommonException {
-        return simpleExec(
-                getShell(),
-                arguments,
-                String.format("%s&exit",
-                              cmd.substring(cmd.length() - 1,
-                                            1)
-                                 .equals("&")
-                              ? cmd.substring(0,
-                                              cmd.length() - 1)
-                              : cmd),
-                environments,
-                workingDirectory,
-                inputCharset,
-                outputCharset,
-                errorCharset);
+        return simpleExec(getShell(),
+                          arguments,
+                          String.format("%s&exit",
+                                        cmd.substring(cmd.length() - 1,
+                                                      1)
+                                           .equals("&")
+                                        ? cmd.substring(0,
+                                                        cmd.length() - 1)
+                                        : cmd),
+                          environments,
+                          workingDirectory,
+                          inputCharset,
+                          outputCharset,
+                          errorCharset);
     }
 }
