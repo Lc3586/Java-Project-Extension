@@ -2,10 +2,13 @@ package project.extension.hub;
 
 import org.atmosphere.cpr.AtmosphereResource;
 import org.slf4j.Logger;
+import project.extension.action.IAction1;
+import project.extension.exception.CommonException;
 import project.extension.task.TaskQueueHandler;
 import project.extension.tuple.Tuple2;
 import project.extension.tuple.Tuple4;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -30,6 +33,8 @@ public abstract class HubHandler {
                       int handlerThreadPoolSize,
                       int senderThreadPoolSize,
                       Logger logger) {
+        this.name = name;
+        this.startTime = new Date();
         this.messageHandler = new MessageHandler(name,
                                                  handlerThreadPoolSize,
                                                  logger);
@@ -63,11 +68,51 @@ public abstract class HubHandler {
     private final MessageSender messageSender;
 
     /**
+     * 名称
+     */
+    private final String name;
+
+    /**
+     * 启动时间
+     */
+    private final Date startTime;
+
+    /**
+     * 关停状态
+     */
+    private boolean shutDown = false;
+
+    /**
+     * 模块名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 模块启动时间
+     */
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * 关停状态
+     */
+    public boolean getShutDown() {
+        return this.shutDown;
+    }
+
+    /**
      * 添加客户端
      *
      * @param client 客户端
      */
     public void add(AtmosphereResource client) {
+        if (getShutDown())
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         clientMap.put(client.uuid(),
                       client);
     }
@@ -81,6 +126,10 @@ public abstract class HubHandler {
      */
     public void add(AtmosphereResource client,
                     String group) {
+        if (getShutDown())
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         add(client);
 
         join(client.uuid(),
@@ -107,6 +156,10 @@ public abstract class HubHandler {
      */
     public void join(String uuid,
                      String group) {
+        if (getShutDown())
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         if (!groupMap.containsKey(group))
             groupMap.put(group,
                          new ArrayList<>());
@@ -270,6 +323,28 @@ public abstract class HubHandler {
         messageSender.broadcastGroup(group,
                                      MessageType.BUFFER,
                                      data);
+    }
+
+    /**
+     * 关闭集线器
+     *
+     * @param before 关停前执行
+     */
+    public void shutDown(IAction1<AtmosphereResource> before) {
+        this.shutDown = true;
+        getAllClients().forEach(before::invoke);
+
+        this.messageSender.wait2Idle();
+
+        this.messageSender.wait2Idle();
+
+        getAllClients().forEach(x -> {
+            try {
+                x.close();
+            } catch (IOException ignore) {
+
+            }
+        });
     }
 
     /**

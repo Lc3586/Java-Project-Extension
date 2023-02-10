@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.springframework.lang.Nullable;
 import project.extension.action.IAction0;
 import project.extension.action.IAction1;
+import project.extension.exception.CommonException;
 import project.extension.func.IFunc0;
 
 import java.util.*;
@@ -262,6 +263,11 @@ public abstract class TaskQueueHandler {
      */
     public void addTask(Object taskKey,
                         boolean handler) {
+        if (this.state.equals(TaskQueueHandlerState.STOPPING)
+                || this.state.equals(TaskQueueHandlerState.STOPPED))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         taskQueue.add(taskKey);
 
         if (handler)
@@ -286,6 +292,11 @@ public abstract class TaskQueueHandler {
      */
     public void addTasks(Collection<Object> taskKeys,
                          boolean handler) {
+        if (this.state.equals(TaskQueueHandlerState.STOPPING)
+                || this.state.equals(TaskQueueHandlerState.STOPPED))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         taskQueue.addAll(taskKeys);
 
         if (handler)
@@ -297,6 +308,87 @@ public abstract class TaskQueueHandler {
      */
     public void handler() {
         if (cf != null) cf.complete(true);
+    }
+
+    /**
+     * 等待启动
+     */
+    public void wait2Start() {
+        wait2Start(-1);
+    }
+
+    /**
+     * 等待启动
+     *
+     * @param timeout 超时时间(ms)(值为-1时会一直等待下去)
+     */
+    public void wait2Start(int timeout) {
+        if (!this.getState()
+                 .equals(TaskQueueHandlerState.STARTING))
+            return;
+
+        if (timeout != -1
+                && timeout <= 0)
+            throw new CommonException(String.format("等待%s启动超时",
+                                                    getName()));
+
+        this.timer.schedule(new ActionTimerTask<>(this::wait2Start,
+                                                  --timeout),
+                            50);
+    }
+
+    /**
+     * 等待任务执行结束
+     */
+    public void wait2Idle() {
+        wait2Idle(0,
+                  0,
+                  -1);
+    }
+
+    /**
+     * 等待任务执行结束
+     *
+     * @param offsetConcurrentTaskCount 并发子任务差值
+     *                                  <p>如果当总的并发子任务个数减去此差值小于等于0，则判断任务已执行结束</p>
+     * @param offsetScheduleTaskCount   延时子任务差值
+     *                                  <p>如果当总的延时子任务个数减去此差值小于等于0，则判断任务已执行结束</p>
+     */
+    public void wait2Idle(int offsetConcurrentTaskCount,
+                          int offsetScheduleTaskCount) {
+        wait2Idle(offsetConcurrentTaskCount,
+                  offsetScheduleTaskCount,
+                  -1);
+    }
+
+    /**
+     * 等待任务执行结束
+     *
+     * @param offsetConcurrentTaskCount 并发子任务差值
+     *                                  <p>如果当总的并发子任务个数减去此差值小于等于0，则判断任务已执行结束</p>
+     * @param offsetScheduleTaskCount   延时子任务差值
+     *                                  <p>如果当总的延时子任务个数减去此差值小于等于0，则判断任务已执行结束</p>
+     * @param timeout                   超时时间(ms)(值为-1时会一直等待下去)
+     */
+    public void wait2Idle(int offsetConcurrentTaskCount,
+                          int offsetScheduleTaskCount,
+                          int timeout) {
+        if (!this.getState()
+                 .equals(TaskQueueHandlerState.RUNNING)
+                && getConcurrentTaskCount() - offsetConcurrentTaskCount <= 0
+                && getScheduleTaskCount() - offsetScheduleTaskCount <= 0)
+            return;
+
+        if (timeout != -1
+                && timeout <= 0)
+            throw new CommonException(String.format("等待%s任务执行结束超时",
+                                                    getName()));
+
+        this.timer.schedule(new ActionTimerTask3<>(this::wait2Idle,
+                                                   offsetConcurrentTaskCount,
+                                                   offsetScheduleTaskCount,
+                                                   --timeout),
+                            50);
     }
 
     /**
@@ -367,6 +459,11 @@ public abstract class TaskQueueHandler {
                                      Runnable runnable,
                                      @Nullable
                                              Consumer<Void> thenAccept) {
+        if (this.state.equals(TaskQueueHandlerState.STOPPING)
+                || this.state.equals(TaskQueueHandlerState.STOPPED))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         ConcurrentTaskMap.put(key,
                               thenAccept == null
                               ? CompletableFuture.runAsync(runnable,
@@ -404,6 +501,11 @@ public abstract class TaskQueueHandler {
     protected <T> void addScheduleTask(IAction1<T> action,
                                        T parameter,
                                        long delay) {
+        if (this.state.equals(TaskQueueHandlerState.STOPPING)
+                || this.state.equals(TaskQueueHandlerState.STOPPED))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
         UUID key = UUID.randomUUID();
         ScheduleTaskList.add(key);
         timer.schedule(new ActionTimerTask<>(state -> {
