@@ -544,6 +544,62 @@ public class FileExtension {
     }
 
     /**
+     * 获取jar文件地址
+     */
+    public static String getJarFilePath() {
+        String jarFilePath = System.getProperty("java.class.path");
+
+        if (!StringUtils.hasText(jarFilePath)
+                || !jarFilePath.endsWith(".jar")) {
+            throw new CommonException("获取当前jar文件失败");
+        }
+
+        return jarFilePath;
+    }
+
+    /**
+     * 提取jar文件中的单个资源
+     *
+     * @param targetFileInJar         文件在jar中的路径
+     * @param destinationFileInOutput 存储提取的文件的输出流
+     */
+    public static void extractSingleFileFromJar(String targetFileInJar,
+                                                OutputStream destinationFileInOutput)
+            throws
+            CommonException {
+        targetFileInJar = targetFileInJar.replaceAll("\\\\",
+                                                     "/");
+
+        try (JarFile jar = new JarFile(getJarFilePath())) {
+            Enumeration<JarEntry> fileList = jar.entries();
+            while (fileList.hasMoreElements()) {
+                //获取条目
+                JarEntry jarEntry = fileList.nextElement();
+                //获取条目名称
+                String name = jarEntry.getName();
+
+                //判断是否为需要处理的条目
+                if (!name.equals(targetFileInJar)) {
+                    continue;
+                }
+
+                //复制文件
+                try (InputStream jarInputStream = jar.getInputStream(jar.getEntry(name))) {
+                    FileExtension.copy(jarInputStream,
+                                       destinationFileInOutput,
+                                       true);
+                }
+
+                break;
+            }
+        } catch (Exception ex) {
+            throw new CommonException(String.format("提取jar文件中的%s文件失败",
+                                                    targetFileInJar),
+                                      ex);
+        }
+    }
+
+    /**
      * 提取jar文件中的资源
      *
      * @param targetFileInJar       文件在jar中的路径
@@ -553,17 +609,10 @@ public class FileExtension {
                                           String destinationFileInDisk)
             throws
             CommonException {
-        String jarFilePath = System.getProperty("java.class.path");
-
-        if (!StringUtils.hasText(jarFilePath)
-                || !jarFilePath.endsWith(".jar")) {
-            throw new CommonException("获取当前jar文件失败");
-        }
-
         targetFileInJar = targetFileInJar.replaceAll("\\\\",
                                                      "/");
 
-        try (JarFile jar = new JarFile(jarFilePath)) {
+        try (JarFile jar = new JarFile(getJarFilePath())) {
             Enumeration<JarEntry> fileList = jar.entries();
             while (fileList.hasMoreElements()) {
                 //获取条目
