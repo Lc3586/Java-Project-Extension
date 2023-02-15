@@ -1,0 +1,80 @@
+#项目拓展
+project:
+  extension:
+    mybatis:
+      # 默认的数据源
+      dataSource: master
+      # mybatis配置文件路径
+      configLocation: classpath:mybatis/mybatis-config.xml
+      # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
+      scanEntitiesPackages: project.extension.mybatis.edge.entity.**
+      # 需要扫描的存放Mapper接口类的包（可选）
+      scanMapperPackages: project.extension.mybatis.edge.mapper.**
+      # 需要扫描的存放Mapper配置类的包
+      scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
+      # 默认的实体类表明/列名命名规则
+      nameConvertType: None
+      # 多数据源配置（单数据库时无需配置此项）
+      multiDataSource:
+        #主库-MySql数据库
+        master:
+          # 启用
+          enable: true
+          # 数据库类型
+          dbType: JdbcMySql
+          nameConvertType: PascalCaseToUnderscoreWithLower
+          properties:
+            # 连接字符串
+            url: ENC(n6bQBumKHQd03g9JO6UiZaGwH711mXUI0+ud2b3yFdFCM8isW3XZAL6bYidbcNKU/tTjR7qmiHy9RYP9YiDEyOeUYB0NpVlolZAyfxNoyqEccCJwR0ZGfnT0LVp5aGwVYYKhGwey4/uTD7iLUFTL8Z84JrQhsVAUJfkPFBfnB6gSbZRRfNCtciUb+7WVXhTpTk3lGmBJ4FNcfIdCiHSnV7n/r20Pxk9VnL2Pwmx1P/0UnnDq8N+VyghqDI/ay99i)
+            # 用户名
+            username: ENC(LWfGadRuyaYT3ZIEFoEs/w==)
+            # 密码
+            password: ENC(Q88XTJSttazzBLg5bVN32Oyn0e5CagP/+MXtmSUYGxc=)
+        #从库-SqlServer数据库
+        sqlserver:
+          enable: false
+          dbType: JdbcSqlServer
+          properties:
+            url:
+            username:
+            password:
+        #从库-SqlServer数据库2012及以上版本
+        sqlserver2012:
+          enable: true
+          dbType: JdbcSqlServer_2012_plus
+          properties:
+            url: ENC(0PuXkecs2pAkwowQWCkohXz2oUvrDCFTLDuj9WwbZYApXgdwx8FFa75QF1M2oQ5zbRnY5jDSB3zH2dNJpj8UIOVNmNUjYr6S)
+            username: ENC(wRcisMssTFy7D6ATnFH9FQ==)
+            password: ENC(EAMmuitoh95dSC4GUZp66sOIXZUAqVlm)
+        #从库-达梦数据库
+        dameng:
+          enable: true
+          dbType: JdbcDameng
+          nameConvertType: PascalCaseToUnderscoreWithUpper
+          properties:
+            url: ENC(fnfXdurWJfsrafQ2JI+LHFss5/LagAU6DJC7wGpkObMKhSrqVGYXHKcfc8btEaYwUD7fd5UKzV5+11REAzq7rPRTf3DK++spLYr+ZEV+S97TCiM404wrli9QbdkZzcVSafGg96rxNDNK90zWjFFzRiyTq/lkexMqDnGJh78fq7x6bKv6vFu8DhLdtFdETm9J0xlHBeQRr3aYL8c09mSBu5UzY0/RSf0v0WHqfOZnho7FZe4aLIMKJQ==)
+            username: ENC(IbCv7dXNKR9+hdJjOwPcaQ==)
+            password: ENC(ZnT+mSxXGkl3pwf9BIpyWXb2t4NlBeqE7WuTOvJkQYo=)
+        #从库-Oracle数据库
+        oracle:
+          enable: true
+          dbType: JdbcOracle
+          nameConvertType: PascalCaseToUnderscoreWithUpper
+          properties:
+            url: ENC(c5q8D8TOl+fdZsfUeOvSjJGa9xO7efGfDVn7pWigtXh9MxXemk/Cx8MoWDm9kuy8GhfZkqEsmOc=)
+            username: ENC(HmX/hIXjMJcgQdPZX86GIurqXqDRI9Ov)
+            password: ENC(XysUf7FPD7lNLpUNNKppbbPkArUE2FhE)
+        #从库-PostgreSQL数据库
+        postgresql:
+          enable: true
+          dbType: JdbcPostgreSQL
+          properties:
+            url: ENC(jLVeoBUA0yt6Q4Cu2imtopygTSymhvo06g/1HSXB0oZ6QyIwE2QxnKcTchy8yyy5GvV79RdVTAUZenrKVtqzeQ==)
+            username: ENC(ZIboxBXpEJwq+P31GtHPgKY1ODE1wx3b)
+            password: ENC(I32k3anXaRqqCfXw0rI68t1+8zP+1WPNU7n/giflEvE=)
+
+jasypt:
+  encryptor:
+    password: ${JAVA_LCTR_TEST_JASYPT_PASSWORD}
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

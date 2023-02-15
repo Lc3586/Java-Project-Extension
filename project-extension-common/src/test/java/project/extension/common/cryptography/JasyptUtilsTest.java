@@ -90,7 +90,7 @@ public class JasyptUtilsTest {
             throws
             Throwable {
         String password = JasyptUtils.getPassword();
-        String text = "ENC(kSMyRaceHTrcWti5p607CA==)";
+        String text = "ENC(iXb0v7Wnr1ZgfGZ1eAyCOg==)";
         System.out.printf("密文：%s%n",
                           text);
         String data1 = JasyptUtils.decrypt(text,

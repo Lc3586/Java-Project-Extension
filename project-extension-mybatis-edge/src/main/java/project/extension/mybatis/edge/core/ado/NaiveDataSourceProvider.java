@@ -160,15 +160,48 @@ public class NaiveDataSourceProvider
             //VFS.addImplClass(SpringBootVFS.class);
             SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
             sqlSessionFactoryBean.setDataSource(dataSource);
-            sqlSessionFactoryBean.setConfigLocation(ScanExtension.getResource(CommonUtils.getConfig()
-                                                                                         .getConfigLocation()));
-            sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
-                                                              .toArray(new Class[0]));
-            sqlSessionFactoryBean.setMapperLocations(ScanExtension.scanResourceFromLocation(dataSourceConfig.getScanMapperXmlLocations())
-                                                                  .toArray(new Resource[0]));
+            try {
+                sqlSessionFactoryBean.setConfigLocation(ScanExtension.getResource(CommonUtils.getConfig()
+                                                                                             .getConfigLocation()));
+            } catch (Exception ex) {
+                throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
+                                                                                   "configLocation",
+                                                                                   dataSourceConfig.getConfigLocation()),
+                                          ex);
+            }
+
+            try {
+                sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
+                                                                  .toArray(new Class[0]));
+            } catch (Exception ex) {
+                throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
+                                                                                   "scanEntitiesPackages",
+                                                                                   dataSourceConfig.getScanEntitiesPackages()
+                                                                                           == null
+                                                                                   ? ""
+                                                                                   : String.join(" ",
+                                                                                                 dataSourceConfig.getScanEntitiesPackages())),
+                                          ex);
+            }
+
+            try {
+                sqlSessionFactoryBean.setMapperLocations(ScanExtension.scanResourceFromLocation(dataSourceConfig.getScanMapperXmlLocations())
+                                                                      .toArray(new Resource[0]));
+            } catch (Exception ex) {
+                throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
+                                                                                   "scanMapperXmlLocations",
+                                                                                   dataSourceConfig.getScanMapperXmlLocations()
+                                                                                           == null
+                                                                                   ? ""
+                                                                                   : String.join(" ",
+                                                                                                 dataSourceConfig.getScanMapperXmlLocations())),
+                                          ex);
+            }
             sqlSessionFactory = sqlSessionFactoryBean.getObject();
             if (sqlSessionFactory == null)
                 throw new Exception("method SqlSessionFactoryBean.getObject() result null");
+        } catch (ModuleException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ModuleException(Strings.getSqlSessionFactoryFailed(),
                                       ex);

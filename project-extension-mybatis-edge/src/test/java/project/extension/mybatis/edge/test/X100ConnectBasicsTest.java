@@ -6,6 +6,7 @@ import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.common.OrmInjection;
 import project.extension.mybatis.edge.core.ado.NaiveDataSource;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
+import project.extension.standard.exception.ModuleException;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -82,22 +83,30 @@ public class X100ConnectBasicsTest {
                                      String.format("未获取到%s的orm",
                                                    ormName));
 
-            IDbFirst dbFirst = orm.getDbFirst();
+            try {
+                IDbFirst dbFirst = orm.getDbFirst();
 
-            Assertions.assertNotEquals(null,
-                                       dbFirst,
-                                       String.format("未获取到%s的IDbFirst",
-                                                     ormName));
+                Assertions.assertNotEquals(null,
+                                           dbFirst,
+                                           String.format("未获取到%s的IDbFirst",
+                                                         ormName));
 
-            System.out.printf("\r\n成功获取%s的%s\r\n",
-                              ormName,
-                              IDbFirst.class.getName());
-
-            List<String> databases = dbFirst.getDatabases();
-            for (String database : databases) {
-                System.out.printf("\r\n%s查询到数据库：%s%n\r\n",
+                System.out.printf("\r\n成功获取%s的%s\r\n",
                                   ormName,
-                                  database);
+                                  IDbFirst.class.getName());
+
+                List<String> databases = dbFirst.getDatabases();
+                for (String database : databases) {
+                    System.out.printf("\r\n%s查询到数据库：%s%n\r\n",
+                                      ormName,
+                                      database);
+                }
+            } catch (ModuleException ex) {
+                if (ex.getMessage()
+                      .equals("MybatisEdge: 暂不支持JdbcOracle数据库"))
+                    System.out.println(ex.getMessage());
+                else
+                    Assertions.fail(ex);
             }
         }
     }

@@ -57,6 +57,8 @@ public class Strings_zh_CN {
                        "未启用配置文件中的project.extension.mybatis.multiDataSource.%1$2s数据源");
             values.put("ConfigDataSourceOptionUndefined",
                        "配置文件project.extension.mybatis.multiDataSource - name为%1$2s的数据源缺失%2$2s设置，并且也没有设置默认的%2$2s");
+            values.put("ConfigDataSourceOptionInvalid",
+                       "配置文件project.extension.mybatis.multiDataSource - name为%1$2s的数据源的%2$2s设置无效，设置的值：%3$2s");
             values.put("CreateDataSourceFailed",
                        "创建数据源失败，配置来源于project.extension.mybatis.multiDataSource中名称为%1$2s的数据源配置");
             values.put("UnsupportedDbType",

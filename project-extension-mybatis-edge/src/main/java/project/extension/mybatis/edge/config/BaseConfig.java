@@ -242,7 +242,7 @@ public class BaseConfig {
 //        if (config.getDbType() == null)
 //            config.setDbType(this.getDbType());
 
-        if (config.getDbType() == null)
+        if (config.isEnable() && config.getDbType() == null)
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "dbType"));
 
@@ -252,14 +252,14 @@ public class BaseConfig {
         if (!StringUtils.hasText(config.getConfigLocation()))
             config.setConfigLocation(this.getConfigLocation());
 
-        if (!StringUtils.hasText(config.getConfigLocation()))
+        if (config.isEnable() && !StringUtils.hasText(config.getConfigLocation()))
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "configLocation"));
 
         if (!CollectionsExtension.anyPlus(config.getScanEntitiesPackages()))
             config.setScanEntitiesPackages(this.getScanEntitiesPackages());
 
-        if (!CollectionsExtension.anyPlus(config.getScanEntitiesPackages()))
+        if (config.isEnable() && !CollectionsExtension.anyPlus(config.getScanEntitiesPackages()))
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "scanEntitiesPackages"));
 
@@ -269,7 +269,7 @@ public class BaseConfig {
         if (!CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
             config.setScanMapperXmlLocations(this.getScanMapperXmlLocations());
 
-        if (!CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
+        if (config.isEnable() && !CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "scanMapperXmlLocations"));
 //
@@ -285,6 +285,9 @@ public class BaseConfig {
 //              .computeIfAbsent(DruidDataSourceFactory.PROP_PASSWORD,
 //                               k -> this.getPassword());
 
+
+        if (!config.isEnable())
+            return config;
 
         //检查必须要有的的属性
         List<String> requiredProperties = Arrays.asList(DruidDataSourceFactory.PROP_URL,

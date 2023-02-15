@@ -194,6 +194,22 @@ public class Strings {
     }
 
     /**
+     * 数据源配置项无效
+     *
+     * @param name   数据源名称
+     * @param option 配置项名称
+     * @param value  配置项值
+     */
+    public static String getConfigDataSourceOptionInvalid(String name,
+                                                          String option,
+                                                          String value) {
+        return getString("ConfigDataSourceOptionInvalid",
+                         name,
+                         option,
+                         value);
+    }
+
+    /**
      * 创建指定的数据源失败
      *
      * @param name 数据源名称
