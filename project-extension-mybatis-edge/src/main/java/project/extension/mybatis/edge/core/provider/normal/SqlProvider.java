@@ -943,7 +943,8 @@ public abstract class SqlProvider {
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("%s:%s",
+        String cacheKey = String.format("%s:%s:%s",
+                                        this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
                                         ? ""
@@ -1058,7 +1059,8 @@ public abstract class SqlProvider {
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("%s:%s:%s",
+        String cacheKey = String.format("%s:%s:%s:%s",
+                                        this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
                                         ? ""
