@@ -146,10 +146,17 @@ public class BaseConfig {
     /**
      * 获取所有数据源名称
      */
-    public List<String> getAllDataSource() {
-        this.getDataSourceConfig();
-        return new ArrayList<>(this.getMultiDataSource()
-                                   .keySet());
+    public List<String> getAllDataSource(boolean enabledOnly) {
+        List<String> allDataSource = new ArrayList<>();
+        for (String dataSource : this.getMultiDataSource()
+                                     .keySet()) {
+            if (!enabledOnly
+                    || this.getMultiDataSource()
+                           .get(dataSource)
+                           .isEnable())
+                allDataSource.add(dataSource);
+        }
+        return allDataSource;
     }
 
     /**

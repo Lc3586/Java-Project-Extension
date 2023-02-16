@@ -1,18 +1,24 @@
 package project.extension.mybatis.edge.test;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.common.ExceptionExtension;
 import project.extension.mybatis.edge.common.OrmExtension;
-import project.extension.mybatis.edge.common.OrmInjection;
+import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.extention.EntityExtension;
 import project.extension.standard.exception.BusinessException;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 500.基础Repository事务测试
@@ -26,6 +32,35 @@ import project.extension.tuple.Tuple2;
 //@SpringBootTest(classes = SpringBootTestApplication.class)
 public class X500TransactionRepositoryBasicsTest {
     /**
+     * 全部数据源
+     */
+    private static final Map<String, String> dataSourceMap = new HashMap<>();
+
+    /**
+     * 多数据源测试
+     *
+     * @return 数据源
+     */
+    private static String[] multiDataSourceTest() {
+        dataSourceMap.put("MySQL 8.0",
+                          "mysql");
+        dataSourceMap.put("MariaDB 10.10",
+                          "mariadb");
+        dataSourceMap.put("SqlServer 2012 降级处理",
+                          "sqlserver");
+        dataSourceMap.put("SqlServer 2012",
+                          "sqlserver2012");
+        dataSourceMap.put("达梦 8",
+                          "dameng");
+        dataSourceMap.put("Oracle 19c",
+                          "oracle");
+        dataSourceMap.put("PostgreSQL 15",
+                          "postgresql");
+        return dataSourceMap.keySet()
+                            .toArray(new String[0]);
+    }
+
+    /**
      * 临时数据
      */
     private static CommonQuickInput tempData;
@@ -35,7 +70,7 @@ public class X500TransactionRepositoryBasicsTest {
      */
     @BeforeEach
     public void injection() {
-        OrmInjection.injection();
+        OrmObjectResolve.injection();
     }
 
     /**
@@ -55,13 +90,18 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试编程式事务提交操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("500.测试编程式事务提交操作")
     @Order(500)
-    public void _500()
+    public void _500(String name)
             throws
             Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -71,8 +111,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -103,11 +143,16 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试编程式事务回滚操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("501.测试编程式事务回滚操作")
     @Order(501)
-    public void _501() {
+    public void _501(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -117,8 +162,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -149,13 +194,17 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试编程式事务嵌套提交操作
-     *
      * <p>应抛出异常并回滚事务</p>
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("510.测试编程式事务嵌套提交操作")
     @Order(510)
-    public void _510() {
+    public void _510(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate1 = entityExtension.initialization(new CommonQuickInput());
@@ -171,8 +220,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate2.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -223,13 +272,18 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试声明式事务提交操作（提交）
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Commit
     @DisplayName("520.测试声明式事务提交操作（提交）")
     @Order(520)
-    public void _520() {
+    public void _520(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -239,8 +293,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -255,19 +309,24 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试声明式事务提交操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("521.测试声明式事务提交操作")
     @Order(521)
-    public void _521()
+    public void _521(String name)
             throws
             Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         Assertions.assertNotNull(tempData,
                                  "未记录新增的数据");
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -288,13 +347,18 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试声明式事务回滚操作（回滚）
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Rollback
     @DisplayName("522.测试声明式事务回滚操作（回滚）")
     @Order(522)
-    public void _522() {
+    public void _522(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -304,8 +368,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -320,17 +384,22 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试声明式事务回滚操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("523.测试声明式事务回滚操作")
     @Order(523)
-    public void _523() {
+    public void _523(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         Assertions.assertNotNull(tempData,
                                  "未记录新增的数据");
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
@@ -348,15 +417,19 @@ public class X500TransactionRepositoryBasicsTest {
 
     /**
      * 测试声明式事务嵌套编程式事务提交操作
-     *
      * <p>应抛出异常并回滚事务</p>
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Commit
     @DisplayName("530.测试声明式事务嵌套编程式事务提交操作")
     @Order(530)
-    public void _530() {
+    public void _530(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -366,8 +439,8 @@ public class X500TransactionRepositoryBasicsTest {
         dataCreate.setPublic_(true);
 
         IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = OrmInjection.masterNaiveSql.getRepository_Key(CommonQuickInput.class,
-                                                                String.class);
+                = naiveSql.getRepository_Key(CommonQuickInput.class,
+                                             String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");

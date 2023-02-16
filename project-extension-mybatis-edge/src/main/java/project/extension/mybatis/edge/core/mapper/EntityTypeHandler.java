@@ -112,8 +112,13 @@ public class EntityTypeHandler {
                                    NameConvertType nameConvertType) {
         ColumnSetting columnSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                               ColumnSetting.class);
-        if (columnSettingAttribute != null && StringUtils.hasText(columnSettingAttribute.name()))
-            return columnSettingAttribute.name();
+        if (columnSettingAttribute != null) {
+            if (StringUtils.hasText(columnSettingAttribute.finalName()))
+                return columnSettingAttribute.finalName();
+            if (StringUtils.hasText(columnSettingAttribute.alias()))
+                return getColumn(columnSettingAttribute.alias(),
+                                 nameConvertType);
+        }
         return getColumn(field.getName(),
                          nameConvertType);
     }
@@ -253,12 +258,24 @@ public class EntityTypeHandler {
             for (Field field : entityType.getDeclaredFields()) {
                 ColumnSetting columnSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                       ColumnSetting.class);
-                if (columnSettingAttribute != null && columnSettingAttribute.name()
-                                                                            .equals(column)) return field;
+                if (columnSettingAttribute != null
+                        &&
+                        ((StringUtils.hasText(columnSettingAttribute.finalName())
+                                &&
+                                columnSettingAttribute.finalName()
+                                                      .equals(column))
+                                ||
+                                (StringUtils.hasText(columnSettingAttribute.alias())
+                                        &&
+                                        columnSettingAttribute.alias()
+                                                              .equals(SqlExtension.reductionName(column,
+                                                                                                 nameConvertType)))))
+                    return field;
 
                 if (field.getName()
                          .equalsIgnoreCase(SqlExtension.reductionName(column,
-                                                                      nameConvertType))) result = field;
+                                                                      nameConvertType)))
+                    result = field;
             }
 
             //递归处理父类类型

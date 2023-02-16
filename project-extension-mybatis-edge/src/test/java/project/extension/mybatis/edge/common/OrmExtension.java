@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.common;
 
 import org.junit.jupiter.api.Assertions;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -22,9 +21,9 @@ public class OrmExtension {
                                  T... data)
             throws
             Exception {
-        int rowsDelete = OrmInjection.masterNaiveSql.batchDelete(type,
-                                                                 Arrays.asList(data))
-                                                    .executeAffrows();
+        int rowsDelete = OrmObjectResolve.masterNaiveSql.batchDelete(type,
+                                                                     Arrays.asList(data))
+                                                        .executeAffrows();
 
         Assertions.assertEquals(data.length,
                                 rowsDelete,

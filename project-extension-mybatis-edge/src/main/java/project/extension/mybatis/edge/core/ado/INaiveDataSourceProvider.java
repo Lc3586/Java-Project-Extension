@@ -67,14 +67,32 @@ public interface INaiveDataSourceProvider {
     String defaultDataSource();
 
     /**
-     * 获取所有的数据源
+     * 数据源是否存在
+     *
+     * @param dataSource 数据源
      */
-    List<String> allDataSources();
+    boolean isExists(String dataSource);
+
+    /**
+     * 数据源是否启用
+     *
+     * @param dataSource 数据源
+     */
+    boolean isEnable(String dataSource);
+
+    /**
+     * 获取所有的数据源
+     *
+     * @param enabledOnly 仅获取启用的数据源
+     */
+    List<String> allDataSources(boolean enabledOnly);
 
     /**
      * 加载所有的数据源
+     *
+     * @param enabledOnly 仅获取启用的数据源
      */
-    Map<String, DataSource> loadAllDataSources();
+    Map<String, DataSource> loadAllDataSources(boolean enabledOnly);
 
     /**
      * 获取数据源

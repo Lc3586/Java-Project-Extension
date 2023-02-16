@@ -1,14 +1,12 @@
 package project.extension.mybatis.edge.test;
 
 import org.junit.jupiter.api.*;
-import project.extension.ioc.IOCExtension;
-import project.extension.mybatis.edge.INaiveSql;
-import project.extension.mybatis.edge.common.OrmInjection;
-import project.extension.mybatis.edge.core.ado.NaiveDataSource;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
-import project.extension.standard.exception.ModuleException;
 
-import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,92 +20,60 @@ import java.util.Map;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class X100ConnectBasicsTest {
     /**
+     * 全部数据源
+     */
+    private static final Map<String, String> dataSourceMap = new HashMap<>();
+
+    /**
+     * 多数据源测试
+     *
+     * @return 数据源
+     */
+    private static String[] multiDataSourceTest() {
+        dataSourceMap.put("MySQL 8.0",
+                          "mysql");
+        dataSourceMap.put("MariaDB 10.10",
+                          "mariadb");
+        dataSourceMap.put("SqlServer 2012 降级处理",
+                          "sqlserver");
+        dataSourceMap.put("SqlServer 2012",
+                          "sqlserver2012");
+        dataSourceMap.put("达梦 8",
+                          "dameng");
+        dataSourceMap.put("Oracle 19c",
+                          "oracle");
+        dataSourceMap.put("PostgreSQL 15",
+                          "postgresql");
+        return dataSourceMap.keySet()
+                            .toArray(new String[0]);
+    }
+
+    /**
      * 注入
      */
     @BeforeEach
     public void injection() {
-        OrmInjection.injection();
+        OrmObjectResolve.injection();
     }
 
     /**
      * 测试数据库连接是否正常
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("100.测试数据库连接是否正常")
     @Order(100)
-    public void _100() {
-        NaiveDataSource naiveDataSource = IOCExtension.applicationContext.getBean(NaiveDataSource.class);
+    public void _100(String name) {
+        String dataSource = dataSourceMap.get(name);
 
-        Assertions.assertNotEquals(null,
-                                   naiveDataSource,
-                                   "未获取到NaiveDataSource");
+        IDbFirst dbFirst = OrmObjectResolve.getDbFirst(dataSource);
 
-        System.out.printf("\r\n%s已注入\r\n",
-                          NaiveDataSource.class.getName());
-
-        Map<Object, DataSource> druidDataSourceMap = naiveDataSource.getResolvedDataSources();
-
-        Assertions.assertNotEquals(0,
-                                   druidDataSourceMap.size(),
-                                   "未获取到任何DruidDataSource");
-
-        for (String dataSource : OrmInjection.baseConfig.getAllDataSource()) {
-            if (!OrmInjection.baseConfig.getDataSourceConfig(dataSource)
-                                        .isEnable()) {
-                System.out.printf("\r\n%s数据源未启用\r\n",
-                                  dataSource);
-                continue;
-            }
-
-            Assertions.assertNotEquals(false,
-                                       druidDataSourceMap.containsKey(dataSource),
-                                       String.format("未获取到name为%s的DruidDataSource",
-                                                     dataSource));
-
-            System.out.printf("\r\n已创建%s数据源\r\n",
-                              dataSource);
-
-            INaiveSql orm;
-            String ormName;
-            if (dataSource.equals(OrmInjection.baseConfig.getDataSource())) {
-                orm = OrmInjection.masterNaiveSql;
-                ormName = String.format("主库-%s",
-                                        dataSource);
-            } else {
-                orm = OrmInjection.multiNaiveSql.getSlaveOrm(dataSource);
-                ormName = String.format("从库-%s",
-                                        dataSource);
-            }
-
-            Assertions.assertNotNull(orm,
-                                     String.format("未获取到%s的orm",
-                                                   ormName));
-
-            try {
-                IDbFirst dbFirst = orm.getDbFirst();
-
-                Assertions.assertNotEquals(null,
-                                           dbFirst,
-                                           String.format("未获取到%s的IDbFirst",
-                                                         ormName));
-
-                System.out.printf("\r\n成功获取%s的%s\r\n",
-                                  ormName,
-                                  IDbFirst.class.getName());
-
-                List<String> databases = dbFirst.getDatabases();
-                for (String database : databases) {
-                    System.out.printf("\r\n%s查询到数据库：%s%n\r\n",
-                                      ormName,
-                                      database);
-                }
-            } catch (ModuleException ex) {
-                if (ex.getMessage()
-                      .equals("MybatisEdge: 暂不支持JdbcOracle数据库"))
-                    System.out.println(ex.getMessage());
-                else
-                    Assertions.fail(ex);
-            }
+        List<String> databases = dbFirst.getDatabases();
+        for (String database : databases) {
+            System.out.printf("\r\n查询到数据库：%s%n\r\n",
+                              database);
         }
     }
 }

@@ -28,6 +28,8 @@ public class BusinessException
 
     public BusinessException(String message,
                              Throwable innerException) {
+        super(message,
+              innerException);
         this.message = message;
         this.setInnerException(innerException);
     }

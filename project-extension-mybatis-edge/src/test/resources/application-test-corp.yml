@@ -3,7 +3,7 @@ project:
   extension:
     mybatis:
       # 默认的数据源
-      dataSource: master
+      dataSource: mysql
       # mybatis配置文件路径
       configLocation: classpath:mybatis/mybatis-config.xml
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
@@ -17,7 +17,7 @@ project:
       # 多数据源配置（单数据库时无需配置此项）
       multiDataSource:
         #主库-MySql数据库
-        master:
+        mysql:
           # 启用
           enable: true
           # 数据库类型
@@ -30,14 +30,23 @@ project:
             username: test
             # 密码
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
+        #主库-Mariadb数据库
+        mariadb:
+          enable: true
+          dbType: JdbcMySql
+          nameConvertType: PascalCaseToUnderscoreWithLower
+          properties:
+            url: jdbc:mysql://192.168.1.49:3306/test4java?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+            username: test
+            password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-SqlServer数据库
         sqlserver:
-          enable: false
+          enable: true
           dbType: JdbcSqlServer
           properties:
-            url:
-            username:
-            password:
+            url: jdbc:sqlserver://192.168.1.49:1433;databaseName=Test4Java
+            username: test
+            password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-SqlServer数据库2012及以上版本
         sqlserver2012:
           enable: true

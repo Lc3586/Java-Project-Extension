@@ -22,9 +22,9 @@ import java.util.Date;
 @JSONType(ignores = "serialVersionUID")
 public class CommonQuickInput {
     /**
-     * 快捷输入Id
+     * 主键
      */
-    @OpenApiDescription("个人文件Id")
+    @OpenApiDescription("主键")
     @OpenApiSubTag({"OptionList",
                     "Create"})
     @ColumnSetting(primaryKey = true,
@@ -37,6 +37,7 @@ public class CommonQuickInput {
     @OpenApiDescription("分类")
     @OpenApiSubTag({"OptionList",
                     "Create"})
+    @ColumnSetting(length = 50)
     private String category;
 
     /**
@@ -45,6 +46,7 @@ public class CommonQuickInput {
     @OpenApiDescription("关键词")
     @OpenApiSubTag({"OptionList",
                     "Create"})
+    @ColumnSetting(length = 200)
     private String keyword;
 
     /**
@@ -53,6 +55,8 @@ public class CommonQuickInput {
     @OpenApiDescription("内容")
     @OpenApiSubTag({"OptionList",
                     "Create"})
+    @ColumnSetting(length = -1,
+                   isNullable = false)
     private String content;
 
     /**
@@ -61,7 +65,8 @@ public class CommonQuickInput {
     @OpenApiDescription("公用")
     @OpenApiSubTag({"List",
                     "Create"})
-    @ColumnSetting("PUBLIC")
+    @ColumnSetting(alias = "public",
+                   isNullable = false)
     private Boolean public_;
 
     /**
@@ -69,6 +74,7 @@ public class CommonQuickInput {
      */
     @OpenApiDescription("创建者")
     @OpenApiSubTag({"List"})
+    @ColumnSetting(length = 50)
     private String createBy;
 
     /**

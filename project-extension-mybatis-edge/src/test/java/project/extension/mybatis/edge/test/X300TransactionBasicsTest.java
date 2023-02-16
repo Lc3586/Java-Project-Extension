@@ -1,12 +1,15 @@
 package project.extension.mybatis.edge.test;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.common.ExceptionExtension;
 import project.extension.mybatis.edge.common.OrmExtension;
-import project.extension.mybatis.edge.common.OrmInjection;
+import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
@@ -14,6 +17,9 @@ import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.standard.exception.BusinessException;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 300.基础事务测试
@@ -27,6 +33,35 @@ import project.extension.tuple.Tuple2;
 //@SpringBootTest(classes = SpringBootTestApplication.class)
 public class X300TransactionBasicsTest {
     /**
+     * 全部数据源
+     */
+    private static final Map<String, String> dataSourceMap = new HashMap<>();
+
+    /**
+     * 多数据源测试
+     *
+     * @return 数据源
+     */
+    private static String[] multiDataSourceTest() {
+        dataSourceMap.put("MySQL 8.0",
+                          "mysql");
+        dataSourceMap.put("MariaDB 10.10",
+                          "mariadb");
+        dataSourceMap.put("SqlServer 2012 降级处理",
+                          "sqlserver");
+        dataSourceMap.put("SqlServer 2012",
+                          "sqlserver2012");
+        dataSourceMap.put("达梦 8",
+                          "dameng");
+        dataSourceMap.put("Oracle 19c",
+                          "oracle");
+        dataSourceMap.put("PostgreSQL 15",
+                          "postgresql");
+        return dataSourceMap.keySet()
+                            .toArray(new String[0]);
+    }
+
+    /**
      * 临时数据
      */
     private static CommonQuickInput tempData;
@@ -36,7 +71,7 @@ public class X300TransactionBasicsTest {
      */
     @BeforeEach
     public void injection() {
-        OrmInjection.injection();
+        OrmObjectResolve.injection();
     }
 
     /**
@@ -56,13 +91,18 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试编程式事务提交操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("300.测试编程式事务提交操作")
     @Order(300)
-    public void _300()
+    public void _300(String name)
             throws
             Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -71,10 +111,10 @@ public class X300TransactionBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        Tuple2<Boolean, Exception> tranCreate = OrmInjection.masterNaiveSql.transaction(() -> {
-            int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                                dataCreate)
-                                                        .executeAffrows();
+        Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
+            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+                                             dataCreate)
+                                     .executeAffrows();
 
             Assertions.assertEquals(1,
                                     rowsCreate,
@@ -90,11 +130,11 @@ public class X300TransactionBasicsTest {
 
         System.out.println("\r\n事务已提交");
 
-        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        dataCreate.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
+                                                   .where(x -> x.and(CQI_Fields.id,
+                                                                     FilterCompare.Eq,
+                                                                     dataCreate.getId()))
+                                                   .first();
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
@@ -107,11 +147,16 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试编程式事务回滚操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("301.测试编程式事务回滚操作")
     @Order(301)
-    public void _301() {
+    public void _301(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -120,10 +165,10 @@ public class X300TransactionBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        Tuple2<Boolean, Exception> tranCreate = OrmInjection.masterNaiveSql.transaction(() -> {
-            int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                                dataCreate)
-                                                        .executeAffrows();
+        Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
+            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+                                             dataCreate)
+                                     .executeAffrows();
 
             Assertions.assertEquals(1,
                                     rowsCreate,
@@ -142,11 +187,11 @@ public class X300TransactionBasicsTest {
 
         System.out.println("\r\n事务已回滚");
 
-        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        dataCreate.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
+                                                   .where(x -> x.and(CQI_Fields.id,
+                                                                     FilterCompare.Eq,
+                                                                     dataCreate.getId()))
+                                                   .first();
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
@@ -156,13 +201,17 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试编程式事务嵌套提交操作
-     *
      * <p>应抛出异常并回滚事务</p>
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("310.测试编程式事务嵌套提交操作")
     @Order(310)
-    public void _310() {
+    public void _310(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate1 = entityExtension.initialization(new CommonQuickInput());
@@ -177,10 +226,10 @@ public class X300TransactionBasicsTest {
         dataCreate2.setKeyword("测试关键字2");
         dataCreate2.setPublic_(true);
 
-        Tuple2<Boolean, Exception> tranCreate1 = OrmInjection.masterNaiveSql.transaction(() -> {
-            int rowsCreate1 = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                                 dataCreate1)
-                                                         .executeAffrows();
+        Tuple2<Boolean, Exception> tranCreate1 = naiveSql.transaction(() -> {
+            int rowsCreate1 = naiveSql.insert(CommonQuickInput.class,
+                                              dataCreate1)
+                                      .executeAffrows();
 
             Assertions.assertEquals(1,
                                     rowsCreate1,
@@ -189,10 +238,10 @@ public class X300TransactionBasicsTest {
             System.out.printf("\r\n已新增数据1，Id：%s\r\n",
                               dataCreate1.getId());
 
-            Tuple2<Boolean, Exception> tranCreate2 = OrmInjection.masterNaiveSql.transaction(() -> {
-                int rowsCreate2 = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                                     dataCreate2)
-                                                             .executeAffrows();
+            Tuple2<Boolean, Exception> tranCreate2 = naiveSql.transaction(() -> {
+                int rowsCreate2 = naiveSql.insert(CommonQuickInput.class,
+                                                  dataCreate2)
+                                          .executeAffrows();
 
                 Assertions.assertEquals(1,
                                         rowsCreate2,
@@ -220,20 +269,20 @@ public class X300TransactionBasicsTest {
 
         System.out.println("\r\n事务1已回滚");
 
-        CommonQuickInput dataCheckCreate1 = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                       .where(x -> x.and(CQI_Fields.id,
-                                                                                         FilterCompare.Eq,
-                                                                                         dataCreate1.getId()))
-                                                                       .first();
+        CommonQuickInput dataCheckCreate1 = naiveSql.select(CommonQuickInput.class)
+                                                    .where(x -> x.and(CQI_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataCreate1.getId()))
+                                                    .first();
 
         Assertions.assertNull(dataCheckCreate1,
                               "事务回滚后依然能查询到新增的数据1");
 
-        CommonQuickInput dataCheckCreate2 = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                       .where(x -> x.and(CQI_Fields.id,
-                                                                                         FilterCompare.Eq,
-                                                                                         dataCreate2.getId()))
-                                                                       .first();
+        CommonQuickInput dataCheckCreate2 = naiveSql.select(CommonQuickInput.class)
+                                                    .where(x -> x.and(CQI_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataCreate2.getId()))
+                                                    .first();
 
         Assertions.assertNull(dataCheckCreate2,
                               "事务回滚后依然能查询到新增的数据2");
@@ -243,13 +292,18 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试声明式事务提交操作（提交）
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Commit
     @DisplayName("320.测试声明式事务提交操作（提交）")
     @Order(320)
-    public void _320() {
+    public void _320(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -258,9 +312,9 @@ public class X300TransactionBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                            dataCreate)
-                                                    .executeAffrows();
+        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+                                         dataCreate)
+                                 .executeAffrows();
 
         Assertions.assertEquals(1,
                                 rowsCreate,
@@ -274,21 +328,26 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试声明式事务提交操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("321.测试声明式事务提交操作")
     @Order(321)
-    public void _321()
+    public void _321(String name)
             throws
             Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         Assertions.assertNotNull(tempData,
                                  "未记录新增的数据");
 
-        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        tempData.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
+                                                   .where(x -> x.and(CQI_Fields.id,
+                                                                     FilterCompare.Eq,
+                                                                     tempData.getId()))
+                                                   .first();
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
@@ -304,13 +363,18 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试声明式事务回滚操作（回滚）
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Rollback
     @DisplayName("322.测试声明式事务回滚操作（回滚）")
     @Order(322)
-    public void _322() {
+    public void _322(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -319,9 +383,9 @@ public class X300TransactionBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                            dataCreate)
-                                                    .executeAffrows();
+        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+                                         dataCreate)
+                                 .executeAffrows();
 
         Assertions.assertEquals(1,
                                 rowsCreate,
@@ -335,19 +399,24 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试声明式事务回滚操作
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @DisplayName("323.测试声明式事务回滚操作")
     @Order(323)
-    public void _323() {
+    public void _323(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         Assertions.assertNotNull(tempData,
                                  "未记录新增的数据");
 
-        CommonQuickInput dataCheckCreate = OrmInjection.masterNaiveSql.select(CommonQuickInput.class)
-                                                                      .where(x -> x.and(CQI_Fields.id,
-                                                                                        FilterCompare.Eq,
-                                                                                        tempData.getId()))
-                                                                      .first();
+        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
+                                                   .where(x -> x.and(CQI_Fields.id,
+                                                                     FilterCompare.Eq,
+                                                                     tempData.getId()))
+                                                   .first();
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
@@ -360,15 +429,19 @@ public class X300TransactionBasicsTest {
 
     /**
      * 测试声明式事务嵌套编程式事务提交操作
-     *
      * <p>应抛出异常并回滚事务</p>
+     *
+     * @param name 名称
      */
-    @Test
+    @ParameterizedTest
+    @MethodSource("multiDataSourceTest")
     @Transactional
     @Commit
     @DisplayName("330.测试声明式事务嵌套编程式事务提交操作")
     @Order(330)
-    public void _330() {
+    public void _330(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(dataSourceMap.get(name));
+
         EntityExtension entityExtension = new EntityExtension(null);
 
         CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
@@ -377,10 +450,10 @@ public class X300TransactionBasicsTest {
         dataCreate.setKeyword("测试关键字");
         dataCreate.setPublic_(true);
 
-        Tuple2<Boolean, Exception> tranCreate = OrmInjection.masterNaiveSql.transaction(() -> {
-            int rowsCreate = OrmInjection.masterNaiveSql.insert(CommonQuickInput.class,
-                                                                dataCreate)
-                                                        .executeAffrows();
+        Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
+            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+                                             dataCreate)
+                                     .executeAffrows();
 
             Assertions.assertEquals(1,
                                     rowsCreate,

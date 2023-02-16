@@ -302,16 +302,29 @@ public class NaiveDataSourceProvider
     }
 
     @Override
-    public List<String> allDataSources() {
-        return this.baseConfig.getAllDataSource();
+    public boolean isExists(String dataSource) {
+        return this.baseConfig.getMultiDataSource()
+                              .containsKey(dataSource);
     }
 
     @Override
-    public Map<String, DataSource> loadAllDataSources()
+    public boolean isEnable(String dataSource) {
+        return this.baseConfig.getMultiDataSource()
+                              .get(dataSource)
+                              .isEnable();
+    }
+
+    @Override
+    public List<String> allDataSources(boolean enabledOnly) {
+        return this.baseConfig.getAllDataSource(enabledOnly);
+    }
+
+    @Override
+    public Map<String, DataSource> loadAllDataSources(boolean enabledOnly)
             throws
             ModuleException {
         if (dataSourceMap.size() == 0) {
-            for (String dataSource : baseConfig.getAllDataSource()) {
+            for (String dataSource : baseConfig.getAllDataSource(enabledOnly)) {
                 loadAndRegisterDataSource(dataSource);
             }
         }
@@ -321,7 +334,7 @@ public class NaiveDataSourceProvider
 
     @Override
     public DataSource getDataSources(String dataSource) {
-        return loadAllDataSources().get(dataSource);
+        return loadAllDataSources(false).get(dataSource);
     }
 
     @Override

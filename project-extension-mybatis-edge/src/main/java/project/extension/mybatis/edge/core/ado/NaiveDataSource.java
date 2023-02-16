@@ -19,7 +19,7 @@ import java.util.Map;
 public class NaiveDataSource
         extends AbstractRoutingDataSource {
     public NaiveDataSource(INaiveDataSourceProvider naiveDataSourceProvider) {
-        Map<String, DataSource> dataSourceMap = naiveDataSourceProvider.loadAllDataSources();
+        Map<String, DataSource> dataSourceMap = naiveDataSourceProvider.loadAllDataSources(true);
         super.setTargetDataSources(new HashMap<>(dataSourceMap));
         this.dataSource = naiveDataSourceProvider.defaultDataSource();
         super.setDefaultTargetDataSource(dataSourceMap.get(this.dataSource));

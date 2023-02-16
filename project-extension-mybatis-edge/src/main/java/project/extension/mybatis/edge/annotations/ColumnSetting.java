@@ -15,16 +15,23 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD})
 public @interface ColumnSetting {
     /**
-     * 列名
-     * <p>此值不受配置中的命名规则影响</p>
+     * 列的别名
+     * <p>如果同时设置了finalName，则最后使用的将会是finalName</p>
      */
-    @AliasFor("name") String value() default "";
+    @AliasFor("alias") String value() default "";
 
     /**
-     * 列名
-     * <p>此值不受配置中的命名规则影响</p>
+     * 列的别名
+     * <p>如果同时设置了finalName，则最后使用的将会是finalName</p>
      */
-    @AliasFor("value") String name() default "";
+    @AliasFor("value") String alias() default "";
+
+    /**
+     * 指定列名
+     * <p>此值不受配置中的命名规则影响</p>
+     * <p>优先级高于别名</p>
+     */
+    String finalName() default "";
 
     /**
      * 主键
@@ -57,5 +64,5 @@ public @interface ColumnSetting {
     /**
      * 可为空
      */
-    boolean isNullable() default false;
+    boolean isNullable() default true;
 }
