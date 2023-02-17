@@ -21,7 +21,7 @@ project:
           # 启用
           enable: true
           # 数据库类型
-          dbType: JdbcMySql
+          dbType: JdbcMySql8
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
@@ -33,7 +33,7 @@ project:
         #主库-Mariadb数据库
         mariadb:
           enable: true
-          dbType: JdbcMySql
+          dbType: JdbcMariaDB10
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             url: jdbc:mysql://192.168.1.49:3306/test4java?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
@@ -44,7 +44,7 @@ project:
           enable: true
           dbType: JdbcSqlServer
           properties:
-            url: jdbc:sqlserver://192.168.1.49:1433;databaseName=Test4Java
+            url: jdbc:sqlserver://192.168.1.49:1433;databaseName=Test4Java;trustServerCertificate=true;
             username: test
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-SqlServer数据库2012及以上版本
@@ -52,22 +52,22 @@ project:
           enable: true
           dbType: JdbcSqlServer_2012_plus
           properties:
-            url: jdbc:sqlserver://192.168.1.49:1433;databaseName=Test4Java
+            url: jdbc:sqlserver://192.168.1.49:1433;databaseName=Test4Java;trustServerCertificate=true;
             username: test
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-达梦数据库
         dameng:
           enable: true
-          dbType: JdbcDameng
+          dbType: JdbcDameng8
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:
-            url: jdbc:dm://192.168.1.49:5236/TEST4JAVA?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+            url: jdbc:dm://192.168.1.49:5236/TEST4JAVA
             username: TEST4JAVA
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-Oracle数据库
         oracle:
-          enable: true
-          dbType: JdbcOracle
+          enable: false
+          dbType: JdbcOracle19c
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:
             url: jdbc:oracle:thin:@//192.168.1.49:1521/ORCLPDB
@@ -75,8 +75,8 @@ project:
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-PostgreSQL数据库
         postgresql:
-          enable: true
-          dbType: JdbcPostgreSQL
+          enable: false
+          dbType: JdbcPostgreSQL15
           properties:
             url: jdbc:postgresql://192.168.1.49:5432/test
             username: test4java

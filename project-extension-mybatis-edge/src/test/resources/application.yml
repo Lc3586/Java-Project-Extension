@@ -11,7 +11,9 @@ spring:
     # 切换Druid数据源
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
-      max-active: 10
+      initial-size: 2
+      max-active: 5
+      minIdle: 1
       webStatFilter:
         enabled: true
       statViewServlet:

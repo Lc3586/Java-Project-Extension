@@ -86,6 +86,10 @@ public class OrmObjectResolve {
      * @param dataSource 数据源
      */
     public static INaiveSql getOrm(String dataSource) {
+        Assertions.assertTrue(OrmObjectResolve.naiveDataSourceProvider.isExists(dataSource),
+                              String.format("%s数据源不存在",
+                                            dataSource));
+
         Assertions.assertTrue(OrmObjectResolve.naiveDataSourceProvider.isEnable(dataSource),
                               String.format("%s数据源未启用",
                                             dataSource));

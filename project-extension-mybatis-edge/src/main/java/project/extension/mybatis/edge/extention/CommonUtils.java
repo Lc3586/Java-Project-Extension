@@ -1,8 +1,7 @@
 package project.extension.mybatis.edge.extention;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
-import dm.jdbc.driver.DmDriver;
-import oracle.jdbc.driver.OracleDriver;
+import oracle.jdbc.OracleDriver;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.globalization.Strings;
@@ -10,8 +9,6 @@ import project.extension.mybatis.edge.model.DbType;
 import project.extension.standard.exception.ModuleException;
 
 import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * 通用工具类
@@ -41,16 +38,20 @@ public class CommonUtils {
             throws
             ModuleException {
         switch (dbType) {
-            case JdbcMySql:
+            case JdbcMySql8:
                 return com.alibaba.druid.DbType.mysql;
+            case JdbcMariaDB10:
+                return com.alibaba.druid.DbType.mariadb;
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
                 return com.alibaba.druid.DbType.sqlserver;
-            case JdbcOracle:
+            case JdbcOracle19c:
                 return com.alibaba.druid.DbType.oracle;
-            case JdbcDameng:
+            case JdbcDameng6:
+            case JdbcDameng7:
+            case JdbcDameng8:
                 return com.alibaba.druid.DbType.dm;
-            case JdbcPostgreSQL:
+            case JdbcPostgreSQL15:
                 return com.alibaba.druid.DbType.postgresql;
             default:
                 return com.alibaba.druid.DbType.other;
@@ -67,27 +68,31 @@ public class CommonUtils {
             throws
             ModuleException {
         switch (dbType) {
-            case JdbcMySql:
+            case JdbcMySql8:
                 try {
-                    return new com.mysql.cj.jdbc.Driver();
+                    return new com.mysql.jdbc.Driver();
                 } catch (Exception ex) {
-                    throw new ModuleException(Strings.getCreateInstanceFailed("com.mysql.cj.jdbc.Driver"),
+                    throw new ModuleException(Strings.getCreateInstanceFailed("com.mysql.jdbc.Driver"),
+                                              ex);
+                }
+            case JdbcMariaDB10:
+                try {
+                    return new org.mariadb.jdbc.Driver();
+                } catch (Exception ex) {
+                    throw new ModuleException(Strings.getCreateInstanceFailed("org.mariadb.jdbc.Driver"),
                                               ex);
                 }
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
                 return new SQLServerDriver();
-            case JdbcOracle:
+            case JdbcOracle19c:
                 return new OracleDriver();
-            case JdbcDameng:
-                Driver driver = DmDriver.driver;
-                try {
-                    DriverManager.registerDriver(driver);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-                return driver;
-            case JdbcPostgreSQL:
+            case JdbcDameng6:
+                return new dm6.jdbc.driver.DmDriver();
+            case JdbcDameng7:
+            case JdbcDameng8:
+                return new dm.jdbc.driver.DmDriver();
+            case JdbcPostgreSQL15:
                 return new org.postgresql.Driver();
             default:
                 throw new ModuleException(Strings.getUnsupportedDbType(dbType.toString()));

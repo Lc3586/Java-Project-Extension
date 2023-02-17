@@ -19,9 +19,12 @@ public class DbProvider {
             throws
             ModuleException {
         switch (config.getDbType()) {
-            case JdbcMySql:
+            case JdbcMySql8:
+            case JdbcMariaDB10:
                 return new MySqlProvider(config);
-            case JdbcDameng:
+            case JdbcDameng6:
+            case JdbcDameng7:
+            case JdbcDameng8:
                 return new DamengProvider(config);
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:

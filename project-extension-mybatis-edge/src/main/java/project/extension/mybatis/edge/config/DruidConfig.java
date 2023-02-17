@@ -248,8 +248,10 @@ public class DruidConfig {
             datasource.setValidationQuery(this.getValidationQuery());
         else {
             switch (dbType) {
-                case JdbcOracle:
-                case JdbcDameng:
+                case JdbcOracle19c:
+                case JdbcDameng6:
+                case JdbcDameng7:
+                case JdbcDameng8:
                     datasource.setValidationQuery("select * from dual");
                     break;
                 default:

@@ -18,42 +18,42 @@ public class TestCollectionFor1xTo5x {
     @Nested
     @Order(100)
     @DisplayName("100.数据库连接测试")
-    public class ForX100ConnectBasicsTest
-            extends X100ConnectBasicsTest {
+    public class ForX100BasicsOfConnectTest
+            extends X100BasicsOfConnectTest {
     }
 
     @Nested
     @Order(200)
     @DisplayName("200.基础增删改查测试")
-    public class ForX200CurdBasicsTest
-            extends X200CurdBasicsTest {
+    public class ForX200BasicsOfCurdTest
+            extends X200BasicsOfCurdTest {
     }
 
     @Nested
     @Order(210)
     @DisplayName("210.Mapper增删改查测试")
-    public class ForX210CurdMapperTest
-            extends X210CurdMapperTest {
+    public class ForX210MapperOfCurdTest
+            extends X210MapperOfCurdTest {
     }
 
     @Nested
     @Order(300)
     @DisplayName("300.基础事务测试")
-    public class ForX300TransactionBasicsTest
-            extends X300TransactionBasicsTest {
+    public class ForX300BasicsOfTransactionTest
+            extends X300BasicsOfTransactionTest {
     }
 
     @Nested
     @Order(400)
     @DisplayName("400.基础Repository增删改查测试")
-    public class ForX400CurdRepositoryBasicsTest
-            extends X400CurdRepositoryBasicsTest {
+    public class ForX400BasicsOfRepositoryCurdTest
+            extends X400BasicsOfRepositoryCurdTest {
     }
 
     @Nested
     @Order(500)
     @DisplayName("500.基础Repository事务测试")
-    public class ForX500TransactionRepositoryBasicsTest
-            extends X500TransactionRepositoryBasicsTest {
+    public class ForX500BasicsOfRepositoryTransactionTest
+            extends X500BasicsOfRepositoryTransactionTest {
     }
 }

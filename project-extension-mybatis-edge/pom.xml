@@ -122,8 +122,8 @@
         <!-- SqlServer驱动 -->
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>4.0</version>
+            <artifactId>mssql-jdbc</artifactId>
+            <version>10.2.0.jre8</version>
         </dependency>
 
         <!-- MySql驱动 -->
@@ -133,28 +133,50 @@
             <version>8.0.30</version>
         </dependency>
 
-        <!-- 达梦数据库驱动 -->
+        <!-- MariaDB驱动 -->
         <dependency>
-            <groupId>com.dameng</groupId>
-            <artifactId>DmJdbcDriver18</artifactId>
-            <version>8.1.2.141</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>3.1.2</version>
         </dependency>
 
-        <!-- Oracle驱动 -->
-        <!--    在项目根目录下执行此命令将ojdbc14.jar安装到本地仓库
-                mvn install:install-file -Dfile="project-extension-mybatis-edge\src\main\resources\ojdbc14-10.2.0.4.0\ojdbc14.jar" -DgroupId=com.oracle -DartifactId=ojdbc14 -Dversion="10.2.0.4.0" -Dpackaging=jar
-                接着将project-extension-common\src\main\resources\jacob-1.20目录下的jacob01.20.dll文件放至jdk\bin和jre\bin目录中-->
+        <!-- 达梦8驱动
+             此驱动也可以连接dm7服务，但是最好使用dm7的驱动-->
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>10.2.0.4.0</version>
+            <groupId>com.dameng</groupId>
+            <artifactId>Dm8JdbcDriver18</artifactId>
+            <version>8.1.1.49</version>
+        </dependency>
+        <!--        &lt;!&ndash; 达梦7驱动 &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.dameng</groupId>-->
+        <!--            <artifactId>Dm7JdbcDriver18</artifactId>-->
+        <!--            <version>7.6.0.165</version>-->
+        <!--        </dependency>-->
+        <!-- 达梦6驱动 -->
+        <dependency>
+            <groupId>com.github.tianjing</groupId>
+            <artifactId>Dm6JdbcDriver</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- Oracle需要将project-extension-mybatis-edge\lib目录下的jacob-1.20-x64.dll文件放至jdk\bin和jre\bin目录中 -->
+        <!-- Oracle 19c驱动
+                支持以下数据库：21c, 19c, 18c, and 12.2
+                在项目根目录下执行此命令将ojdbc8-19.18.0.0.jar安装到本地仓库
+                mvn install:install-file -Dfile="project-extension-mybatis-edge\lib\ojdbc8 for 19c(19.18.0.0)  with JDK8 and JDK 11\ojdbc8-19.18.0.0.jar" -DgroupId=com.oracle.database.jdbc -DartifactId=ojdbc8 -Dversion="19.18.0.0" -Dpackaging=jar
+        -->
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.18.0.0</version>
         </dependency>
 
         <!-- PostgreSQL驱动 -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.1</version>
+            <version>LATEST</version>
         </dependency>
 
         <!-- 测试工具 -->

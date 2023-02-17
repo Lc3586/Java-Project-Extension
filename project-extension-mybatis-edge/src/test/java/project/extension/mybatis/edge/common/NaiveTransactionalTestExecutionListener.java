@@ -6,7 +6,7 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.PlatformTransactionManager;
 import project.extension.mybatis.edge.annotations.NaiveDataSource;
-import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
+import project.extension.mybatis.edge.config.TestDataSourceConfig;
 import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
 
 import java.lang.reflect.Method;
@@ -27,6 +27,17 @@ public class NaiveTransactionalTestExecutionListener
                                                                @Nullable
                                                                        String qualifier) {
         Method testMethod = testContext.getTestMethod();
+
+        //TODO 当前方法无法确认在创建事务前使用的是哪个数据源
+        String name = TempDataExtension.getThreadTransaction(Thread.currentThread()
+                                                                   .getId());
+
+        if (name != null) {
+            String dataSource = TestDataSourceConfig.getTestDataSource(name);
+            return super.getTransactionManager(testContext,
+                                               NaiveDataSourceProvider.getTransactionManagerBeanName(dataSource));
+        }
+
         NaiveDataSource naiveDataSource = AnnotationUtils.getAnnotation(testMethod,
                                                                         NaiveDataSource.class);
         if (naiveDataSource == null) {
