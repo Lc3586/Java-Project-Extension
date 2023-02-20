@@ -1,7 +1,6 @@
-package project.extension.mybatis.edge.config;
+package project.extension.mybatis.edge.configure;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * 测试数据源配置
@@ -9,16 +8,13 @@ import java.util.Map;
  * @author LCTR
  * @date 2023-02-17
  */
-public class TestDataSourceConfig {
+public class TestDataSourceConfigure {
     /**
      * 全部的测试数据源
      */
-    private static final Map<String, String> multiDataSourceTestMap = new HashMap<>();
+    private static final LinkedHashMap<String, String> multiDataSourceTestMap = new LinkedHashMap<>();
 
-    /**
-     * 获取全部用于测试的数据源名称集合
-     */
-    public static String[] getMultiTestDataSourceName() {
+    static {
         multiDataSourceTestMap.put("MySQL 8.0",
                                    "mysql");
         multiDataSourceTestMap.put("MariaDB 10.10",
@@ -33,6 +29,12 @@ public class TestDataSourceConfig {
 //                                   "oracle");
 //        multiDataSourceTestMap.put("PostgreSQL 15",
 //                                   "postgresql");
+    }
+
+    /**
+     * 获取全部用于测试的数据源名称集合
+     */
+    public static String[] getMultiTestDataSourceName() {
         return multiDataSourceTestMap.keySet()
                                      .toArray(new String[0]);
     }

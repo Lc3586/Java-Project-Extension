@@ -6,10 +6,13 @@ import org.springframework.test.context.TestContext;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.PlatformTransactionManager;
 import project.extension.mybatis.edge.annotations.NaiveDataSource;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 监听测试方法的事务
@@ -19,6 +22,17 @@ import java.lang.reflect.Method;
  */
 public class NaiveTransactionalTestExecutionListener
         extends TransactionalTestExecutionListener {
+    private static final String[] names;
+
+    static {
+        names = TestDataSourceConfigure.getMultiTestDataSourceName();
+    }
+
+    /**
+     * 方法所接受的数据源
+     */
+    public static final ConcurrentHashMap<String, List<String>> testName4Method = new ConcurrentHashMap<>();
+
     /**
      * 获取事务管理器
      */
@@ -27,16 +41,6 @@ public class NaiveTransactionalTestExecutionListener
                                                                @Nullable
                                                                        String qualifier) {
         Method testMethod = testContext.getTestMethod();
-
-        //TODO 当前方法无法确认在创建事务前使用的是哪个数据源
-        String name = TempDataExtension.getThreadTransaction(Thread.currentThread()
-                                                                   .getId());
-
-        if (name != null) {
-            String dataSource = TestDataSourceConfig.getTestDataSource(name);
-            return super.getTransactionManager(testContext,
-                                               NaiveDataSourceProvider.getTransactionManagerBeanName(dataSource));
-        }
 
         NaiveDataSource naiveDataSource = AnnotationUtils.getAnnotation(testMethod,
                                                                         NaiveDataSource.class);
@@ -49,6 +53,32 @@ public class NaiveTransactionalTestExecutionListener
         if (naiveDataSource != null)
             return super.getTransactionManager(testContext,
                                                NaiveDataSourceProvider.getTransactionManagerBeanName(naiveDataSource.dataSource()));
+
+        String key = testContext.getTestClass()
+                                .getName() + testMethod.getName();
+
+        if (!testName4Method.containsKey(key))
+            testName4Method.put(key,
+                                new ArrayList<>());
+
+        List<String> nameList = testName4Method.get(key);
+        for (int i = 0; i < names.length; i++) {
+            if (nameList.contains(names[i])) {
+                if (i == names.length - 1) {
+                    nameList.clear();
+                    nameList.add(names[0]);
+                }
+            } else {
+                nameList.add(names[i]);
+                break;
+            }
+        }
+
+        if (nameList.size() > 0) {
+            String dataSource = TestDataSourceConfigure.getTestDataSource(nameList.get(nameList.size() - 1));
+            return super.getTransactionManager(testContext,
+                                               NaiveDataSourceProvider.getTransactionManagerBeanName(dataSource));
+        }
 
         return super.getTransactionManager(testContext,
                                            qualifier);

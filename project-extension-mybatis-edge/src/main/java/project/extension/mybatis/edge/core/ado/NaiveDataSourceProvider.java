@@ -2,6 +2,7 @@ package project.extension.mybatis.edge.core.ado;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -45,6 +46,7 @@ public class NaiveDataSourceProvider
                                    DruidConfig druidConfig) {
         this.baseConfig = baseConfig;
         this.druidConfig = druidConfig;
+        this.databaseIdProvider = IOCExtension.tryGetBean(DatabaseIdProvider.class);
     }
 
     /**
@@ -56,6 +58,8 @@ public class NaiveDataSourceProvider
      * 连接池配置
      */
     private final DruidConfig druidConfig;
+
+    private final DatabaseIdProvider databaseIdProvider;
 
     private final Map<String, DataSource> dataSourceMap = new HashMap<>();
 
@@ -160,6 +164,9 @@ public class NaiveDataSourceProvider
             //VFS.addImplClass(SpringBootVFS.class);
             SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
             sqlSessionFactoryBean.setDataSource(dataSource);
+            if (this.databaseIdProvider != null)
+                sqlSessionFactoryBean.setDatabaseIdProvider(this.databaseIdProvider);
+
             try {
                 sqlSessionFactoryBean.setConfigLocation(ScanExtension.getResource(CommonUtils.getConfig()
                                                                                              .getConfigLocation()));

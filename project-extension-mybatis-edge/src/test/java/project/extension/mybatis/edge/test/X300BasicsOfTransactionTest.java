@@ -8,11 +8,8 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.transaction.annotation.Transactional;
 import project.extension.mybatis.edge.INaiveSql;
-import project.extension.mybatis.edge.common.ExceptionExtension;
-import project.extension.mybatis.edge.common.NaiveTransactionalTestExecutionListener;
-import project.extension.mybatis.edge.common.TempDataExtension;
-import project.extension.mybatis.edge.common.OrmObjectResolve;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.common.*;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
@@ -54,11 +51,11 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("300.测试编程式事务提交操作")
     @Order(300)
     public void _300(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -114,11 +111,11 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("301.测试编程式事务回滚操作")
     @Order(301)
     public void _301(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -178,11 +175,11 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("310.测试编程式事务嵌套提交操作")
     @Order(310)
     public void _310(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -286,17 +283,13 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @Transactional
     @Commit
     @DisplayName("320.测试声明式事务提交操作（提交）")
     @Order(320)
     public void _320(String name) {
-        TempDataExtension.putThreadTransaction(Thread.currentThread()
-                                                     .getId(),
-                                               name);
-
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -329,11 +322,11 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("321.测试声明式事务提交操作")
     @Order(321)
     public void _321(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,
                                                                    CommonQuickInput.class);
@@ -361,17 +354,13 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @Transactional
     @Rollback
     @DisplayName("322.测试声明式事务回滚操作（回滚）")
     @Order(322)
     public void _322(String name) {
-        TempDataExtension.putThreadTransaction(Thread.currentThread()
-                                                     .getId(),
-                                               name);
-
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -404,11 +393,11 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("323.测试声明式事务回滚操作")
     @Order(323)
     public void _323(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,
                                                                    CommonQuickInput.class);
@@ -437,17 +426,13 @@ public class X300BasicsOfTransactionTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @Transactional
     @Commit
     @DisplayName("330.测试声明式事务嵌套编程式事务提交操作")
     @Order(330)
     public void _330(String name) {
-        TempDataExtension.putThreadTransaction(Thread.currentThread()
-                                                     .getId(),
-                                               name);
-
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 

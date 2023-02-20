@@ -4,7 +4,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 
 import java.util.List;
@@ -32,11 +32,11 @@ public class X100BasicsOfConnectTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("100.测试数据库连接是否正常")
     @Order(100)
     public void _100(String name) {
-        String dataSource = TestDataSourceConfig.getTestDataSource(name);
+        String dataSource = TestDataSourceConfigure.getTestDataSource(name);
 
         IDbFirst dbFirst = OrmObjectResolve.getDbFirst(dataSource);
 

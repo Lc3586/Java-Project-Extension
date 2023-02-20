@@ -4,51 +4,159 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="project.extension.mybatis.edge.mapper.ICommonQuickInputMapper">
-    <resultMap type="CommonQuickInput" id="CommonQuickInputResult">
-        <result property="id" column="id"/>
-        <result property="category" column="category"/>
-        <result property="keyword" column="keyword"/>
-        <result property="content" column="content"/>
-        <result property="public_" column="public"/>
-        <result property="createBy" column="create_by"/>
-        <result property="createTime" column="create_time"/>
+    <resultMap type="CommonQuickInput"
+               id="CommonQuickInputResult">
+        <result property="id"
+                column="id"/>
+        <result property="category"
+                column="category"/>
+        <result property="keyword"
+                column="keyword"/>
+        <result property="content"
+                column="content"/>
+        <result property="public_"
+                column="public"/>
+        <result property="createBy"
+                column="create_by"/>
+        <result property="createBy"
+                column="createBy"/>
+        <result property="createTime"
+                column="create_time"/>
+        <result property="createTime"
+                column="createTime"/>
     </resultMap>
+
+    <sql id="tableName">
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            `common_quick_input`
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            [CommonQuickInput]
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            "COMMON_QUICK_INPUT"
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            "CommonQuickInput"
+        </if>
+    </sql>
 
     <sql id="selectAll">
         select *
-        from `common_quick_input`
+        from <include refid="tableName"/>
         where 1 = 1
     </sql>
 
-    <select id="list" parameterType="CommonQuickInput"
+    <select id="list"
+            parameterType="CommonQuickInput"
             resultMap="CommonQuickInputResult">
         <include refid="selectAll"/>
         <if test="category != null and category != ''">
-            AND `category` = #{category}
+            AND
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `category`
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Category]
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "CATEGORY"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Category"
+            </if>
+            = #{category}
         </if>
         <if test="keyword != null and keyword != 0">
-            AND `keyword` = #{keyword}
+            AND
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `keyword`
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Keyword]
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "KEYWORD"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Keyword"
+            </if>
+            like '%#{keyword}%'
         </if>
         <if test="content != null and content != ''">
-            AND `content` like '%#{content}%'
+            AND
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `content`
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Content]
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "CONTENT"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Content"
+            </if>
+            like '%#{content}%'
         </if>
     </select>
 
     <select id="getById" parameterType="String" resultMap="CommonQuickInputResult">
         <include refid="selectAll"/>
-        AND `id` = #{id}
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            AND `id` = #{id}
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            AND [Id] = #{id}
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            AND "ID" = #{id}
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            AND "Id" = #{id}
+        </if>
     </select>
 
     <insert id="insert" parameterType="CommonQuickInput">
-        insert into `common_quick_input`
+        insert into
+        <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            `id`,
-            <if test="category != null">`category`,</if>
-            <if test="keyword != null">`keyword`,</if>
-            <if test="content != null">`content`,</if>
-            <if test="public_ != null">`public`,</if>
-            <if test="createBy != null">`create_by`,</if>
-            <if test="createTime != null">`create_time`,</if>
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `id`,
+                <if test="category != null">`category`,</if>
+                <if test="keyword != null">`keyword`,</if>
+                <if test="content != null">`content`,</if>
+                <if test="public_ != null">`public`,</if>
+                <if test="createBy != null">`create_by`,</if>
+                <if test="createTime != null">`create_time`,</if>
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Id],
+                <if test="category != null">[Category],</if>
+                <if test="keyword != null">[Keyword],</if>
+                <if test="content != null">[Content],</if>
+                <if test="public_ != null">[Public],</if>
+                <if test="createBy != null">[CreateBy],</if>
+                <if test="createTime != null">[CreateTime],</if>
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "ID",
+                <if test="category != null">"CATEGORY",</if>
+                <if test="keyword != null">"KEYWORD",</if>
+                <if test="content != null">"CONTENT",</if>
+                <if test="public_ != null">"PUBLIC",</if>
+                <if test="createBy != null">"CREATE_BY",</if>
+                <if test="createTime != null">"CREATE_TIME",</if>
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Id",
+                <if test="category != null">"Category",</if>
+                <if test="keyword != null">"Keyword",</if>
+                <if test="content != null">"Content",</if>
+                <if test="public_ != null">"Public",</if>
+                <if test="createBy != null">"CreateBy",</if>
+                <if test="createTime != null">"CreateTime",</if>
+            </if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -63,26 +171,89 @@
     </insert>
 
     <update id="update" parameterType="CommonQuickInput">
-        update `common_quick_input`
-        <trim prefix="SET" suffixOverrides=",">
-            <if test="category != null">`category`=#{category},</if>
-            <if test="keyword != null">`keyword`=#{keyword},</if>
-            <if test="content != null">`content`=#{content},</if>
-            <if test="public_ != null">`public`=#{public_},</if>
-            <if test="createBy != null">`create_by`=#{createBy},</if>
-            <if test="createTime != null">`create_time`=#{createTime},</if>
-        </trim>
-        where `id` = #{id}
+        update
+        <include refid="tableName"/>
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="category != null">`CATEGORY`=#{category},</if>
+                <if test="keyword != null">`keyword`=#{keyword},</if>
+                <if test="content != null">`content`=#{content},</if>
+                <if test="public_ != null">`public`=#{public_},</if>
+                <if test="createBy != null">`create_by`=#{createBy},</if>
+                <if test="createTime != null">`create_time`=#{createTime},</if>
+            </trim>
+            where `id` = #{id}
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="category != null">[Category]=#{category},</if>
+                <if test="keyword != null">[Keyword]=#{keyword},</if>
+                <if test="content != null">[Content]=#{content},</if>
+                <if test="public_ != null">[Public]=#{public_},</if>
+                <if test="createBy != null">[CreateBy]=#{createBy},</if>
+                <if test="createTime != null">[CreateTime]=#{createTime},</if>
+            </trim>
+            where [Id] = #{id}
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="category != null">"CATEGORY"=#{category},</if>
+                <if test="keyword != null">"KEYWORD"=#{keyword},</if>
+                <if test="content != null">"CONTENT"=#{content},</if>
+                <if test="public_ != null">"PUBLIC"=#{public_},</if>
+                <if test="createBy != null">"CREATE_BY"=#{createBy},</if>
+                <if test="createTime != null">"CREATE_TIME"=#{createTime},</if>
+            </trim>
+            where "ID" = #{id}
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            <trim prefix="SET" suffixOverrides=",">
+                <if test="category != null">"Category"=#{category},</if>
+                <if test="keyword != null">"Keyword"=#{keyword},</if>
+                <if test="content != null">"Content"=#{content},</if>
+                <if test="public_ != null">"Public"=#{public_},</if>
+                <if test="createBy != null">"CreateBy"=#{createBy},</if>
+                <if test="createTime != null">"CreateTime"=#{createTime},</if>
+            </trim>
+            where "Id" = #{id}
+        </if>
     </update>
 
     <delete id="deleteById" parameterType="String">
         delete
-        from `common_quick_input`
-        where `id` = #{id}
+        from <include refid="tableName"/>
+        where
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            `id` = #{id}
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            [Id] = #{id}
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            "ID" = #{id}
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            "Id" = #{id}
+        </if>
     </delete>
 
     <delete id="deleteByIds" parameterType="String">
-        delete from `common_quick_input` where `id` in
+        delete
+        from <include refid="tableName"/>
+        where
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            `id`
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            [Id]
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            "ID"
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            "Id"
+        </if>
+        in
         <foreach collection="array" item="ids" open="(" separator="," close=")">
             #{id}
         </foreach>

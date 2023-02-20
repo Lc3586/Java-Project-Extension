@@ -7,7 +7,7 @@ import project.extension.mybatis.edge.INaiveSql;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
@@ -44,13 +44,13 @@ public class X200BasicsOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("200.测试新增功能")
     @Order(200)
     public void _200(String name)
             throws
             Throwable {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -103,13 +103,13 @@ public class X200BasicsOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("201.测试更新功能")
     @Order(201)
     public void _201(String name)
             throws
             Throwable {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,
                                                                    CommonQuickInput.class);
@@ -167,11 +167,11 @@ public class X200BasicsOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("202.测试删除功能")
     @Order(202)
     public void _202(String name) {
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,
                                                                    CommonQuickInput.class);

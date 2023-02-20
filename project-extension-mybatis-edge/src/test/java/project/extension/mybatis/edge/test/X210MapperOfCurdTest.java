@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.entity.CommonQuickInput;
 import project.extension.mybatis.edge.entityFields.CQI_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
@@ -43,13 +43,13 @@ public class X210MapperOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("210.测试新增功能")
     @Order(210)
     public void _210(String name)
             throws
             Throwable {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfig.getTestDataSource(name),
+        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
                                                                     ICommonQuickInputMapper.class);
         EntityExtension entityExtension = new EntityExtension(null);
 
@@ -95,13 +95,13 @@ public class X210MapperOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("211.测试更新功能")
     @Order(211)
     public void _211(String name)
             throws
             Throwable {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfig.getTestDataSource(name),
+        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
                                                                     ICommonQuickInputMapper.class);
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,
@@ -153,11 +153,11 @@ public class X210MapperOfCurdTest {
      * @param name 名称
      */
     @ParameterizedTest
-    @MethodSource("project.extension.mybatis.edge.config.TestDataSourceConfig#getMultiTestDataSourceName")
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @DisplayName("212.测试删除功能")
     @Order(212)
     public void _212(String name) {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfig.getTestDataSource(name),
+        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
                                                                     ICommonQuickInputMapper.class);
 
         CommonQuickInput tempData = TempDataExtension.getFirstData(name,

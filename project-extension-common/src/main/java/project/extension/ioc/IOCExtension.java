@@ -21,4 +21,18 @@ public class IOCExtension {
      * 应用上下文
      */
     public static ApplicationContext applicationContext;
+
+    /**
+     * 尝试获取依赖
+     *
+     * @param requiredType 类型
+     * @param <T>          类型
+     */
+    public static <T> T tryGetBean(Class<T> requiredType) {
+        try {
+            return applicationContext.getBean(requiredType);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
 }

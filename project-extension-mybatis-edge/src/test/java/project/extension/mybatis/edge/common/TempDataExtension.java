@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.common;
 import org.junit.jupiter.api.Assertions;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.INaiveSql;
-import project.extension.mybatis.edge.config.TestDataSourceConfig;
+import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 
 import java.util.*;
 
@@ -158,7 +158,7 @@ public class TempDataExtension {
                               false,
                               key);
 
-        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
         int rowsDelete = naiveSql.delete(type,
                                          data)
@@ -180,7 +180,7 @@ public class TempDataExtension {
      * 清理全部数据
      */
     public static void clearUp() {
-        for (String name : TestDataSourceConfig.getMultiTestDataSourceName()) {
+        for (String name : TestDataSourceConfigure.getMultiTestDataSourceName()) {
             if (!tempData.containsKey(name))
                 return;
 
@@ -189,7 +189,7 @@ public class TempDataExtension {
             if (dataOfType.size() == 0)
                 return;
 
-            INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfig.getTestDataSource(name));
+            INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
             for (Class type : dataOfType.keySet()) {
                 Map<Object, Object> dataOfKey = dataOfType.get(type);
