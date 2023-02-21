@@ -2,9 +2,9 @@ package project.extension.mybatis.edge.core.provider;
 
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.mybatis.edge.core.provider.standard.IWhere;
-import project.extension.mybatis.edge.core.provider.standard.IWhereAction;
-import project.extension.mybatis.edge.core.provider.standard.IWhereSource;
+import project.extension.mybatis.edge.core.provider.standard.curd.IWhere;
+import project.extension.mybatis.edge.core.provider.standard.curd.IWhereAction;
+import project.extension.mybatis.edge.core.provider.standard.curd.IWhereSource;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.mybatis.edge.model.FilterGroupRelation;
 import project.extension.mybatis.edge.model.DynamicFilter;

@@ -13,7 +13,7 @@ project:
       # 需要扫描的存放Mapper配置类的包
       scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
       # 默认的实体类表明/列名命名规则
-      nameConvertType: None
+      nameConvertType: CamelCaseToPascalCase
       # 多数据源配置（单数据库时无需配置此项）
       multiDataSource:
         #主库-MySql数据库
@@ -21,7 +21,7 @@ project:
           # 启用
           enable: true
           # 数据库类型
-          dbType: JdbcMySql8
+          dbType: JdbcMySQL8
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
@@ -66,7 +66,7 @@ project:
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-Oracle数据库
         oracle:
-          enable: false
+          enable: true
           dbType: JdbcOracle19c
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:
@@ -75,7 +75,7 @@ project:
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-PostgreSQL数据库
         postgresql:
-          enable: false
+          enable: true
           dbType: JdbcPostgreSQL15
           properties:
             url: jdbc:postgresql://192.168.1.49:5432/test

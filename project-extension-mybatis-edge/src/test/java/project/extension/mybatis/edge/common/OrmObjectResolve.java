@@ -2,8 +2,8 @@ package project.extension.mybatis.edge.common;
 
 import org.junit.jupiter.api.Assertions;
 import project.extension.ioc.IOCExtension;
-import project.extension.mybatis.edge.IMultiNaiveSql;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.IMultiNaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.core.ado.NaiveDataSource;

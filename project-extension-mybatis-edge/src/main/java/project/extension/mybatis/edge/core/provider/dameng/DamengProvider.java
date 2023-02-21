@@ -2,7 +2,15 @@ package project.extension.mybatis.edge.core.provider.dameng;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.provider.dameng.curd.DamengDelete;
+import project.extension.mybatis.edge.core.provider.dameng.curd.DamengInsert;
+import project.extension.mybatis.edge.core.provider.dameng.curd.DamengSelect;
+import project.extension.mybatis.edge.core.provider.dameng.curd.DamengUpdate;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
+import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
+import project.extension.mybatis.edge.core.provider.standard.curd.IUpdate;
 
 /**
  * Dameng数据库对象构造器

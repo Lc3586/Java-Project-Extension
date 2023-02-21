@@ -2,7 +2,15 @@ package project.extension.mybatis.edge.core.provider.sqlserver;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.provider.sqlserver.curd.SqlServerDelete;
+import project.extension.mybatis.edge.core.provider.sqlserver.curd.SqlServerInsert;
+import project.extension.mybatis.edge.core.provider.sqlserver.curd.SqlServerSelect;
+import project.extension.mybatis.edge.core.provider.sqlserver.curd.SqlServerUpdate;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
+import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
+import project.extension.mybatis.edge.core.provider.standard.curd.IUpdate;
 
 /**
  * SqlServer数据库对象构造器

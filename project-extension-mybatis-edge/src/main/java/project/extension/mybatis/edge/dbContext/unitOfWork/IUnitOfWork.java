@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.dbContext.unitOfWork;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.transaction.TransactionStatus;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 
 import java.util.Map;
 

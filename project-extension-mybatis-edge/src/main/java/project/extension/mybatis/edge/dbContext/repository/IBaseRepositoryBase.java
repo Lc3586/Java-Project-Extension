@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.dbContext.repository;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import project.extension.action.IAction0;
 import project.extension.func.IFunc1;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
 import project.extension.tuple.Tuple2;
 

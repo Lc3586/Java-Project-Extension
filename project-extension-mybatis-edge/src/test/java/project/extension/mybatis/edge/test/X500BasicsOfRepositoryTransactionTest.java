@@ -7,7 +7,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.transaction.annotation.Transactional;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.common.ExceptionExtension;
 import project.extension.mybatis.edge.common.NaiveTransactionalTestExecutionListener;
 import project.extension.mybatis.edge.common.TempDataExtension;

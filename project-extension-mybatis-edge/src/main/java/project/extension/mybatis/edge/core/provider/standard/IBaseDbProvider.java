@@ -1,6 +1,10 @@
 package project.extension.mybatis.edge.core.provider.standard;
 
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
+import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
+import project.extension.mybatis.edge.core.provider.standard.curd.IUpdate;
 
 /**
  * 基础构造器

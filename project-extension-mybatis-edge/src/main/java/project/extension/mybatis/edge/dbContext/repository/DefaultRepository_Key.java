@@ -1,6 +1,6 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.standard.exception.ModuleException;
 
 /**

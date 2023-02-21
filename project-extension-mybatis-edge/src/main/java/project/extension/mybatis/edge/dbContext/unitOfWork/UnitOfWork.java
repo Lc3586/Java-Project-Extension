@@ -4,7 +4,7 @@ import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.util.StringUtils;
 import project.extension.ioc.IOCExtension;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.Operation;
 import project.extension.mybatis.edge.aop.TraceBeforeEventArgs;

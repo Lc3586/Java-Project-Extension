@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.test;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;

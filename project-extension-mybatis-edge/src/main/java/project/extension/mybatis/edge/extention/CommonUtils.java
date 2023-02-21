@@ -38,14 +38,17 @@ public class CommonUtils {
             throws
             ModuleException {
         switch (dbType) {
-            case JdbcMySql8:
+            case JdbcMySQL8:
                 return com.alibaba.druid.DbType.mysql;
             case JdbcMariaDB10:
                 return com.alibaba.druid.DbType.mariadb;
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
                 return com.alibaba.druid.DbType.sqlserver;
+            case JdbcOracle12c:
+            case JdbcOracle18c:
             case JdbcOracle19c:
+            case JdbcOracle21c:
                 return com.alibaba.druid.DbType.oracle;
             case JdbcDameng6:
             case JdbcDameng7:
@@ -68,7 +71,7 @@ public class CommonUtils {
             throws
             ModuleException {
         switch (dbType) {
-            case JdbcMySql8:
+            case JdbcMySQL8:
                 try {
                     return new com.mysql.jdbc.Driver();
                 } catch (Exception ex) {
@@ -85,7 +88,10 @@ public class CommonUtils {
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
                 return new SQLServerDriver();
+            case JdbcOracle12c:
+            case JdbcOracle18c:
             case JdbcOracle19c:
+            case JdbcOracle21c:
                 return new OracleDriver();
             case JdbcDameng6:
                 return new dm6.jdbc.driver.DmDriver();

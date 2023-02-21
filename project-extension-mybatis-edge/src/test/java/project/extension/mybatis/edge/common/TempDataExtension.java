@@ -2,7 +2,7 @@ package project.extension.mybatis.edge.common;
 
 import org.junit.jupiter.api.Assertions;
 import project.extension.collections.CollectionsExtension;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 
 import java.util.*;

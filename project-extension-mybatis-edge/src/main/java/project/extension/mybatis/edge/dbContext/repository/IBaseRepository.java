@@ -1,9 +1,9 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
-import project.extension.mybatis.edge.core.provider.standard.IDelete;
-import project.extension.mybatis.edge.core.provider.standard.IInsert;
-import project.extension.mybatis.edge.core.provider.standard.ISelect;
-import project.extension.mybatis.edge.core.provider.standard.IUpdate;
+import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
+import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
+import project.extension.mybatis.edge.core.provider.standard.curd.IUpdate;
 import project.extension.standard.exception.ModuleException;
 
 import java.util.Collection;

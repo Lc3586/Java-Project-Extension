@@ -69,10 +69,12 @@ public class SqlServerSqlProvider
             if (!StringUtils.hasText(orderBySql))
                 throw new ModuleException(Strings.getSqlServerRequireOrderBy4Paging());
 
-            String alias1 = getValueWithCharacter(String.format("t1_%s",
-                                                                UUID.randomUUID()));
-            String alias2 = getValueWithCharacter(String.format("t2_%s",
-                                                                UUID.randomUUID()));
+            String alias1 = getValueWithCharacter(String.format("T1_%s",
+                                                                UUID.randomUUID()
+                                                                    .getMostSignificantBits()));
+            String alias2 = getValueWithCharacter(String.format("T2_%s",
+                                                                UUID.randomUUID()
+                                                                    .getMostSignificantBits()));
 
             //重新设置别名
             orderBySql = orderBySql.replaceAll("\\[(.*?)]\\.",

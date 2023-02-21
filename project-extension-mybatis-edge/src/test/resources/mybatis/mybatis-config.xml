@@ -19,7 +19,6 @@
 
     <!-- 添加实体映射 -->
     <typeAliases>
-        <!--<package name="project.extension.mybatis.edge.entity.**"/>-->
-        <typeAlias type="project.extension.mybatis.edge.entity.CommonQuickInput" alias="CommonQuickInput"/>
+        <package name="project.extension.mybatis.edge.entity"/>
     </typeAliases>
 </configuration>

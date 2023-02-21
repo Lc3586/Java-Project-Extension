@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.core.provider;
 
-import project.extension.mybatis.edge.core.provider.standard.ISet;
-import project.extension.mybatis.edge.core.provider.standard.ISetAction;
-import project.extension.mybatis.edge.core.provider.standard.ISetSource;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISet;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISetAction;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISetSource;
 import project.extension.mybatis.edge.model.*;
 
 /**

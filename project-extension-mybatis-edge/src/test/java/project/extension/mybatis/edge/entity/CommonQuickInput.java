@@ -5,6 +5,7 @@ import com.alibaba.fastjson.annotation.JSONType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.apache.ibatis.type.Alias;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.TableSetting;
 import project.extension.openapi.annotations.OpenApiDescription;
@@ -20,6 +21,7 @@ import java.util.Date;
  */
 @TableSetting
 @JSONType(ignores = "serialVersionUID")
+@Alias("CommonQuickInput")
 public class CommonQuickInput {
     /**
      * 主键

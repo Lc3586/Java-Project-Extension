@@ -10,11 +10,11 @@ import project.extension.openapi.annotations.OpenApiDescription;
  */
 public enum DbType {
     /**
-     * Jdbc MySql 8.0
+     * Jdbc MySQL 8.0
      */
-    @OpenApiDescription("Jdbc MySql 8.0")
-    JdbcMySql8(0,
-               "JdbcMySql8"),
+    @OpenApiDescription("Jdbc MySQL 8.0")
+    JdbcMySQL8(0,
+               "JdbcMySQL8"),
     /**
      * Jdbc MariaDB 10.0
      */
@@ -40,11 +40,29 @@ public enum DbType {
     JdbcPostgreSQL15(30,
                      "JdbcPostgreSQL15"),
     /**
+     * Jdbc Oracle 12c
+     */
+    @OpenApiDescription("Jdbc Oracle 12c")
+    JdbcOracle12c(41,
+                  "JdbcOracle12c"),
+    /**
+     * Jdbc Oracle 18c
+     */
+    @OpenApiDescription("Jdbc Oracle 18c")
+    JdbcOracle18c(42,
+                  "JdbcOracle18c"),
+    /**
      * Jdbc Oracle 19c
      */
     @OpenApiDescription("Jdbc Oracle 19c")
-    JdbcOracle19c(40,
+    JdbcOracle19c(43,
                   "JdbcOracle19c"),
+    /**
+     * Jdbc Oracle 21c
+     */
+    @OpenApiDescription("Jdbc Oracle 21c")
+    JdbcOracle21c(44,
+                  "JdbcOracle21c"),
     /**
      * Jdbc Dameng 6
      */

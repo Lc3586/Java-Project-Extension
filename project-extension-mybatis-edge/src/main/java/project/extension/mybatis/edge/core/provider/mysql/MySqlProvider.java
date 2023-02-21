@@ -2,7 +2,15 @@ package project.extension.mybatis.edge.core.provider.mysql;
 
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
+import project.extension.mybatis.edge.core.provider.mysql.curd.MySqlDelete;
+import project.extension.mybatis.edge.core.provider.mysql.curd.MySqlInsert;
+import project.extension.mybatis.edge.core.provider.mysql.curd.MySqlSelect;
+import project.extension.mybatis.edge.core.provider.mysql.curd.MySqlUpdate;
 import project.extension.mybatis.edge.core.provider.standard.*;
+import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
+import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
+import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
+import project.extension.mybatis.edge.core.provider.standard.curd.IUpdate;
 
 /**
  * MySql数据库对象构造器

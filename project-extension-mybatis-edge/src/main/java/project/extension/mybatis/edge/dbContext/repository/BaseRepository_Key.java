@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import project.extension.collections.TupleExtension;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.FilterCompare;

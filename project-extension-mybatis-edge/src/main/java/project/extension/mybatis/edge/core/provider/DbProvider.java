@@ -3,6 +3,8 @@ package project.extension.mybatis.edge.core.provider;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.provider.dameng.DamengProvider;
 import project.extension.mybatis.edge.core.provider.mysql.MySqlProvider;
+import project.extension.mybatis.edge.core.provider.oracle.OracleProvider;
+import project.extension.mybatis.edge.core.provider.postgresql.PostgreSQLProvider;
 import project.extension.mybatis.edge.core.provider.sqlserver.SqlServerProvider;
 import project.extension.mybatis.edge.core.provider.standard.IBaseDbProvider;
 import project.extension.mybatis.edge.globalization.Strings;
@@ -19,7 +21,7 @@ public class DbProvider {
             throws
             ModuleException {
         switch (config.getDbType()) {
-            case JdbcMySql8:
+            case JdbcMySQL8:
             case JdbcMariaDB10:
                 return new MySqlProvider(config);
             case JdbcDameng6:
@@ -29,6 +31,13 @@ public class DbProvider {
             case JdbcSqlServer:
             case JdbcSqlServer_2012_plus:
                 return new SqlServerProvider(config);
+            case JdbcOracle12c:
+            case JdbcOracle18c:
+            case JdbcOracle19c:
+            case JdbcOracle21c:
+                return new OracleProvider(config);
+            case JdbcPostgreSQL15:
+                return new PostgreSQLProvider(config);
             default:
                 throw new ModuleException(Strings.getUnsupportedDbType(config.getDbType()
                                                                              .toString()));

@@ -70,6 +70,10 @@ public class SqlExtension {
             default:
             case None:
                 return name;
+            case CamelCaseToPascalCase:
+                return StringExtension.firstChar2UpperCase(name);
+            case PascalCaseToCamelCase:
+                return StringExtension.firstChar2LowerCase(name);
             case PascalCaseToUnderscore:
                 return StringExtension.pascalCaseToUnderScore(name);
             case PascalCaseToUnderscoreWithUpper:
@@ -98,6 +102,10 @@ public class SqlExtension {
             default:
             case None:
                 return name;
+            case CamelCaseToPascalCase:
+                return StringExtension.firstChar2LowerCase(name);
+            case PascalCaseToCamelCase:
+                return StringExtension.firstChar2UpperCase(name);
             case PascalCaseToUnderscore:
             case PascalCaseToUnderscoreWithUpper:
             case PascalCaseToUnderscoreWithLower:

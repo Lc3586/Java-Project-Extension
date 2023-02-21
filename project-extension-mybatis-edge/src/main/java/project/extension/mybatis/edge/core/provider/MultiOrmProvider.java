@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.core.provider;
 
 import org.springframework.stereotype.Component;
-import project.extension.mybatis.edge.IMultiNaiveSql;
-import project.extension.mybatis.edge.INaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.IMultiNaiveSql;
+import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.globalization.Strings;

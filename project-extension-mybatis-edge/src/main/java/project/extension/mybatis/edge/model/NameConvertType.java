@@ -16,34 +16,46 @@ public enum NameConvertType {
     None(0,
          "None"),
     /**
+     * 将帕斯卡命名字符串转换为骆驼命名字符串（BigApple -> bigApple）
+     */
+    @OpenApiDescription("将帕斯卡命名字符串转换为骆驼命名字符串（BigApple -> bigApple）")
+    PascalCaseToCamelCase(1,
+                          "PascalCaseToCamelCase"),
+    /**
+     * 将骆驼命名字符串转换为帕斯卡命名字符串（bigApple -> BigApple）
+     */
+    @OpenApiDescription("将骆驼命名字符串转换为帕斯卡命名字符串（bigApple -> BigApple）")
+    CamelCaseToPascalCase(2,
+                          "CamelCaseToPascalCase"),
+    /**
      * 将帕斯卡命名字符串转换为下划线分隔字符串（BigApple -> Big_Apple）
      */
     @OpenApiDescription("将帕斯卡命名字符串转换为下划线分隔字符串（BigApple -> Big_Apple）")
-    PascalCaseToUnderscore(1,
+    PascalCaseToUnderscore(3,
                            "PascalCaseToUnderscore"),
     /**
      * 将帕斯卡命名字符串转换为下划线分隔字符串，且转换为全大写（BigApple -> BIG_APPLE）
      */
     @OpenApiDescription("将帕斯卡命名字符串转换为下划线分隔字符串，且转换为全大写（BigApple -> BIG_APPLE）")
-    PascalCaseToUnderscoreWithUpper(2,
+    PascalCaseToUnderscoreWithUpper(4,
                                     "PascalCaseToUnderscoreWithUpper"),
     /**
      * 将帕斯卡命名字符串转换为下划线分隔字符串，且转换为全小写（BigApple -> big_apple）
      */
     @OpenApiDescription("将帕斯卡命名字符串转换为下划线分隔字符串，且转换为全小写（BigApple -> big_apple）")
-    PascalCaseToUnderscoreWithLower(3,
+    PascalCaseToUnderscoreWithLower(5,
                                     "PascalCaseToUnderscoreWithLower"),
     /**
      * 将字符串转换为大写（BigApple -> BIGAPPLE）
      */
     @OpenApiDescription("将字符串转换为大写（BigApple -> BIGAPPLE）")
-    ToUpper(4,
+    ToUpper(6,
             "ToUpper"),
     /**
      * 将字符串转换为小写（BigApple -> bigapple）
      */
     @OpenApiDescription("将字符串转换为小写（BigApple -> bigapple）")
-    ToLower(5,
+    ToLower(7,
             "ToLower");
 
     /**

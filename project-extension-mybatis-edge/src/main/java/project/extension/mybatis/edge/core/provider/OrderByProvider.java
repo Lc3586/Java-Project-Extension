@@ -2,8 +2,8 @@ package project.extension.mybatis.edge.core.provider;
 
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.mybatis.edge.core.provider.standard.IOrderBy;
-import project.extension.mybatis.edge.core.provider.standard.IOrderBySource;
+import project.extension.mybatis.edge.core.provider.standard.curd.IOrderBy;
+import project.extension.mybatis.edge.core.provider.standard.curd.IOrderBySource;
 import project.extension.mybatis.edge.model.AdvancedOrder;
 import project.extension.mybatis.edge.model.DynamicOrder;
 import project.extension.mybatis.edge.model.OrderMethod;

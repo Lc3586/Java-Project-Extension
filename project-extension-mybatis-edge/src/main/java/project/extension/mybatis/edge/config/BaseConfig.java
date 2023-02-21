@@ -52,7 +52,7 @@ public class BaseConfig {
     /**
      * 默认的实体类表名/列名命名规则
      */
-    private NameConvertType nameConvertType = NameConvertType.None;
+    private NameConvertType nameConvertType = NameConvertType.CamelCaseToPascalCase;
 
     /**
      * 多数据源配置
