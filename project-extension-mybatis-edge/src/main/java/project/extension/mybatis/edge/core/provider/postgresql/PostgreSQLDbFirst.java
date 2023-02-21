@@ -47,7 +47,7 @@ public class PostgreSQLDbFirst
         if (dbToJavaMap.size() > 0)
             return;
 
-        dbToJavaMap.putIfAbsent("number(1)",
+        dbToJavaMap.putIfAbsent("bool",
                                 new DbTypeToJavaType("(boolean)",
                                                      "(Boolean)",
                                                      "Boolean.parseBoolean(%s)",
