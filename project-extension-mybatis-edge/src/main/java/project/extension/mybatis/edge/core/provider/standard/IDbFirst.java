@@ -15,14 +15,6 @@ import java.util.List;
  */
 public interface IDbFirst {
     /**
-     * 所有操作是否在由springframework管理的事务下运行
-     * <p>如果是 需要在方法上添加此注解 org.springframework.transaction.annotation.Transactional</p>
-     *
-     * @param withTransactional 所有操作是否在由springframework管理的事务下运行
-     */
-    IDbFirst withTransactional(boolean withTransactional);
-
-    /**
      * 获取所有数据库
      *
      * @return 所有的数据库名称

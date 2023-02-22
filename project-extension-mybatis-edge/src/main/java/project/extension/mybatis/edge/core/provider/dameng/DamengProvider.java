@@ -66,6 +66,7 @@ public class DamengProvider
 
     @Override
     public ICodeFirst createCodeFirst(INaiveAdo ado) {
-        return new DamengCodeFirst(ado);
+        return new DamengCodeFirst(config,
+                                   ado);
     }
 }

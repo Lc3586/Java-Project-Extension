@@ -45,6 +45,8 @@ public class DamengDbFirst
         if (dbToJavaMap.size() > 0)
             return;
 
+        //java类型要存储在数据库的最低数据库数据类型
+
         dbToJavaMap.putIfAbsent("number(1)",
                                 new DbTypeToJavaType("(boolean)",
                                                      "(Boolean)",
@@ -244,21 +246,21 @@ public class DamengDbFirst
             case "numeric":
             case "number":
                 if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(19)");
-                    else if (column.getPrecision() >= 10)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(10)");
-                    else if (column.getPrecision() >= 5)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(5)");
-                    else if (column.getPrecision() >= 3)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(3)");
-                    else
+                    if (column.getPrecision() <= 3)
                         copyAndPutDbToJavaMap(dbTypeTextFull,
                                               "number(1)");
+                    else if (column.getPrecision() <= 5)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(3)");
+                    else if (column.getPrecision() <= 10)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(5)");
+                    else if (column.getPrecision() <= 19)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(10)");
+                    else
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(19)");
                     break;
                 }
             case "dec":
@@ -1309,16 +1311,16 @@ public class DamengDbFirst
             case "numeric":
             case "number":
                 if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        return JDBCType.BIGINT;
-                    else if (column.getPrecision() >= 10)
-                        return JDBCType.INTEGER;
-                    else if (column.getPrecision() >= 5)
-                        return JDBCType.SMALLINT;
-                    else if (column.getPrecision() >= 3)
-                        return JDBCType.TINYINT;
-                    else
+                    if (column.getPrecision() <= 3)
                         return JDBCType.BIT;
+                    else if (column.getPrecision() <= 5)
+                        return JDBCType.TINYINT;
+                    else if (column.getPrecision() <= 10)
+                        return JDBCType.SMALLINT;
+                    else if (column.getPrecision() <= 19)
+                        return JDBCType.INTEGER;
+                    else
+                        return JDBCType.BIGINT;
                 }
             case "dec":
             case "decimal":

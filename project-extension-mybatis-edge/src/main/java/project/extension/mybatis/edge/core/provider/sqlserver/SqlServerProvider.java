@@ -66,6 +66,7 @@ public class SqlServerProvider
 
     @Override
     public ICodeFirst createCodeFirst(INaiveAdo ado) {
-        return new SqlServerCodeFirst(ado);
+        return new SqlServerCodeFirst(config,
+                                      ado);
     }
 }

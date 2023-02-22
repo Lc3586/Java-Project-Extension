@@ -66,6 +66,7 @@ public class MySqlProvider
 
     @Override
     public ICodeFirst createCodeFirst(INaiveAdo ado) {
-        return new MySqlCodeFirst(ado);
+        return new MySqlCodeFirst(config,
+                                  ado);
     }
 }

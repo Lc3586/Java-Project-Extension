@@ -63,11 +63,13 @@ public class OracleProvider
     @Override
     public IDbFirst createDbFirst(INaiveAdo ado) {
         return new OracleDbFirst(config,
-                                 ado);
+                                 ado,
+                                 createCodeFirst(ado));
     }
 
     @Override
     public ICodeFirst createCodeFirst(INaiveAdo ado) {
-        return new OracleCodeFirst(ado);
+        return new OracleCodeFirst(config,
+                                   ado);
     }
 }

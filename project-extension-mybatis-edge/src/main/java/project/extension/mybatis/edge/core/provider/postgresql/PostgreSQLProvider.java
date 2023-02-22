@@ -68,6 +68,7 @@ public class PostgreSQLProvider
 
     @Override
     public ICodeFirst createCodeFirst(INaiveAdo ado) {
-        return new PostgreSQLCodeFirst(ado);
+        return new PostgreSQLCodeFirst(config,
+                                       ado);
     }
 }

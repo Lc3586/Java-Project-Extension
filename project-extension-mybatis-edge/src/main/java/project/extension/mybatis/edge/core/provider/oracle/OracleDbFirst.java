@@ -8,6 +8,7 @@ import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.DbFirst;
+import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
@@ -30,13 +31,14 @@ import java.util.stream.Collectors;
 public class OracleDbFirst
         extends DbFirst {
     public OracleDbFirst(DataSourceConfig config,
-                         INaiveAdo ado) {
+                         INaiveAdo ado,
+                         ICodeFirst codeFirst) {
         super(config,
               ado,
               "OracleDbFirst");
         initialization();
-
-        //TODO 待实现
+        //创建需要的数据方法
+        codeFirst.createOrReplaceFunctions();
     }
 
     /**
@@ -46,6 +48,8 @@ public class OracleDbFirst
         //是否已初始化
         if (dbToJavaMap.size() > 0)
             return;
+
+        //java类型要存储在数据库的最低数据库数据类型
 
         dbToJavaMap.putIfAbsent("number(1)",
                                 new DbTypeToJavaType("(boolean)",
@@ -143,7 +147,7 @@ public class OracleDbFirst
                                                      "java.sql.Time",
                                                      java.sql.Time.class,
                                                      java.sql.Time.class));
-        dbToJavaMap.putIfAbsent("timestamp(6)",
+        dbToJavaMap.putIfAbsent("timestamp(6) with local time zone",
                                 new DbTypeToJavaType("(Date)",
                                                      "(Date)",
                                                      "new Date(Long.parseLong(%s))",
@@ -209,80 +213,44 @@ public class OracleDbFirst
                             : column.getDbTypeText()
                                     .toLowerCase(Locale.ROOT);
         switch (dbTypeText) {
-            case "bit":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(1)");
+            case "number":
+                if (column.getScale() == 0) {
+                    if (column.getPrecision() <= 3)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(1)");
+                    else if (column.getPrecision() <= 5)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(3)");
+                    else if (column.getPrecision() <= 10)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(5)");
+                    else if (column.getPrecision() <= 19)
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(10)");
+                    else
+                        copyAndPutDbToJavaMap(dbTypeTextFull,
+                                              "number(19)");
+                } else
+                    copyAndPutDbToJavaMap(dbTypeTextFull,
+                                          "number(10,2)");
                 break;
-            case "byte":
-            case "tinyint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(3)");
+            case "float":
+                if (column.getPrecision() <= 63)
+                    copyAndPutDbToJavaMap(dbTypeTextFull,
+                                          "float(63)");
+                else
+                    copyAndPutDbToJavaMap(dbTypeTextFull,
+                                          "float(126)");
                 break;
-            case "smallint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(5)");
-                break;
-            case "int":
-            case "integer":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(10)");
-                break;
-            case "bigint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(19)");
-                break;
-            case "real":
             case "binary_float":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "float(63)");
                 break;
-            case "double":
-            case "float":
-            case "double precision":
             case "binary_double":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "float(126)");
                 break;
-            case "numeric":
-            case "number":
-                if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(19)");
-                    else if (column.getPrecision() >= 10)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(10)");
-                    else if (column.getPrecision() >= 5)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(5)");
-                    else if (column.getPrecision() >= 3)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(3)");
-                    else
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(1)");
-                    break;
-                }
-            case "dec":
-            case "decimal":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(10,2)");
-                break;
-            case "time":
             case "interval day to second":
-            case "interval year to month":
-            case "interval year":
-            case "interval month":
-            case "interval day":
-            case "interval day to hour":
-            case "interval day to minute":
-            case "interval hour":
-            case "interval hour to minute":
-            case "interval hour to second":
-            case "interval minute":
-            case "interval minute to second":
-            case "interval second":
-            case "time with time zone":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "interval day(2) to second(6)");
                 break;
@@ -290,36 +258,28 @@ public class OracleDbFirst
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "date");
                 break;
-            case "datetime":
             case "timestamp":
             case "timestamp with local time zone":
-            case "timestamp with time zone":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "timestamp(6)");
+                                      "timestamp(6) with local time zone");
                 break;
-            case "binary":
-            case "varbinary":
             case "blob":
-            case "image":
-            case "longvarbinary":
-            case "bfile":
             case "raw":
             case "long raw":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "blob");
                 break;
-            case "character":
             case "char":
             case "nchar":
-            case "nvarchar":
             case "nvarchar2":
-            case "nclob":
             case "clob":
+            case "nclob":
             case "varchar":
             case "varchar2":
-            case "text":
-            case "longvarchar":
+            case "long":
+            case "long varchar":
             case "rowid":
+            case "urowid":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "nvarchar2(255)");
             default:
@@ -425,12 +385,13 @@ public class OracleDbFirst
                                            + "a.char_used as \"F7\",\r\n"
                                            + "case when a.nullable = 'N' then 0 else 1 end as \"F8\",\r\n"
                                            + "nvl((select 1 from user_sequences where upper(sequence_name)=upper(a.table_name||'_seq_'||a.column_name) and rownum < 2), 0) as \"F9\",\r\n"
-                                           + "b.comments as \"F10\",\r\n"
-                                           + "a.data_default as \"F11\" \r\n"
+                                           + "to_char(b.comments) as \"F10\",\r\n"
+                                           + "nvl(NAIVE_SQL_LONG_TO_CHAR_DEFAULT(a.table_name, a.column_name),'') as \"F11\" \r\n"
                                            + "from all_tab_cols a \r\n"
                                            + "left join all_col_comments b on b.owner = a.owner and b.table_name = a.table_name and b.column_name = a.column_name \r\n"
                                            + "where %s in (%s) \r\n"
-                                           + "and %s ",
+                                           + "and %s "
+                                           + "and a.column_id is not null",
                                    ignoreCase
                                    ? "lower(a.owner) "
                                    : "a.owner ",
@@ -462,7 +423,7 @@ public class OracleDbFirst
             ModuleException {
         String sql = String.format("select \r\n"
                                            + "a.table_owner || '.' || a.table_name as \"F1\",\r\n"
-                                           + "c.column_name as \"F2\",\r\n"
+                                           + "nvl(NAIVE_SQL_LONG_TO_VARCHAR(a.index_name, c.table_name, c.column_position), c.column_name), as \"F2\",\r\n"
                                            + "c.index_name as \"F3\",\r\n"
                                            + "case when a.uniqueness = 'UNIQUE' then 1 else 0 end as \"F4\",\r\n"
                                            + "case when exists(select 1 from all_constraints where index_name = a.index_name and constraint_type = 'P') then 1 else 0 end as \"F5\",\r\n"
@@ -585,12 +546,12 @@ public class OracleDbFirst
     private String getUserIdFromConnectionString(boolean lower)
             throws
             ModuleException {
-        Matcher matcher = Pattern.compile("jdbc:dm://(.*?)/(.*?)\\?",
+        Matcher matcher = Pattern.compile("jdbc:oracle://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(config.getProperties()
                                                 .getProperty(DruidDataSourceFactory.PROP_URL));
         if (!matcher.find())
-            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:dm://(.*?)/(.*?)\\?"));
+            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:oracle://(.*?)/(.*?)\\?"));
 
         if (lower)
             return matcher.group(2)
@@ -1244,19 +1205,14 @@ public class OracleDbFirst
                                         .toLowerCase(Locale.ROOT);
         switch (dbTypeTextFull) {
             case "number(1)":
-            case "numeric(1)":
                 return JDBCType.BIT;
             case "number(3)":
-            case "numeric(3)":
                 return JDBCType.TINYINT;
             case "number(5)":
-            case "numeric(5)":
                 return JDBCType.SMALLINT;
             case "number(10)":
-            case "numeric(10)":
                 return JDBCType.INTEGER;
             case "number(19)":
-            case "numeric(19)":
                 return JDBCType.BIGINT;
             case "float(63)":
                 return JDBCType.FLOAT;
@@ -1267,7 +1223,6 @@ public class OracleDbFirst
 
             case "interval day(2) to second(6)":
                 return JDBCType.TIME;
-            case "datetime":
             case "timestamp(6)":
             case "timestamp(6) with local time zone":
                 return JDBCType.TIMESTAMP;
@@ -1276,10 +1231,12 @@ public class OracleDbFirst
                 return JDBCType.BLOB;
             case "clob":
                 return JDBCType.CLOB;
+            case "nclob":
+                return JDBCType.NCLOB;
             case "nvarchar2(255)":
                 return JDBCType.NVARCHAR;
 
-            case "char(36)":
+            case "char(36 char)":
                 return JDBCType.CHAR;
         }
 
@@ -1288,89 +1245,60 @@ public class OracleDbFirst
                             : column.getDbTypeText()
                                     .toLowerCase(Locale.ROOT);
         switch (dbTypeText) {
-            case "bit":
-                return JDBCType.BIT;
-            case "byte":
-            case "tinyint":
-                return JDBCType.TINYINT;
-            case "smallint":
-                return JDBCType.SMALLINT;
-            case "int":
-            case "integer":
-                return JDBCType.INTEGER;
-            case "bigint":
-                return JDBCType.BIGINT;
-            case "real":
+            case "number":
+                if (column.getScale() == 0) {
+                    if (column.getPrecision() <= 1)
+                        return JDBCType.BIT;
+                    else if (column.getPrecision() <= 3)
+                        return JDBCType.TINYINT;
+                    else if (column.getPrecision() >= 5)
+                        return JDBCType.SMALLINT;
+                    else if (column.getPrecision() <= 10)
+                        return JDBCType.INTEGER;
+                    else if (column.getPrecision() <= 19)
+                        return JDBCType.BIGINT;
+                }
+                return JDBCType.DECIMAL;
+            case "float":
             case "binary_float":
                 return JDBCType.FLOAT;
             case "double":
-            case "float":
-            case "double precision":
             case "binary_double":
                 return JDBCType.DOUBLE;
             case "numeric":
-            case "number":
-                if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        return JDBCType.BIGINT;
-                    else if (column.getPrecision() >= 10)
-                        return JDBCType.INTEGER;
-                    else if (column.getPrecision() >= 5)
-                        return JDBCType.SMALLINT;
-                    else if (column.getPrecision() >= 3)
-                        return JDBCType.TINYINT;
-                    else
-                        return JDBCType.BIT;
-                }
             case "dec":
             case "decimal":
                 return JDBCType.DECIMAL;
-            case "time":
             case "interval day to second":
-            case "interval year to month":
-            case "interval year":
-            case "interval month":
-            case "interval day":
-            case "interval day to hour":
-            case "interval day to minute":
-            case "interval hour":
-            case "interval hour to minute":
-            case "interval hour to second":
-            case "interval minute":
-            case "interval minute to second":
-            case "interval second":
-            case "time with time zone":
                 return JDBCType.TIME;
             case "date":
                 return JDBCType.DATE;
             case "timestamp":
             case "timestamp with local time zone":
-            case "timestamp with time zone":
                 return JDBCType.TIMESTAMP;
-            case "binary":
-            case "varbinary":
             case "blob":
-            case "image":
-            case "longvarbinary":
-            case "bfile":
+                return JDBCType.BLOB;
             case "raw":
             case "long raw":
                 return JDBCType.VARBINARY;
-            case "character":
             case "char":
                 return JDBCType.CHAR;
             case "nchar":
                 return JDBCType.NCHAR;
-            case "nvarchar":
             case "nvarchar2":
-            case "nclob":
                 return JDBCType.NVARCHAR;
+            case "long":
+            case "long varchar":
+                return JDBCType.LONGVARCHAR;
             case "clob":
+                return JDBCType.CLOB;
+            case "nclob":
+                return JDBCType.NCLOB;
+            case "rowid":
+            case "urowid":
+                return JDBCType.ROWID;
             case "varchar":
             case "varchar2":
-            case "text":
-            case "longvarchar":
-            case "rowid":
             default:
                 return JDBCType.VARCHAR;
         }

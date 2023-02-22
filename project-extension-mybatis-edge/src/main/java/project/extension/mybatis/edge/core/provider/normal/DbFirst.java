@@ -36,8 +36,6 @@ public abstract class DbFirst
      */
     protected static final ConcurrentMap<String, DbTypeToJavaType> dbToJavaMap = new ConcurrentHashMap<>();
 
-    protected boolean withTransactional = false;
-
     protected final DataSourceConfig config;
 
     protected final INaiveAdo ado;
@@ -163,12 +161,6 @@ public abstract class DbFirst
                      return compare;
                  });
         return tableInfo;
-    }
-
-    @Override
-    public IDbFirst withTransactional(boolean withTransactional) {
-        this.withTransactional = withTransactional;
-        return this;
     }
 
     @Override

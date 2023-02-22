@@ -1,7 +1,9 @@
 package project.extension.mybatis.edge.core.provider.postgresql;
 
+import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.CodeFirst;
+import project.extension.standard.exception.ModuleException;
 
 /**
  * PostgreSQL CodeFirst 开发模式相关功能
@@ -11,7 +13,17 @@ import project.extension.mybatis.edge.core.provider.normal.CodeFirst;
  */
 public class PostgreSQLCodeFirst
         extends CodeFirst {
-    protected PostgreSQLCodeFirst(INaiveAdo ado) {
-        super(ado);
+    protected PostgreSQLCodeFirst(DataSourceConfig config,
+                                  INaiveAdo ado) {
+        super(config,
+              ado,
+              "PostgreSQLCodeFirst");
+    }
+
+    @Override
+    public void createOrReplaceFunctions()
+            throws
+            ModuleException {
+
     }
 }

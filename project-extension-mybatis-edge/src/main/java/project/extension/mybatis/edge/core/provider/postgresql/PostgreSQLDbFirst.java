@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.core.provider.postgresql;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import com.alibaba.fastjson2.JSONObject;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
@@ -13,6 +14,7 @@ import project.extension.mybatis.edge.model.*;
 import project.extension.number.NumericExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+import sun.security.util.BitArray;
 
 import java.math.BigDecimal;
 import java.sql.JDBCType;
@@ -47,7 +49,7 @@ public class PostgreSQLDbFirst
         if (dbToJavaMap.size() > 0)
             return;
 
-        dbToJavaMap.putIfAbsent("bool",
+        dbToJavaMap.putIfAbsent("boolean",
                                 new DbTypeToJavaType("(boolean)",
                                                      "(Boolean)",
                                                      "Boolean.parseBoolean(%s)",
@@ -57,17 +59,17 @@ public class PostgreSQLDbFirst
                                                      boolean.class,
                                                      Boolean.class));
 
-        dbToJavaMap.putIfAbsent("number(3)",
-                                new DbTypeToJavaType("(byte)",
-                                                     "(Byte)",
-                                                     "Byte.parseByte(%s)",
-                                                     "Byte.toString(%s)",
-                                                     "byte",
-                                                     "Byte",
-                                                     byte.class,
-                                                     Byte.class));
+        dbToJavaMap.putIfAbsent("boolean[]",
+                                new DbTypeToJavaType("(boolean[])",
+                                                     "(Boolean[])",
+                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "boolean[]",
+                                                     "Boolean[]",
+                                                     boolean[].class,
+                                                     Boolean[].class));
 
-        dbToJavaMap.putIfAbsent("number(5)",
+        dbToJavaMap.putIfAbsent("smallint",
                                 new DbTypeToJavaType("(short)",
                                                      "(Short)",
                                                      "Short.parseShort(%s)",
@@ -77,7 +79,17 @@ public class PostgreSQLDbFirst
                                                      short.class,
                                                      Short.class));
 
-        dbToJavaMap.putIfAbsent("number(10)",
+        dbToJavaMap.putIfAbsent("smallint[]",
+                                new DbTypeToJavaType("(short[])",
+                                                     "(Short[])",
+                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "short[]",
+                                                     "Short[]",
+                                                     short[].class,
+                                                     Short[].class));
+
+        dbToJavaMap.putIfAbsent("integer",
                                 new DbTypeToJavaType("(int)",
                                                      "(Integer)",
                                                      "Integer.parseInt(%s)",
@@ -87,7 +99,17 @@ public class PostgreSQLDbFirst
                                                      int.class,
                                                      Integer.class));
 
-        dbToJavaMap.putIfAbsent("number(19)",
+        dbToJavaMap.putIfAbsent("integer[]",
+                                new DbTypeToJavaType("(int[])",
+                                                     "(Integer[])",
+                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "int[]",
+                                                     "Integer[]",
+                                                     int[].class,
+                                                     Integer[].class));
+
+        dbToJavaMap.putIfAbsent("bigint",
                                 new DbTypeToJavaType("(long)",
                                                      "(Long)",
                                                      "Long.parseLong(%s)",
@@ -97,7 +119,17 @@ public class PostgreSQLDbFirst
                                                      long.class,
                                                      Long.class));
 
-        dbToJavaMap.putIfAbsent("float(63)",
+        dbToJavaMap.putIfAbsent("bigint[]",
+                                new DbTypeToJavaType("(long[])",
+                                                     "(Long[])",
+                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "long[]",
+                                                     "Long[]",
+                                                     long[].class,
+                                                     Long[].class));
+
+        dbToJavaMap.putIfAbsent("numeric",
                                 new DbTypeToJavaType("(float)",
                                                      "(Float)",
                                                      "Float.parseFloat(%s)",
@@ -106,7 +138,7 @@ public class PostgreSQLDbFirst
                                                      "Float",
                                                      float.class,
                                                      Float.class));
-        dbToJavaMap.putIfAbsent("float(126)",
+        dbToJavaMap.putIfAbsent("real",
                                 new DbTypeToJavaType("(double)",
                                                      "(Double)",
                                                      "Double.parseDouble(%s)",
@@ -115,7 +147,7 @@ public class PostgreSQLDbFirst
                                                      "Double",
                                                      double.class,
                                                      Double.class));
-        dbToJavaMap.putIfAbsent("number(10,2)",
+        dbToJavaMap.putIfAbsent("numeric",
                                 new DbTypeToJavaType("(BigDecimal)",
                                                      "(BigDecimal)",
                                                      "new BigDecimal(%s)",
@@ -134,7 +166,7 @@ public class PostgreSQLDbFirst
                                                      "java.sql.Date",
                                                      java.sql.Date.class,
                                                      java.sql.Date.class));
-        dbToJavaMap.putIfAbsent("interval day(2) to second(6)",
+        dbToJavaMap.putIfAbsent("time",
                                 new DbTypeToJavaType("(java.sql.Time)",
                                                      "(java.sql.Time)",
                                                      "new java.sql.Time(Long.parseLong(%s))",
@@ -143,7 +175,7 @@ public class PostgreSQLDbFirst
                                                      "java.sql.Time",
                                                      java.sql.Time.class,
                                                      java.sql.Time.class));
-        dbToJavaMap.putIfAbsent("timestamp(6)",
+        dbToJavaMap.putIfAbsent("timestamp",
                                 new DbTypeToJavaType("(Date)",
                                                      "(Date)",
                                                      "new Date(Long.parseLong(%s))",
@@ -153,7 +185,7 @@ public class PostgreSQLDbFirst
                                                      Date.class,
                                                      Date.class));
 
-        dbToJavaMap.putIfAbsent("blob",
+        dbToJavaMap.putIfAbsent("bytea",
                                 new DbTypeToJavaType("(byte[])",
                                                      "(Byte[])",
                                                      "Base64.getDecoder().decode(%s.getBytes(StandardCharsets.UTF_8))",
@@ -162,6 +194,26 @@ public class PostgreSQLDbFirst
                                                      "Byte[]",
                                                      byte[].class,
                                                      Byte[].class));
+
+        dbToJavaMap.putIfAbsent("bit",
+                                new DbTypeToJavaType("(BitArray)",
+                                                     "(BitArray)",
+                                                     "StringExtension.ToBitArray(%s)",
+                                                     "StringExtension.ToBitString(%s)",
+                                                     "BitArray",
+                                                     "BitArray",
+                                                     BitArray.class,
+                                                     BitArray.class));
+
+        dbToJavaMap.putIfAbsent("json",
+                                new DbTypeToJavaType("(JSONObject)",
+                                                     "(JSONObject)",
+                                                     "JSONObject.parseObject(%s)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "BitArray",
+                                                     "BitArray",
+                                                     JSONObject.class,
+                                                     JSONObject.class));
 
         dbToJavaMap.putIfAbsent("nvarchar2(255)",
                                 new DbTypeToJavaType("(String)",
@@ -172,7 +224,7 @@ public class PostgreSQLDbFirst
                                                      "String",
                                                      String.class,
                                                      String.class));
-        dbToJavaMap.putIfAbsent("char(36 char)",
+        dbToJavaMap.putIfAbsent("uuid",
                                 new DbTypeToJavaType("(UUID)",
                                                      "(UUID)",
                                                      "UUID.fromString(%s)",

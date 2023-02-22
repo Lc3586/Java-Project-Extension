@@ -1,5 +1,7 @@
 package project.extension.string;
 
+import sun.security.util.BitArray;
+
 import javax.xml.bind.DatatypeConverter;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -190,8 +192,8 @@ public class StringExtension {
     public static String toHexString(byte[] bytes) {
         StringBuilder result = new StringBuilder(bytes.length);
 
-        for (int i = 0; i < bytes.length; i++) {
-            String item = Integer.toHexString(0xFF & bytes[i]);
+        for (byte aByte : bytes) {
+            String item = Integer.toHexString(0xFF & aByte);
             if (item.length() < 2)
                 result.append(0);
             result.append(item.toUpperCase());
@@ -223,7 +225,34 @@ public class StringExtension {
      * @param c 字符
      * @return 十六进制数据
      */
-    private static byte getHexFromChar(char c) {
+    public static byte getHexFromChar(char c) {
         return (byte) "0123456789ABCDEF".indexOf(c);
+    }
+
+    /**
+     * 将BitArray转为1010101010这样的二进制字符串
+     */
+    public static String ToBitString(BitArray bitArray) {
+        char[] chars = new char[bitArray.length()];
+        for (int a = 0; a < chars.length; a++)
+            chars[a] = bitArray.get(a)
+                       ? '1'
+                       : '0';
+        return new String(chars);
+    }
+
+    /**
+     * 将1010101010这样的二进制字符串转换成BitArray
+     *
+     * @param bitString 二进制字符串
+     */
+    public static BitArray ToBitArray(String bitString) {
+        if (bitString == null) return null;
+        char[] chars = bitString.toCharArray();
+        BitArray ret = new BitArray(chars.length);
+        for (int a = 0; a < chars.length; a++)
+            ret.set(a,
+                    chars[a] == '1');
+        return ret;
     }
 }
