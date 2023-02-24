@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
+import project.extension.mybatis.edge.entity.TestGeneralEntity;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,30 +13,30 @@ import java.util.List;
  * @date 2023-02-06
  */
 @Mapper
-public interface ICommonQuickInputMapper {
+public interface ITestGeneralEntityMapper {
     /**
      * 获取数据集合
      *
      * @param data4Search 搜索参数
      */
-    List<CommonQuickInput> list(CommonQuickInput data4Search);
+    List<TestGeneralEntity> list(TestGeneralEntity data4Search);
 
     /**
      * 获取数据
      *
      * @param id 主键
      */
-    CommonQuickInput getById(String id);
+    TestGeneralEntity getById(String id);
 
     /**
      * 新增数据
      */
-    int insert(CommonQuickInput data);
+    int insert(TestGeneralEntity data);
 
     /**
      * 更新数据
      */
-    int update(CommonQuickInput data);
+    int update(TestGeneralEntity data);
 
     /**
      * 删除数据

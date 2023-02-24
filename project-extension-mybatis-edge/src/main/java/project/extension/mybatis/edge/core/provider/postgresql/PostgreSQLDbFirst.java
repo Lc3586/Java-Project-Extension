@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.core.provider.postgresql;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
@@ -82,7 +83,7 @@ public class PostgreSQLDbFirst
         dbToJavaMap.putIfAbsent("smallint[]",
                                 new DbTypeToJavaType("(short[])",
                                                      "(Short[])",
-                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSONObject.parseObject(%s, short[].class)",
                                                      "JSON.toJSONString(%s)",
                                                      "short[]",
                                                      "Short[]",
@@ -102,12 +103,32 @@ public class PostgreSQLDbFirst
         dbToJavaMap.putIfAbsent("integer[]",
                                 new DbTypeToJavaType("(int[])",
                                                      "(Integer[])",
-                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSONObject.parseObject(%s, int[].class)",
                                                      "JSON.toJSONString(%s)",
                                                      "int[]",
                                                      "Integer[]",
                                                      int[].class,
                                                      Integer[].class));
+
+        dbToJavaMap.putIfAbsent("int4range",
+                                new DbTypeToJavaType("(int[])",
+                                                     "(Integer[])",
+                                                     "JSONObject.parseObject(%s, int[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "int[]",
+                                                     "Integer[]",
+                                                     int[].class,
+                                                     Integer[].class));
+
+        dbToJavaMap.putIfAbsent("int4range[]",
+                                new DbTypeToJavaType("(int[][])",
+                                                     "(Integer[][])",
+                                                     "JSONObject.parseObject(%s, int[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "int[][]",
+                                                     "Integer[][]",
+                                                     int[][].class,
+                                                     Integer[][].class));
 
         dbToJavaMap.putIfAbsent("bigint",
                                 new DbTypeToJavaType("(long)",
@@ -122,14 +143,34 @@ public class PostgreSQLDbFirst
         dbToJavaMap.putIfAbsent("bigint[]",
                                 new DbTypeToJavaType("(long[])",
                                                      "(Long[])",
-                                                     "JSONObject.parseObject(%s, boolean[].class)",
+                                                     "JSONObject.parseObject(%s, long[].class)",
                                                      "JSON.toJSONString(%s)",
                                                      "long[]",
                                                      "Long[]",
                                                      long[].class,
                                                      Long[].class));
 
-        dbToJavaMap.putIfAbsent("numeric",
+        dbToJavaMap.putIfAbsent("int8range",
+                                new DbTypeToJavaType("(long[])",
+                                                     "(Long[])",
+                                                     "JSONObject.parseObject(%s, long[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "long[]",
+                                                     "Long[]",
+                                                     long[].class,
+                                                     Long[].class));
+
+        dbToJavaMap.putIfAbsent("int8range[]",
+                                new DbTypeToJavaType("(long[][])",
+                                                     "(Long[][])",
+                                                     "JSONObject.parseObject(%s, long[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "long[][]",
+                                                     "Long[][]",
+                                                     long[][].class,
+                                                     Long[][].class));
+
+        dbToJavaMap.putIfAbsent("real",
                                 new DbTypeToJavaType("(float)",
                                                      "(Float)",
                                                      "Float.parseFloat(%s)",
@@ -138,7 +179,17 @@ public class PostgreSQLDbFirst
                                                      "Float",
                                                      float.class,
                                                      Float.class));
-        dbToJavaMap.putIfAbsent("real",
+
+        dbToJavaMap.putIfAbsent("real[]",
+                                new DbTypeToJavaType("(float[])",
+                                                     "(Float[])",
+                                                     "JSONObject.parseObject(%s, float[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "float",
+                                                     "Float",
+                                                     float[].class,
+                                                     Float[].class));
+        dbToJavaMap.putIfAbsent("double precision",
                                 new DbTypeToJavaType("(double)",
                                                      "(Double)",
                                                      "Double.parseDouble(%s)",
@@ -147,6 +198,15 @@ public class PostgreSQLDbFirst
                                                      "Double",
                                                      double.class,
                                                      Double.class));
+        dbToJavaMap.putIfAbsent("double precision[]",
+                                new DbTypeToJavaType("(double[])",
+                                                     "(Double[])",
+                                                     "JSONObject.parseObject(%s, double[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "double[]",
+                                                     "Double[]",
+                                                     double[].class,
+                                                     Double[].class));
         dbToJavaMap.putIfAbsent("numeric",
                                 new DbTypeToJavaType("(BigDecimal)",
                                                      "(BigDecimal)",
@@ -156,6 +216,33 @@ public class PostgreSQLDbFirst
                                                      "BigDecimal",
                                                      BigDecimal.class,
                                                      BigDecimal.class));
+        dbToJavaMap.putIfAbsent("numeric[]",
+                                new DbTypeToJavaType("(BigDecimal[])",
+                                                     "(BigDecimal[])",
+                                                     "JSONObject.parseObject(%s, BigDecimal[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "BigDecimal[]",
+                                                     "BigDecimal[]",
+                                                     BigDecimal[].class,
+                                                     BigDecimal[].class));
+        dbToJavaMap.putIfAbsent("numrange",
+                                new DbTypeToJavaType("(BigDecimal[])",
+                                                     "(BigDecimal[])",
+                                                     "JSONObject.parseObject(%s, BigDecimal[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "BigDecimal[]",
+                                                     "BigDecimal[]",
+                                                     BigDecimal[].class,
+                                                     BigDecimal[].class));
+        dbToJavaMap.putIfAbsent("numrange[]",
+                                new DbTypeToJavaType("(BigDecimal[][])",
+                                                     "(BigDecimal[][])",
+                                                     "JSONObject.parseObject(%s, BigDecimal[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "BigDecimal[][]",
+                                                     "BigDecimal[][]",
+                                                     BigDecimal[][].class,
+                                                     BigDecimal[][].class));
 
         dbToJavaMap.putIfAbsent("date",
                                 new DbTypeToJavaType("(java.sql.Date)",
@@ -166,6 +253,33 @@ public class PostgreSQLDbFirst
                                                      "java.sql.Date",
                                                      java.sql.Date.class,
                                                      java.sql.Date.class));
+        dbToJavaMap.putIfAbsent("date[]",
+                                new DbTypeToJavaType("(java.sql.Date[])",
+                                                     "(java.sql.Date[])",
+                                                     "JSONObject.parseObject(%s, java.sql.Date[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "java.sql.Date[]",
+                                                     "java.sql.Date[]",
+                                                     java.sql.Date[].class,
+                                                     java.sql.Date[].class));
+        dbToJavaMap.putIfAbsent("daterange",
+                                new DbTypeToJavaType("(java.sql.Date[])",
+                                                     "(java.sql.Date[])",
+                                                     "JSONObject.parseObject(%s, java.sql.Date[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "java.sql.Date[]",
+                                                     "java.sql.Date[]",
+                                                     java.sql.Date[].class,
+                                                     java.sql.Date[].class));
+        dbToJavaMap.putIfAbsent("daterange[]",
+                                new DbTypeToJavaType("(java.sql.Date[][])",
+                                                     "(java.sql.Date[][])",
+                                                     "JSONObject.parseObject(%s, java.sql.Date[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "java.sql.Date[][]",
+                                                     "java.sql.Date[][]",
+                                                     java.sql.Date[][].class,
+                                                     java.sql.Date[][].class));
         dbToJavaMap.putIfAbsent("time",
                                 new DbTypeToJavaType("(java.sql.Time)",
                                                      "(java.sql.Time)",
@@ -175,6 +289,15 @@ public class PostgreSQLDbFirst
                                                      "java.sql.Time",
                                                      java.sql.Time.class,
                                                      java.sql.Time.class));
+        dbToJavaMap.putIfAbsent("time[]",
+                                new DbTypeToJavaType("(java.sql.Time[])",
+                                                     "(java.sql.Time[])",
+                                                     "JSONObject.parseObject(%s, java.sql.Time[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "java.sql.Time[]",
+                                                     "java.sql.Time[]",
+                                                     java.sql.Time[].class,
+                                                     java.sql.Time[].class));
         dbToJavaMap.putIfAbsent("timestamp",
                                 new DbTypeToJavaType("(Date)",
                                                      "(Date)",
@@ -184,16 +307,25 @@ public class PostgreSQLDbFirst
                                                      "Date",
                                                      Date.class,
                                                      Date.class));
+        dbToJavaMap.putIfAbsent("timestamp[]",
+                                new DbTypeToJavaType("(Date[])",
+                                                     "(Date[])",
+                                                     "JSONObject.parseObject(%s, Date[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "Date[]",
+                                                     "Date[]",
+                                                     Date[].class,
+                                                     Date[].class));
 
         dbToJavaMap.putIfAbsent("bytea",
                                 new DbTypeToJavaType("(byte[])",
-                                                     "(Byte[])",
+                                                     "(byte[])",
                                                      "Base64.getDecoder().decode(%s.getBytes(StandardCharsets.UTF_8))",
                                                      "new String(Base64.getEncoder().encode(%s), StandardCharsets.UTF_8)",
                                                      "byte[]",
-                                                     "Byte[]",
+                                                     "byte[]",
                                                      byte[].class,
-                                                     Byte[].class));
+                                                     byte[].class));
 
         dbToJavaMap.putIfAbsent("bit",
                                 new DbTypeToJavaType("(BitArray)",
@@ -214,8 +346,47 @@ public class PostgreSQLDbFirst
                                                      "BitArray",
                                                      JSONObject.class,
                                                      JSONObject.class));
+        dbToJavaMap.putIfAbsent("json[]",
+                                new DbTypeToJavaType("(JSONArray)",
+                                                     "(JSONArray)",
+                                                     "JSONArray.parseArray(%s)",
+                                                     "JSONArray.toJSONString(%s)",
+                                                     "BitArray",
+                                                     "BitArray",
+                                                     JSONArray.class,
+                                                     JSONArray.class));
 
-        dbToJavaMap.putIfAbsent("nvarchar2(255)",
+        dbToJavaMap.putIfAbsent("char",
+                                new DbTypeToJavaType("(char)",
+                                                     "(Character)",
+                                                     "%s.charAt(0)",
+                                                     "Character.toString(%s)",
+                                                     "char",
+                                                     "Character",
+                                                     char.class,
+                                                     Character.class));
+
+        dbToJavaMap.putIfAbsent("char[]",
+                                new DbTypeToJavaType("(char[])",
+                                                     "(Character[])",
+                                                     "JSONObject.parseObject(%s, Character[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "char",
+                                                     "Character",
+                                                     char[].class,
+                                                     Character[].class));
+
+        dbToJavaMap.putIfAbsent("character varying",
+                                new DbTypeToJavaType("(String)",
+                                                     "(String)",
+                                                     "%s",
+                                                     "%s",
+                                                     "String",
+                                                     "String",
+                                                     String.class,
+                                                     String.class));
+
+        dbToJavaMap.putIfAbsent("character varying[]",
                                 new DbTypeToJavaType("(String)",
                                                      "(String)",
                                                      "%s",
@@ -233,6 +404,15 @@ public class PostgreSQLDbFirst
                                                      "UUID",
                                                      UUID.class,
                                                      UUID.class));
+        dbToJavaMap.putIfAbsent("uuid[]",
+                                new DbTypeToJavaType("(UUID[])",
+                                                     "(UUID[])",
+                                                     "JSONObject.parseObject(%s, UUID[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "UUID[]",
+                                                     "UUID[]",
+                                                     UUID[].class,
+                                                     UUID[].class));
 
         dbToJavaMap.putIfAbsent("unknown",
                                 new DbTypeToJavaType("(Object)",
@@ -243,6 +423,15 @@ public class PostgreSQLDbFirst
                                                      "Object",
                                                      Object.class,
                                                      Object.class));
+        dbToJavaMap.putIfAbsent("unknown[]",
+                                new DbTypeToJavaType("(Object[])",
+                                                     "(Object[])",
+                                                     "JSONObject.parseObject(%s, Object[].class)",
+                                                     "JSON.toJSONString(%s)",
+                                                     "Object[]",
+                                                     "Object[]",
+                                                     Object[].class,
+                                                     Object[].class));
     }
 
     /**
@@ -251,194 +440,165 @@ public class PostgreSQLDbFirst
      * @param column 列信息
      */
     private void checkAndSetupJavaMap(DbColumnInfo column) {
-        String dbTypeTextFull = column.getDbTypeTextFull();
-
-        if (dbToJavaMap.containsKey(dbTypeTextFull))
+        if (dbToJavaMap.containsKey(column.getDbTypeTextFull()))
             return;
 
-        String dbTypeText = column.getDbTypeText() == null
-                            ? ""
-                            : column.getDbTypeText()
-                                    .toLowerCase(Locale.ROOT);
+        String dbTypeText = column.getDbTypeText();
+        dbTypeText = dbTypeText == null
+                     ? ""
+                     : dbTypeText.toLowerCase(Locale.ROOT);
+
+        boolean isArray = dbTypeText.endsWith("[]");
+
+        if (isArray) dbTypeText = dbTypeText.substring(0,
+                                                       dbTypeText.length() - 2);
+
+        String copyDbType;
+
         switch (dbTypeText) {
-            case "bit":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(1)");
-                break;
-            case "byte":
-            case "tinyint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(3)");
+            case "boolean":
+                copyDbType = "boolean";
                 break;
             case "smallint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(5)");
+            case "smallserial":
+                copyDbType = "smallint";
                 break;
-            case "int":
             case "integer":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(10)");
+            case "serial":
+                copyDbType = "integer";
+                break;
+            case "int4range":
+                copyDbType = "int4range";
                 break;
             case "bigint":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(19)");
+            case "bigserial":
+                copyDbType = "bigint";
+                break;
+            case "int8range":
+                copyDbType = "int8range";
                 break;
             case "real":
-            case "binary_float":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "float(63)");
+                copyDbType = "real";
                 break;
-            case "double":
-            case "float":
             case "double precision":
-            case "binary_double":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "float(126)");
+                copyDbType = "double precision";
                 break;
             case "numeric":
-            case "number":
-                if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(19)");
-                    else if (column.getPrecision() >= 10)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(10)");
-                    else if (column.getPrecision() >= 5)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(5)");
-                    else if (column.getPrecision() >= 3)
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(3)");
-                    else
-                        copyAndPutDbToJavaMap(dbTypeTextFull,
-                                              "number(1)");
-                    break;
-                }
-            case "dec":
-            case "decimal":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "number(10,2)");
+            case "money":
+                copyDbType = "numeric";
                 break;
-            case "time":
-            case "interval day to second":
-            case "interval year to month":
-            case "interval year":
-            case "interval month":
-            case "interval day":
-            case "interval day to hour":
-            case "interval day to minute":
-            case "interval hour":
-            case "interval hour to minute":
-            case "interval hour to second":
-            case "interval minute":
-            case "interval minute to second":
-            case "interval second":
-            case "time with time zone":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "interval day(2) to second(6)");
+            case "numrange":
+                copyDbType = "numrange";
                 break;
             case "date":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "date");
+                copyDbType = "date";
                 break;
-            case "datetime":
+            case "daterange":
+                copyDbType = "daterange";
+                break;
+            case "time":
+            case "time with time zone":
+            case "time without time zone":
+                copyDbType = "time";
+                break;
             case "timestamp":
-            case "timestamp with local time zone":
             case "timestamp with time zone":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "timestamp(6)");
+            case "timestamp without time zone":
+                copyDbType = "timestamp";
                 break;
-            case "binary":
-            case "varbinary":
-            case "blob":
-            case "image":
-            case "longvarbinary":
-            case "bfile":
-            case "raw":
-            case "long raw":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "blob");
+            case "bytea":
+                copyDbType = "bytea";
                 break;
-            case "character":
+            case "bit":
+            case "bit varying":
+                copyDbType = "bit";
+                break;
             case "char":
-            case "nchar":
-            case "nvarchar":
-            case "nvarchar2":
-            case "nclob":
-            case "clob":
+                copyDbType = "char";
+                break;
             case "varchar":
-            case "varchar2":
+            case "character":
+            case "character varying":
             case "text":
-            case "longvarchar":
-            case "rowid":
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "nvarchar2(255)");
+            case "name":
+            case "cidr":
+            case "inet":
+            case "macaddr":
+            case "macaddr8":
+                copyDbType = "character varying";
+                break;
+            case "json":
+            case "jsonb":
+                copyDbType = "json";
+                break;
+            case "uuid":
+                copyDbType = "uuid";
+                break;
             default:
-                copyAndPutDbToJavaMap(dbTypeTextFull,
-                                      "unknown");
+                copyDbType = "unknown";
                 break;
         }
+
+        copyAndPutDbToJavaMap(column.getDbTypeTextFull(),
+                              String.format("%s%s",
+                                            copyDbType,
+                                            isArray
+                                            ? "[]"
+                                            : ""));
     }
 
     /**
      * 查询表信息
      *
-     * @param inDatabase 用来筛选数据库的sql语句
      * @param tbname     表名
      * @param ignoreCase 忽略大小写
      * @return 表信息
      */
-    private List<Map<String, Object>> selectTableInfo(String inDatabase,
-                                                      String[] tbname,
+    private List<Map<String, Object>> selectTableInfo(String[] tbname,
                                                       boolean ignoreCase)
             throws
             ModuleException {
-        String sql = String.format("select \r\n"
-                                           + "a.owner || '.' || a.table_name as \"F1\",\r\n"
-                                           + "a.owner as \"F2\",\r\n"
-                                           + "a.table_name as \"F3\",\r\n"
-                                           + "b.comments as \"F4\",\r\n"
+        String sql = String.format("%s select \r\n"
+                                           + "b.nspname || '.' || a.tablename as \"F1\",\r\n"
+                                           + "a.schemaname as \"F2\",\r\n"
+                                           + "a.tablename as \"F3\",\r\n"
+                                           + "d.description as \"F4\",\r\n"
                                            + "'TABLE' as \"F5\" \r\n"
-                                           + "from all_tables a \r\n"
-                                           + "left join all_tab_comments b on b.owner = a.owner and b.table_name = a.table_name and b.table_type = 'TABLE' \r\n"
-                                           + "where %s in (%s) %s \r\n"
-                                           + "\r\n"
-                                           + "UNION ALL \r\n"
-                                           + "\r\n"
+                                           + "from pg_tables a \r\n"
+                                           + "inner join pg_namespace b on b.nspname = a.schemaname \r\n"
+                                           + "inner join pg_class c on c.relnamespace = b.oid and c.relname = a.tablename \r\n"
+                                           + "left join pg_description d on d.objoid = c.oid and objsubid = 0 \r\n"
+                                           + "where a.schemaname not in ('pg_catalog', 'information_schema', 'topology') \r\n"
+                                           + "and b.nspname || '.' || a.tablename not in ('public.spatial_ref_sys') \r\n"
+                                           + "union all \r\n"
                                            + "select \r\n"
-                                           + "a.owner || '.' || a.view_name,\r\n"
-                                           + "a.owner,\r\n"
-                                           + "a.view_name,\r\n"
-                                           + "b.comments,\r\n"
+                                           + "b.nspname || '.' || a.relname, \r\n"
+                                           + "b.nspname, \r\n"
+                                           + "a.relname, \r\n"
+                                           + "d.description, \r\n"
                                            + "'VIEW' \r\n"
-                                           + "from all_views a \r\n"
-                                           + "left join all_tab_comments b on b.owner = a.owner and b.table_name = a.view_name and b.table_type = 'VIEW' \r\n"
-                                           + "where %s in (%s) %s ",
-                                   ignoreCase
-                                   ? "lower(a.owner) "
-                                   : "a.owner ",
-                                   inDatabase,
+                                           + "from pg_class a \r\n"
+                                           + "inner join pg_namespace b on b.oid = a.relnamespace \r\n"
+                                           + "left join pg_description d on d.objoid = a.oid and objsubid = 0 \r\n"
+                                           + "where b.nspname not in ('pg_catalog', 'information_schema') and a.relkind in ('m','v')  \r\n"
+                                           + "and b.nspname || '.' || a.relname not in ('public.geography_columns','public.geometry_columns','public.raster_columns','public.raster_overviews') \r\n"
+                                           + "%s \r\n",
                                    tbname == null
                                    ? ""
-                                   : String.format(" and %s%s",
+                                   : "select * from (",
+                                   tbname == null
+                                   ? ""
+                                   : String.format(") ft_dbf where %s%s and %s%s",
                                                    ignoreCase
-                                                   ? "lower(a.table_name)"
-                                                   : "a.table_name",
-                                                   StringUtils.hasText(tbname[1])
+                                                   ? "lower(schemaname) "
+                                                   : "schemaname ",
+                                                   StringUtils.hasText(tbname[0])
                                                    ? String.format("='%s'",
-                                                                   tbname[1])
-                                                   : " is null"),
-                                   ignoreCase
-                                   ? "lower(a.owner) "
-                                   : "a.owner ",
-                                   inDatabase,
-                                   tbname == null
-                                   ? ""
-                                   : String.format(" and %s%s",
+                                                                   tbname[0])
+                                                   : " is null",
                                                    ignoreCase
-                                                   ? "lower(a.view_name)"
-                                                   : "a.view_name",
+                                                   ? "lower(tablename) "
+                                                   : "tablename ",
                                                    StringUtils.hasText(tbname[1])
                                                    ? String.format("='%s'",
                                                                    tbname[1])
@@ -468,24 +628,32 @@ public class PostgreSQLDbFirst
             throws
             ModuleException {
         String sql = String.format("select \r\n"
-                                           + "a.owner || '.' || a.table_name as \"F1\",\r\n"
-                                           + "a.column_name as \"F2\",\r\n"
-                                           + "a.data_type as \"F3\",\r\n"
-                                           + "a.data_length as \"F4\",\r\n"
-                                           + "a.data_precision as \"F5\",\r\n"
-                                           + "a.data_scale as \"F6\",\r\n"
-                                           + "a.char_used as \"F7\",\r\n"
-                                           + "case when a.nullable = 'N' then 0 else 1 end as \"F8\",\r\n"
-                                           + "nvl((select 1 from user_sequences where upper(sequence_name)=upper(a.table_name||'_seq_'||a.column_name) and rownum < 2), 0) as \"F9\",\r\n"
-                                           + "b.comments as \"F10\",\r\n"
-                                           + "a.data_default as \"F11\" \r\n"
-                                           + "from all_tab_cols a \r\n"
-                                           + "left join all_col_comments b on b.owner = a.owner and b.table_name = a.table_name and b.column_name = a.column_name \r\n"
+                                           + "ns.nspname || '.' || c.relname as \"F1\",\r\n"
+                                           + "cc.column_name as \"F2\",\r\n"
+                                           + "cc.data_type || '.' || t.typname as \"F3\",\r\n"
+                                           + "case when a.atttypmod > 0 and a.atttypmod < 32767 then a.atttypmod - 4 else a.attlen end as \"F4\",\r\n"
+                                           + "cc.numeric_precision as \"F5\",\r\n"
+                                           + "cc.numeric_scale as \"F6\",\r\n"
+                                           + "null as \"F7\",\r\n"
+                                           + "case cc.is_nullable when 'NO' then 0 else 1 end as \"F8\",\r\n"
+                                           + "case cc.is_identity when 'NO' then 0 else 1 end as \"F9\",\r\n"
+                                           + "d.description as \"F10\",\r\n"
+                                           + "cc.column_default as \"F11\" \r\n"
+                                           + "from pg_class c \r\n"
+                                           + "inner join pg_attribute a on a.attnum > 0 and a.attrelid = c.oid \r\n"
+                                           + "left join information_schema.columns cc on cc.column_name = a.attname \r\n"
+                                           + "left join pg_constraint const on const.conrelid = c.oid and const.contype = 'p' and a.attnum = const.conkey[1] \r\n"
+                                           + "inner join pg_type t on t.oid = a.atttypid \r\n"
+                                           + "left join pg_type t2 on t2.oid = t.typelem \r\n"
+                                           + "left join pg_description d on d.objoid = a.attrelid and d.objsubid = a.attnum \r\n"
+                                           + "left join pg_attrdef e on e.adrelid = a.attrelid and e.adnum = a.attnum \r\n"
+                                           + "inner join pg_namespace ns on ns.oid = c.relnamespace \r\n"
+                                           + "inner join pg_namespace ns2 on ns2.oid = t.typnamespace \r\n"
                                            + "where %s in (%s) \r\n"
-                                           + "and %s ",
+                                           + "and %s",
                                    ignoreCase
-                                   ? "lower(a.owner) "
-                                   : "a.owner ",
+                                   ? "lower(cc.table_catalog) "
+                                   : "cc.table_catalog ",
                                    inDatabase,
                                    tablesMatcher);
 
@@ -502,36 +670,28 @@ public class PostgreSQLDbFirst
     /**
      * 查询索引/唯一键信息
      *
-     * @param inDatabase    用来筛选数据库的sql语句
      * @param tablesMatcher 用来匹配表名的sql语句
-     * @param ignoreCase    忽略大小写
      * @return 索引/唯一键信息
      */
-    private List<Map<String, Object>> selectIndexInfo(String inDatabase,
-                                                      String tablesMatcher,
-                                                      boolean ignoreCase)
+    private List<Map<String, Object>> selectIndexInfo(String tablesMatcher)
             throws
             ModuleException {
-        String sql = String.format("select \r\n"
-                                           + "a.table_owner || '.' || a.table_name as \"F1\",\r\n"
-                                           + "c.column_name as \"F2\",\r\n"
-                                           + "c.index_name as \"F3\",\r\n"
-                                           + "case when a.uniqueness = 'UNIQUE' then 1 else 0 end as \"F4\",\r\n"
-                                           + "case when exists(select 1 from all_constraints where index_name = a.index_name and constraint_type = 'P') then 1 else 0 end as \"F5\",\r\n"
-                                           + "0 as \"F6\",\r\n"
-                                           + "case when c.descend = 'DESC' then 1 else 0 end as \"F7\",\r\n"
-                                           + "c.column_position as \"F8\" \r\n"
-                                           + "from all_indexes a,\r\n"
-                                           + "all_ind_columns c \r\n"
-                                           + "where a.index_name = c.index_name \r\n"
-                                           + "and a.table_owner = c.table_owner \r\n"
-                                           + "and a.table_name = c.table_name \r\n"
-                                           + "and %s in (%s) \r\n"
-                                           + "and %s ",
-                                   ignoreCase
-                                   ? "lower(a.table_owner)"
-                                   : "a.table_owner",
-                                   inDatabase,
+        String sql = String.format("select\n"
+                                           + "ns.nspname || '.' || c.relname as table_id as \"F1\", \r\n"
+                                           + "attr.attname as \"F2\", \r\n"
+                                           + "b.relname as \"F3\", \r\n"
+                                           + "case when a.indisunique then 1 else 0 end as \"F4\", \r\n"
+                                           + "case when a.indisprimary then 1 else 0 end as \"F5\", \r\n"
+                                           + "case when a.indisclustered then 0 else 1 end as \"F6\", \r\n"
+                                           + "case when pg_index_column_has_property(b.oid, attr.attnum, 'desc') = 't' then 1 else 0 end as \"F7\", \r\n"
+                                           + "a.indkey::text as \"F8\", \r\n"
+                                           + "attr.attnum as \"F9\" \r\n"
+                                           + "from pg_index a\n"
+                                           + "inner join pg_class b on b.oid = a.indexrelid\n"
+                                           + "inner join pg_attribute attr on attr.attnum > 0 and attr.attrelid = b.oid\n"
+                                           + "inner join pg_namespace ns on ns.oid = b.relnamespace\n"
+                                           + "inner join pg_class c on c.oid = a.indrelid \r\n"
+                                           + "where %s ",
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
@@ -558,43 +718,18 @@ public class PostgreSQLDbFirst
             throws
             ModuleException {
         String sql = String.format("select \r\n"
-                                           + "a.owner || '.' || a.table_name as \"F1\",\r\n"
-                                           + "c.column_name as \"F2\",\r\n"
-                                           + "c.constraint_name as \"F3\",\r\n"
-                                           + "b.owner || '.' || b.table_name as \"F4\",\r\n"
-                                           + "1 as \"F5\",\r\n"
-                                           + "d.column_name as \"F6\" \r\n"
-                                           + "\r\n"
-                                           + "-- a.owner 外键拥有者,\r\n"
-                                           + "-- a.table_name 外键表,\r\n"
-                                           + "-- c.column_name 外键列,\r\n"
-                                           + "-- b.owner 主键拥有者,\r\n"
-                                           + "-- b.table_name 主键表,\r\n"
-                                           + "-- d.column_name 主键列,\r\n"
-                                           + "-- c.constraint_name 外键名,\r\n"
-                                           + "-- d.constraint_name 主键名\r\n"
-                                           + "\r\n"
-                                           + "from \r\n"
-                                           + "all_constraints a,\r\n"
-                                           + "all_constraints b,\r\n"
-                                           + "all_cons_columns c, --外键表\r\n"
-                                           + "all_cons_columns d  --主键表\r\n"
-                                           + "where \r\n"
-                                           + "a.r_constraint_name = b.constraint_name \r\n"
-                                           + "and a.constraint_type = 'R' \r\n"
-                                           + "and b.constraint_type = 'P' \r\n"
-                                           + "and a.r_owner = b.owner \r\n"
-                                           + "and a.constraint_name = c.constraint_name \r\n"
-                                           + "and b.constraint_name = d.constraint_name \r\n"
-                                           + "and a.owner = c.owner \r\n"
-                                           + "and a.table_name = c.table_name \r\n"
-                                           + "and b.owner = d.owner \r\n"
-                                           + "and b.table_name = d.table_name \r\n"
-                                           + "and %s in (%s) and %s ",
-                                   ignoreCase
-                                   ? "lower(a.owner)"
-                                   : "a.owner",
-                                   inDatabase,
+                                           + "ns.nspname || '.' || c.relname as \"F1\", \r\n"
+                                           + "array(select attname from pg_attribute where attrelid = a.conrelid and attnum = any(a.conkey)) as \"F2\", \r\n"
+                                           + "a.conname as \"F3\", \r\n"
+                                           + "ns2.nspname || '.' || b.relname as \"F4\", \r\n"
+                                           + "1 as \"F5\", \r\n"
+                                           + "array(select attname from pg_attribute where attrelid = a.confrelid and attnum = any(a.confkey)) as \"F6\" \r\n"
+                                           + "from  pg_constraint a \r\n"
+                                           + "inner join pg_class c on c.oid = a.conrelid \r\n"
+                                           + "inner join pg_class b on b.oid = a.confrelid \r\n"
+                                           + "inner join pg_namespace ns on ns.oid = c.relnamespace \r\n"
+                                           + "inner join pg_namespace ns2 on ns2.oid = b.relnamespace \r\n"
+                                           + "where %s ",
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
@@ -608,47 +743,128 @@ public class PostgreSQLDbFirst
     }
 
     /**
-     * 从数据库查询用户标识
-     *
-     * @return 用户标识
-     */
-    private String getUserIdFromDatabase()
-            throws
-            ModuleException {
-        //从数据库中查询
-        String sql = " select username from user_users";
-        return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
-                                  sql,
-                                  null,
-                                  null,
-                                  String.class,
-                                  null,
-                                  null,
-                                  config.getNameConvertType());
-    }
-
-    /**
-     * 从连接字符串中获取用户标识
+     * 获取用户标识
      *
      * @param lower 转小写
      * @return 用户标识
      */
-    private String getUserIdFromConnectionString(boolean lower)
+    private String getUserId(boolean lower)
             throws
             ModuleException {
-        Matcher matcher = Pattern.compile("jdbc:dm://(.*?)/(.*?)\\?",
+        String userId = this.config.getProperties()
+                                   .getProperty(DruidDataSourceFactory.PROP_USERNAME);
+        if (lower)
+            return userId.toLowerCase(Locale.ROOT);
+        else
+            return userId;
+    }
+
+    /**
+     * 从数据库查询模式名
+     *
+     * @param lower 转小写
+     * @return 模式名
+     */
+    private String getSchemaNameFromDatabase(boolean lower)
+            throws
+            ModuleException {
+        //从数据库中查询
+        String sql = " select \"schema_name\" from information_schema.schemata where \"schema_owner\"=(select current_user)";
+        String userId = this.ado.selectOne(getSqlSession(),
+                                           getMSId(MD5Utils.hash(sql)),
+                                           sql,
+                                           null,
+                                           null,
+                                           String.class,
+                                           null,
+                                           null,
+                                           config.getNameConvertType());
+        if (lower)
+            return userId.toLowerCase(Locale.ROOT);
+        else
+            return userId;
+    }
+
+    /**
+     * 从连接字符串中获取数据库名
+     *
+     * @param lower 转小写
+     * @return 数据库名
+     */
+    private String getDatabaseFromConnectionString(boolean lower)
+            throws
+            ModuleException {
+        Matcher matcher = Pattern.compile("jdbc:postgresql://(.*?)/(.*?)\\?",
                                           Pattern.CASE_INSENSITIVE)
                                  .matcher(config.getProperties()
                                                 .getProperty(DruidDataSourceFactory.PROP_URL));
         if (!matcher.find())
-            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:dm://(.*?)/(.*?)\\?"));
+            throw new ModuleException(Strings.getCanNotGetDbNameFromUrl("jdbc:postgresql://(.*?)/(.*?)\\?"));
 
         if (lower)
             return matcher.group(2)
                           .toLowerCase(Locale.ROOT);
         else
             return matcher.group(2);
+    }
+
+    /**
+     * 获取建表时的数据库数据类型
+     */
+    private String getSqlTypeName(String dataType,
+                                  String pgType) {
+        if (dataType.equals("array")) {
+            switch (pgType) {
+                case "_bool":
+                    pgType = "boolean";
+                    break;
+                case "_int2":
+                    pgType = "smallint";
+                    break;
+                case "_int4":
+                    pgType = "integer";
+                    break;
+                case "_int8":
+                    pgType = "bigint";
+                    break;
+                case "_float4":
+                    pgType = "real";
+                    break;
+                case "_float8":
+                    pgType = "double precision";
+                    break;
+                case "_char":
+                    pgType = "\"char\"";
+                    break;
+                case "_bpchar":
+                    pgType = "character";
+                    break;
+                case "_varchar":
+                    pgType = "character varying";
+                    break;
+                case "_time":
+                    pgType = "time without time zone";
+                    break;
+                case "_timetz":
+                    pgType = "time with time zone";
+                    break;
+                case "_timestamp":
+                    pgType = "timestamp without time zone";
+                    break;
+                case "_timestamptz":
+                    pgType = "timestamp with time zone";
+                    break;
+                default:
+                    pgType = pgType.substring(1);
+                    break;
+            }
+
+            return String.format("%s[]",
+                                 pgType);
+        } else if (dataType.equals("char"))
+            return "\"char\"";
+        else
+            return dataType;
     }
 
     /**
@@ -664,40 +880,25 @@ public class PostgreSQLDbFirst
                                       int length,
                                       int precision,
                                       int scale) {
-        String sqlType = type.toUpperCase(Locale.ROOT);
+        String sqlType = type.toLowerCase(Locale.ROOT);
 
-        if (sqlType.startsWith("INTERVAL DAY TO SECOND"))
-            sqlType = String.format("INTERVAL DAY(%s) TO SECOND(%s)",
-                                    (scale - 1536) / 16,
-                                    (scale - 1536) % 16);
-        else if (Pattern.compile("INTERVAL YEAR\\(\\d+\\) TO MONTH",
-                                 Pattern.CASE_INSENSITIVE)
-                        .matcher(sqlType)
-                        .find()) {
-            return sqlType;
-        } else if (sqlType.startsWith("TIMESTAMP"))
-            sqlType += scale <= 0
-                       ? ""
-                       : String.format("(%s)",
-                                       scale);
-        else if (sqlType.startsWith("BLOB")) {
-            return sqlType;
-        } else if (sqlType.startsWith("CLOB")) {
-            return sqlType;
-        } else if (sqlType.startsWith("NCLOB")) {
-            return sqlType;
-        } else if (sqlType.startsWith("TEXT")) {
-            return sqlType;
-        } else if (sqlType.equals("REAL") || sqlType.equals("DOUBLE") || sqlType.equals("FLOAT")) {
-            return sqlType;
-        } else if (precision > 0 && scale > 0)
-            sqlType += String.format("(%s,%s)",
+        if (sqlType.startsWith("timestamp with time zone") && length > 0)
+            sqlType = String.format("timestamp(%s) with time zone",
+                                    length);
+        else if (sqlType.startsWith("timestamp without time zone") && length > 0)
+            sqlType = String.format("timestamp(%s) without time zone",
+                                    length);
+        else if (sqlType.startsWith("time with time zone") && length > 0)
+            sqlType = String.format("time(%s) with time zone",
+                                    length);
+        else if (sqlType.startsWith("time without time zone") && length > 0)
+            sqlType = String.format("time(%s) without time zone",
+                                    length);
+        else if (precision > 0)
+            sqlType += String.format("(%s, %s)",
                                      precision,
                                      scale);
-        else if (precision > 0)
-            sqlType += String.format("(%s)",
-                                     precision);
-        else
+        else if (length > 0)
             sqlType += String.format("(%s)",
                                      length);
 
@@ -726,7 +927,7 @@ public class PostgreSQLDbFirst
      * 获取数据库表结构信息
      *
      * @param database   数据库名
-     * @param tablename  表明
+     * @param tablename  表名
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */
@@ -746,6 +947,10 @@ public class PostgreSQLDbFirst
         //尝试获取模式名+表名
         //模式名即为数据库名
         String[] tbname = null;
+
+        //当前数据库
+        String currentDatabase = getDatabaseFromConnectionString(ignoreCase);
+
         if (StringUtils.hasText(tablename)) {
             tbname = splitTableName(tablename,
                                     ignoreCase);
@@ -753,22 +958,18 @@ public class PostgreSQLDbFirst
                 throw new ModuleException(Strings.getUnknownValue("tablename",
                                                                   tablename));
             if (tbname.length == 1) {
-                String userId = getUserIdFromDatabase();
-                if (!StringUtils.hasText(userId))
-                    return tables;
-                tbname = new String[]{userId,
+                String schemaName = getSchemaNameFromDatabase(false);
+                tbname = new String[]{schemaName,
                                       tbname[0]};
             }
             if (ignoreCase)
                 tbname = new String[]{tbname[0].toLowerCase(Locale.ROOT),
                                       tbname[1].toLowerCase(Locale.ROOT)};
-            database = new String[]{tbname[0]};
-        } else if (database == null || database.length == 0) {
-            String userId = getUserIdFromDatabase();
-            if (!StringUtils.hasText(userId))
-                return tables;
-            database = new String[]{userId};
+            database = new String[]{currentDatabase};
         }
+        //如果没有指定数据库，则获取当前数据库为指定数据库
+        else if (database == null || database.length == 0)
+            database = new String[]{currentDatabase};
 
         //用来在sql语句中筛选出当前操作涉及的数据库
         String inDatabase = Arrays.stream(database)
@@ -778,8 +979,7 @@ public class PostgreSQLDbFirst
                                   .collect(Collectors.joining(","));
 
         //查询表结构信息
-        List<Map<String, Object>> dataMap = selectTableInfo(inDatabase,
-                                                            tbname,
+        List<Map<String, Object>> dataMap = selectTableInfo(tbname,
                                                             ignoreCase);
 
         if (dataMap == null || dataMap.size() == 0)
@@ -864,8 +1064,8 @@ public class PostgreSQLDbFirst
             for (int i = 0; i < t_v_names.size(); i++) {
                 if (i > 0) tablesMatcherSB.append(" or ");
                 tablesMatcherSB.append(ignoreCase
-                                       ? "lower(a.table_name) in ("
-                                       : "a.table_name in (");
+                                       ? "lower(ns.nspname || '.' || c.relname) in ("
+                                       : "ns.nspname || '.' || c.relname in (");
 
                 for (int j = 0; j < t_v_names.get(i).length; j++) {
                     if (j > 0) tablesMatcherSB.append(",");
@@ -896,9 +1096,13 @@ public class PostgreSQLDbFirst
             //列名
             String column = String.valueOf(d.get("F2"));
             //数据类型
-            String type = String.valueOf(d.get("F3"))
-                                .replaceAll("\\(\\d+\\)",
-                                            "");
+            String type = String.valueOf(d.get("F3"));
+            //数据库建表时的数据类型
+            String[] types = type.toLowerCase(Locale.ROOT)
+                                 .split("\\.");
+            type = getSqlTypeName(types[0],
+                                  types[1]);
+
             //数据长度
             Tuple2<Boolean, Integer> length_result = NumericExtension.tryParseInt(String.valueOf(d.get("F4")));
             int length = length_result.a
@@ -915,16 +1119,13 @@ public class PostgreSQLDbFirst
                         ? scale_result.b
                         : 0;
             //建表时的完整类型名称
-            String sqlType = getSqlTypeFullName(String.valueOf(d.get("F3")),
+            String sqlType = getSqlTypeFullName(type,
                                                 length,
                                                 precision,
                                                 scale);
             //数据的最大长度
-            Matcher max_length_matcher = Pattern.compile("\\w+\\((\\d+)")
-                                                .matcher(sqlType);
-            int max_length = max_length_matcher.find()
-                             ? Integer.parseInt(max_length_matcher.group(1))
-                             : -1;
+            int max_length = length;
+
             //是否可为空
             boolean is_nullable = String.valueOf(d.get("F8"))
                                         .equals("1");
@@ -933,10 +1134,11 @@ public class PostgreSQLDbFirst
                                         .equals("1");
             //注释
             String comment = String.valueOf(d.get("F10"));
+
             //默认值
             String defaultValue = String.valueOf(d.get("F11"));
 
-            //如果数据的最大长度为0，则判定为可变长度的数据类型（TEXT, CLOB......）
+            //如果数据的最大长度为0，则判定为可变长度的数据类型（TEXT, ARRAY......）
             if (max_length == 0)
                 max_length = -1;
 
@@ -972,9 +1174,7 @@ public class PostgreSQLDbFirst
         }
 
         //查询索引/唯一键信息
-        dataMap = selectIndexInfo(inDatabase,
-                                  tablesMatcher,
-                                  ignoreCase);
+        dataMap = selectIndexInfo(tablesMatcher);
 
         if (dataMap == null)
             return tables;
@@ -1004,6 +1204,16 @@ public class PostgreSQLDbFirst
             //是否降序
             boolean is_desc = String.valueOf(d.get("F7"))
                                     .equals("1");
+//            //索引
+//            String[] indkeys = String.valueOf(d.get("F8"))
+//                                     .split(" ");
+//            Tuple2<Boolean, Integer> attnum_result = NumericExtension.tryParseInt(String.valueOf(d.get("F9")));
+//            int indkey = 0;
+//            if (attnum_result.a) {
+//                Tuple2<Boolean, Integer> indkey_result = NumericExtension.tryParseInt(indkeys[attnum_result.b - 1]);
+//                if (indkey_result.a)
+//                    indkey = indkey_result.b;
+//            }
 
             //如果当前只有默认数据库
             if (database.length == 1)
@@ -1111,6 +1321,8 @@ public class PostgreSQLDbFirst
                 //列名
                 String column = String.valueOf(d.get("F2"))
                                       .trim();
+                column = column.substring(1,
+                                          column.length() - 1);
                 //外键名
                 String fk_id = String.valueOf(d.get("F3"));
                 //关联表名
@@ -1119,7 +1331,10 @@ public class PostgreSQLDbFirst
 //                boolean is_foreign_key = String.valueOf(d.get("F5"))
 //                                               .equals("1");
                 //关联列名
-                String ref_column = String.valueOf(d.get("F6"));
+                String ref_column = String.valueOf(d.get("F6"))
+                                          .trim();
+                ref_column = ref_column.substring(1,
+                                                  ref_column.length() - 1);
 
                 //如果当前只有默认数据库
                 if (database.length == 1) {
@@ -1212,7 +1427,7 @@ public class PostgreSQLDbFirst
     public List<String> getDatabases()
             throws
             ModuleException {
-        String sql = " select username from all_users";
+        String sql = " select datname from pg_database where datname not in ('template1', 'template0')";
         return this.ado.selectList(getSqlSession(),
                                    getMSId(MD5Utils.hash(sql)),
                                    sql,
@@ -1256,22 +1471,22 @@ public class PostgreSQLDbFirst
 
         //获取当前模式名，也就是用户标识
         if (tbname.length == 1) {
-            String userId = getUserIdFromConnectionString(ignoreCase);
-            tbname = new String[]{userId,
+            String schemaName = getSchemaNameFromDatabase(ignoreCase);
+            tbname = new String[]{schemaName,
                                   tbname[0]};
         }
 
-        String sql = String.format(" select case when count(1) > 0 then 1 else 0 end from all_tab_comments where %s%s and %s%s",
+        String sql = String.format(" select case when count(1) > 0 then 1 else 0 end from pg_tables a inner join pg_namespace b on b.nspname = a.schemaname where %s%s and %s%s",
                                    ignoreCase
-                                   ? "lower(owner)"
-                                   : "owner",
+                                   ? "lower(b.nspname)"
+                                   : "b.nspname",
                                    StringUtils.hasText(tbname[0])
                                    ? String.format("='%s'",
                                                    tbname[0])
                                    : " is null",
                                    ignoreCase
-                                   ? "lower(table_name)"
-                                   : "table_name",
+                                   ? "lower(a.tablename)"
+                                   : "a.tablename",
                                    StringUtils.hasText(tbname[1])
                                    ? String.format("='%s'",
                                                    tbname[1])
@@ -1290,141 +1505,73 @@ public class PostgreSQLDbFirst
 
     @Override
     public JDBCType getJDBCType(DbColumnInfo column) {
-        String dbTypeTextFull = column.getDbTypeTextFull() == null
-                                ? ""
-                                : column.getDbTypeTextFull()
-                                        .toLowerCase(Locale.ROOT);
-        switch (dbTypeTextFull) {
-            case "number(1)":
-            case "numeric(1)":
-                return JDBCType.BIT;
-            case "number(3)":
-            case "numeric(3)":
-                return JDBCType.TINYINT;
-            case "number(5)":
-            case "numeric(5)":
-                return JDBCType.SMALLINT;
-            case "number(10)":
-            case "numeric(10)":
-                return JDBCType.INTEGER;
-            case "number(19)":
-            case "numeric(19)":
-                return JDBCType.BIGINT;
-            case "float(63)":
-                return JDBCType.FLOAT;
-            case "float(126)":
-                return JDBCType.DOUBLE;
-            case "number(10,2)":
-                return JDBCType.DECIMAL;
+        String dbTypeText = column.getDbTypeText();
+        dbTypeText = dbTypeText == null
+                     ? ""
+                     : dbTypeText.toLowerCase(Locale.ROOT);
 
-            case "interval day(2) to second(6)":
-                return JDBCType.TIME;
-            case "datetime":
-            case "timestamp(6)":
-            case "timestamp(6) with local time zone":
-                return JDBCType.TIMESTAMP;
+        boolean isArray = dbTypeText.endsWith("[]");
 
-            case "blob":
-                return JDBCType.BLOB;
-            case "clob":
-                return JDBCType.CLOB;
-            case "nvarchar2(255)":
-                return JDBCType.NVARCHAR;
+        if (isArray)
+            return JDBCType.ARRAY;
 
-            case "char(36)":
-                return JDBCType.CHAR;
-        }
-
-        String dbTypeText = column.getDbTypeText() == null
-                            ? ""
-                            : column.getDbTypeText()
-                                    .toLowerCase(Locale.ROOT);
         switch (dbTypeText) {
-            case "bit":
-                return JDBCType.BIT;
-            case "byte":
-            case "tinyint":
-                return JDBCType.TINYINT;
+            case "boolean":
+                return JDBCType.BOOLEAN;
             case "smallint":
+            case "smallserial":
                 return JDBCType.SMALLINT;
-            case "int":
             case "integer":
+            case "serial":
                 return JDBCType.INTEGER;
             case "bigint":
+            case "bigserial":
                 return JDBCType.BIGINT;
             case "real":
-            case "binary_float":
                 return JDBCType.FLOAT;
-            case "double":
-            case "float":
             case "double precision":
-            case "binary_double":
                 return JDBCType.DOUBLE;
             case "numeric":
-            case "number":
-                if (column.getScale() == 0) {
-                    if (column.getPrecision() >= 19)
-                        return JDBCType.BIGINT;
-                    else if (column.getPrecision() >= 10)
-                        return JDBCType.INTEGER;
-                    else if (column.getPrecision() >= 5)
-                        return JDBCType.SMALLINT;
-                    else if (column.getPrecision() >= 3)
-                        return JDBCType.TINYINT;
-                    else
-                        return JDBCType.BIT;
-                }
-            case "dec":
-            case "decimal":
+            case "money":
                 return JDBCType.DECIMAL;
-            case "time":
-            case "interval day to second":
-            case "interval year to month":
-            case "interval year":
-            case "interval month":
-            case "interval day":
-            case "interval day to hour":
-            case "interval day to minute":
-            case "interval hour":
-            case "interval hour to minute":
-            case "interval hour to second":
-            case "interval minute":
-            case "interval minute to second":
-            case "interval second":
-            case "time with time zone":
-                return JDBCType.TIME;
+
             case "date":
                 return JDBCType.DATE;
+            case "time":
+            case "time without time zone":
+                return JDBCType.TIME;
+            case "time with time zone":
+                return JDBCType.TIME_WITH_TIMEZONE;
             case "timestamp":
-            case "timestamp with local time zone":
-            case "timestamp with time zone":
+            case "timestamp without time zone":
                 return JDBCType.TIMESTAMP;
-            case "binary":
-            case "varbinary":
-            case "blob":
-            case "image":
-            case "longvarbinary":
-            case "bfile":
-            case "raw":
-            case "long raw":
+            case "timestamp with time zone":
+                return JDBCType.TIMESTAMP_WITH_TIMEZONE;
+
+            case "bytea":
+                return JDBCType.LONGVARBINARY;
+            case "bit":
+                return JDBCType.BINARY;
+            case "bit varying":
                 return JDBCType.VARBINARY;
-            case "character":
+
             case "char":
                 return JDBCType.CHAR;
-            case "nchar":
-                return JDBCType.NCHAR;
-            case "nvarchar":
-            case "nvarchar2":
-            case "nclob":
-                return JDBCType.NVARCHAR;
-            case "clob":
             case "varchar":
-            case "varchar2":
-            case "text":
-            case "longvarchar":
-            case "rowid":
+            case "character":
+            case "character varying":
+            case "name":
+            case "cidr":
+            case "inet":
+            case "macaddr":
+            case "macaddr8":
+            case "uuid":
             default:
                 return JDBCType.VARCHAR;
+            case "text":
+            case "json":
+            case "jsonb":
+                return JDBCType.LONGVARCHAR;
         }
     }
 

@@ -170,6 +170,15 @@ public class SqlServerDbFirst
                                                      byte[].class,
                                                      Byte[].class));
 
+        dbToJavaMap.putIfAbsent("char",
+                                new DbTypeToJavaType("(char)",
+                                                     "(Character)",
+                                                     "%s.charAt(0)",
+                                                     "Character.toString(%s)",
+                                                     "char",
+                                                     "Character",
+                                                     char.class,
+                                                     Character.class));
         dbToJavaMap.putIfAbsent("nvarchar",
                                 new DbTypeToJavaType("(String)",
                                                      "(String)",
@@ -279,16 +288,21 @@ public class SqlServerDbFirst
                                       "binary");
                 break;
             case "char":
+            case "nchar":
+                copyAndPutDbToJavaMap(dbTypeTextFull,
+                                      "char");
+                break;
             case "varchar":
             case "text":
-            case "nchar":
             case "nvarchar":
             case "ntext":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "nvarchar");
+                break;
             case "uniqueidentifier":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "uniqueidentifier");
+                break;
             default:
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "unknown");
@@ -588,7 +602,7 @@ public class SqlServerDbFirst
      * 获取数据库表结构信息
      *
      * @param database   数据库名
-     * @param tablename  表明
+     * @param tablename  表名
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */

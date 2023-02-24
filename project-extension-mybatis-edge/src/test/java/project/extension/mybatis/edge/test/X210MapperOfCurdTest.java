@@ -7,10 +7,9 @@ import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
-import project.extension.mybatis.edge.entityFields.CQI_Fields;
-import project.extension.mybatis.edge.extention.EntityExtension;
-import project.extension.mybatis.edge.mapper.ICommonQuickInputMapper;
+import project.extension.mybatis.edge.entity.TestGeneralEntity;
+import project.extension.mybatis.edge.entityFields.TGE_Fields;
+import project.extension.mybatis.edge.mapper.ITestGeneralEntityMapper;
 
 /**
  * 210.Mapper增删改查测试
@@ -49,15 +48,10 @@ public class X210MapperOfCurdTest {
     public void _210(String name)
             throws
             Throwable {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
-                                                                    ICommonQuickInputMapper.class);
-        EntityExtension entityExtension = new EntityExtension(null);
+        ITestGeneralEntityMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
+                                                                     ITestGeneralEntityMapper.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         int rowsCreate = mapper.insert(dataCreate);
 
@@ -68,22 +62,18 @@ public class X210MapperOfCurdTest {
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 
-        CommonQuickInput dataCheckCreate = mapper.getById(dataCreate.getId());
+        TestGeneralEntity dataCheckCreate = mapper.getById(dataCreate.getId());
         Assertions.assertNotNull(dataCheckCreate,
                                  "查询新增的数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCheckCreate.getId(),
                                   dataCheckCreate);
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
-                                     CQI_Fields.id,
-                                     CQI_Fields.category,
-                                     CQI_Fields.content,
-                                     CQI_Fields.keyword,
-                                     CQI_Fields.public_);
+                                     TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                           dataCheckCreate.getId());
@@ -101,21 +91,15 @@ public class X210MapperOfCurdTest {
     public void _211(String name)
             throws
             Throwable {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
-                                                                    ICommonQuickInputMapper.class);
+        ITestGeneralEntityMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
+                                                                     ITestGeneralEntityMapper.class);
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        CommonQuickInput dataUpdate = new CommonQuickInput();
+        TestGeneralEntity dataUpdate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         dataUpdate.setId(tempData.getId());
-        dataUpdate.setCategory("测试分类1");
-        dataUpdate.setContent("测试内容1");
-        dataUpdate.setKeyword("测试关键字1");
-        dataUpdate.setPublic_(false);
-        dataUpdate.setCreateBy(tempData.getCreateBy());
-        dataUpdate.setCreateTime(tempData.getCreateTime());
 
         int rowsUpdate = mapper.update(dataUpdate);
 
@@ -126,22 +110,18 @@ public class X210MapperOfCurdTest {
         System.out.printf("\r\n已更新数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckUpdate = mapper.getById(dataUpdate.getId());
+        TestGeneralEntity dataCheckUpdate = mapper.getById(dataUpdate.getId());
         Assertions.assertNotNull(dataCheckUpdate,
                                  "查询新增的数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   tempData.getId(),
                                   dataCheckUpdate);
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
-                                     CQI_Fields.id,
-                                     CQI_Fields.category,
-                                     CQI_Fields.content,
-                                     CQI_Fields.keyword,
-                                     CQI_Fields.public_);
+                                     TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                           dataCheckUpdate.getId());
@@ -157,11 +137,11 @@ public class X210MapperOfCurdTest {
     @DisplayName("212.测试删除功能")
     @Order(212)
     public void _212(String name) {
-        ICommonQuickInputMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
-                                                                    ICommonQuickInputMapper.class);
+        ITestGeneralEntityMapper mapper = OrmObjectResolve.getMapper(TestDataSourceConfigure.getTestDataSource(name),
+                                                                     ITestGeneralEntityMapper.class);
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
         int rowsDelete = mapper.deleteById(tempData.getId());
 
@@ -172,13 +152,13 @@ public class X210MapperOfCurdTest {
         System.out.printf("\r\n已删除数据，Id：%s\r\n",
                           tempData.getId());
 
-        CommonQuickInput dataCheckDelete = mapper.getById(tempData.getId());
+        TestGeneralEntity dataCheckDelete = mapper.getById(tempData.getId());
 
         Assertions.assertNull(dataCheckDelete,
                               "数据未删除");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      tempData.getId());
 
         System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",

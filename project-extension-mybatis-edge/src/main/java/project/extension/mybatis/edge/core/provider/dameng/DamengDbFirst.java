@@ -155,13 +155,13 @@ public class DamengDbFirst
 
         dbToJavaMap.putIfAbsent("blob",
                                 new DbTypeToJavaType("(byte[])",
-                                                     "(Byte[])",
+                                                     "(byte[])",
                                                      "Base64.getDecoder().decode(%s.getBytes(StandardCharsets.UTF_8))",
                                                      "new String(Base64.getEncoder().encode(%s), StandardCharsets.UTF_8)",
                                                      "byte[]",
-                                                     "Byte[]",
+                                                     "byte[]",
                                                      byte[].class,
-                                                     Byte[].class));
+                                                     byte[].class));
 
         dbToJavaMap.putIfAbsent("nvarchar2(255)",
                                 new DbTypeToJavaType("(String)",
@@ -674,7 +674,7 @@ public class DamengDbFirst
      * 获取数据库表结构信息
      *
      * @param database   数据库名
-     * @param tablename  表明
+     * @param tablename  表名
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */

@@ -14,8 +14,7 @@ import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.dbContext.repository.IBaseRepository_Key;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
-import project.extension.mybatis.edge.extention.EntityExtension;
+import project.extension.mybatis.edge.entity.TestGeneralEntity;
 import project.extension.standard.exception.BusinessException;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
@@ -59,16 +58,10 @@ public class X500BasicsOfRepositoryTransactionTest {
     public void _500(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -78,7 +71,7 @@ public class X500BasicsOfRepositoryTransactionTest {
             repository_key.insert(dataCreate);
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
 
@@ -92,13 +85,13 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         System.out.println("\r\n事务已提交");
 
-        CommonQuickInput dataCheckCreate = repository_key.getById(dataCreate.getId());
+        TestGeneralEntity dataCheckCreate = repository_key.getById(dataCreate.getId());
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
 
         TempDataExtension.cleanData(name,
-                                    CommonQuickInput.class,
+                                    TestGeneralEntity.class,
                                     dataCreate.getId());
 
         System.out.println("\r\n事务提交成功");
@@ -116,16 +109,10 @@ public class X500BasicsOfRepositoryTransactionTest {
     public void _501(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -135,7 +122,7 @@ public class X500BasicsOfRepositoryTransactionTest {
             repository_key.insert(dataCreate);
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
 
@@ -152,13 +139,13 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         System.out.println("\r\n事务已回滚");
 
-        CommonQuickInput dataCheckCreate = repository_key.getById(dataCreate.getId());
+        TestGeneralEntity dataCheckCreate = repository_key.getById(dataCreate.getId());
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate.getId());
 
         System.out.println("\r\n事务回滚成功");
@@ -177,22 +164,12 @@ public class X500BasicsOfRepositoryTransactionTest {
     public void _510(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate1 = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate1 = entityExtension.initialization(new CommonQuickInput());
-        dataCreate1.setCategory("测试分类1");
-        dataCreate1.setContent("测试内容1");
-        dataCreate1.setKeyword("测试关键字1");
-        dataCreate1.setPublic_(true);
+        TestGeneralEntity dataCreate2 = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate2 = entityExtension.initialization(new CommonQuickInput());
-        dataCreate2.setCategory("测试分类2");
-        dataCreate2.setContent("测试内容2");
-        dataCreate2.setKeyword("测试关键字2");
-        dataCreate2.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -202,7 +179,7 @@ public class X500BasicsOfRepositoryTransactionTest {
             repository_key.insert(dataCreate1);
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate1.getId(),
                                       dataCreate1);
 
@@ -213,7 +190,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                 repository_key.insert(dataCreate2);
 
                 TempDataExtension.putData(name,
-                                          CommonQuickInput.class,
+                                          TestGeneralEntity.class,
                                           dataCreate2.getId(),
                                           dataCreate2);
 
@@ -239,22 +216,22 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         System.out.println("\r\n事务1已回滚");
 
-        CommonQuickInput dataCheckCreate1 = repository_key.getById(dataCreate1.getId());
+        TestGeneralEntity dataCheckCreate1 = repository_key.getById(dataCreate1.getId());
 
         Assertions.assertNull(dataCheckCreate1,
                               "事务回滚后依然能查询到新增的数据1");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate1.getId());
 
-        CommonQuickInput dataCheckCreate2 = repository_key.getById(dataCreate2.getId());
+        TestGeneralEntity dataCheckCreate2 = repository_key.getById(dataCreate2.getId());
 
         Assertions.assertNull(dataCheckCreate2,
                               "事务回滚后依然能查询到新增的数据2");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate2.getId());
 
         System.out.println("\r\n事务回滚成功");
@@ -278,16 +255,10 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -299,7 +270,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                           dataCreate.getId());
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCreate.getId(),
                                   dataCreate);
     }
@@ -316,17 +287,17 @@ public class X500BasicsOfRepositoryTransactionTest {
     public void _521(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
 
-        CommonQuickInput dataCheckCreate = repository_key.getById(tempData.getId());
+        TestGeneralEntity dataCheckCreate = repository_key.getById(tempData.getId());
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
@@ -335,7 +306,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                           tempData.getId());
 
         TempDataExtension.cleanData(name,
-                                    CommonQuickInput.class,
+                                    TestGeneralEntity.class,
                                     tempData.getId());
     }
 
@@ -357,16 +328,10 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -378,7 +343,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                           dataCreate.getId());
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCreate.getId(),
                                   dataCreate);
     }
@@ -395,23 +360,23 @@ public class X500BasicsOfRepositoryTransactionTest {
     public void _523(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
                                  "获取Repository_Key失败");
 
-        CommonQuickInput dataCheckCreate = repository_key.getById(tempData.getId());
+        TestGeneralEntity dataCheckCreate = repository_key.getById(tempData.getId());
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      tempData.getId());
 
         System.out.printf("\r\n未查询到新增数据，Id：%s，事务回滚成功\r\n",
@@ -440,16 +405,10 @@ public class X500BasicsOfRepositoryTransactionTest {
 
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        IBaseRepository_Key<CommonQuickInput, String> repository_key
-                = naiveSql.getRepository_Key(CommonQuickInput.class,
+        IBaseRepository_Key<TestGeneralEntity, String> repository_key
+                = naiveSql.getRepository_Key(TestGeneralEntity.class,
                                              String.class);
 
         Assertions.assertNotNull(repository_key,
@@ -462,7 +421,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                               dataCreate.getId());
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
         });
@@ -472,7 +431,7 @@ public class X500BasicsOfRepositoryTransactionTest {
                                 "编程式事务未回滚");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate.getId());
 
         ExceptionExtension.output(tranCreate.b);

@@ -36,12 +36,22 @@ public @interface ColumnSetting {
     /**
      * 主键
      */
-    boolean primaryKey() default false;
+    boolean isPrimaryKey() default false;
+
+    /**
+     * 自增
+     */
+    boolean isIdentity() default false;
+
+    /**
+     * 可为空
+     */
+    boolean isNullable() default true;
 
     /**
      * 忽略
      */
-    boolean ignore() default false;
+    boolean isIgnore() default false;
 
     /**
      * 长度
@@ -60,9 +70,4 @@ public @interface ColumnSetting {
      * 小数位
      */
     int scale() default 0;
-
-    /**
-     * 可为空
-     */
-    boolean isNullable() default true;
 }

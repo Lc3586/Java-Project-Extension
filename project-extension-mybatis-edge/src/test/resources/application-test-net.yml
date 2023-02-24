@@ -12,7 +12,7 @@ project:
       scanMapperPackages: project.extension.mybatis.edge.mapper.**
       # 需要扫描的存放Mapper配置类的包
       scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
-      # 默认的实体类表明/列名命名规则
+      # 默认的实体类表名/列名命名规则
       nameConvertType: CamelCaseToPascalCase
       # 多数据源配置（单数据库时无需配置此项）
       multiDataSource:

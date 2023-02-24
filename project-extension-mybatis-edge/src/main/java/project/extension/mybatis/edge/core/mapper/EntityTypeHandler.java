@@ -54,7 +54,7 @@ public class EntityTypeHandler {
         for (Field field : entityType.getDeclaredFields()) {
             ColumnSetting executorSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                     ColumnSetting.class);
-            if (executorSettingAttribute != null && executorSettingAttribute.primaryKey()) fields.add(field);
+            if (executorSettingAttribute != null && executorSettingAttribute.isPrimaryKey()) fields.add(field);
         }
 
         return fields;
@@ -75,7 +75,7 @@ public class EntityTypeHandler {
         for (Field field : entityType.getDeclaredFields()) {
             ColumnSetting executorSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                     ColumnSetting.class);
-            if (executorSettingAttribute != null && executorSettingAttribute.primaryKey())
+            if (executorSettingAttribute != null && executorSettingAttribute.isPrimaryKey())
                 fieldWithColumns.put(field.getName(),
                                      getColumn(field,
                                                nameConvertType));
@@ -527,7 +527,8 @@ public class EntityTypeHandler {
                                          boolean withOutPrimaryKey) {
         ColumnSetting columnSetting = AnnotationUtils.findAnnotation(field,
                                                                      ColumnSetting.class);
-        return columnSetting != null && (columnSetting.ignore() || (withOutPrimaryKey && columnSetting.primaryKey()));
+        return columnSetting != null && (columnSetting.isIgnore() || (withOutPrimaryKey
+                && columnSetting.isPrimaryKey()));
     }
 
     /**
@@ -538,7 +539,7 @@ public class EntityTypeHandler {
     public static boolean isPrimaryKey(Field field) {
         ColumnSetting columnSetting = AnnotationUtils.findAnnotation(field,
                                                                      ColumnSetting.class);
-        return columnSetting != null && columnSetting.primaryKey();
+        return columnSetting != null && columnSetting.isPrimaryKey();
     }
 
     /**
@@ -768,6 +769,7 @@ public class EntityTypeHandler {
         else if (type.equals(Date.class)) return JdbcType.TIMESTAMP;
         else if (type.equals(java.sql.Date.class)) return JdbcType.DATE;
         else if (type.equals(java.sql.Time.class)) return JdbcType.TIME;
+        else if (type.equals(byte[].class)) return JdbcType.VARBINARY;
         else return JdbcType.UNDEFINED;
     }
 

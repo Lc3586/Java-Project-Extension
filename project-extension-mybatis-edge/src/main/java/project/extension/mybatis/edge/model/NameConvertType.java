@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.model;
 import project.extension.openapi.annotations.OpenApiDescription;
 
 /**
- * 实体类表明/列名命名规则
+ * 实体类表名/列名命名规则
  *
  * @author LCTR
  * @date 2022-05-27

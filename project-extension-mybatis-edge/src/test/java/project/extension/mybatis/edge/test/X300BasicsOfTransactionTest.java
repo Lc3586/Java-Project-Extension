@@ -10,9 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.common.*;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
-import project.extension.mybatis.edge.entityFields.CQI_Fields;
-import project.extension.mybatis.edge.extention.EntityExtension;
+import project.extension.mybatis.edge.entity.TestGeneralEntity;
+import project.extension.mybatis.edge.entityFields.TGE_Fields;
 import project.extension.mybatis.edge.model.FilterCompare;
 import project.extension.standard.exception.BusinessException;
 import project.extension.standard.exception.ModuleException;
@@ -57,16 +56,10 @@ public class X300BasicsOfTransactionTest {
     public void _300(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
-
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
-            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+            int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                              dataCreate)
                                      .executeAffrows();
 
@@ -75,7 +68,7 @@ public class X300BasicsOfTransactionTest {
                                     "新增数据失败");
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
 
@@ -89,17 +82,17 @@ public class X300BasicsOfTransactionTest {
 
         System.out.println("\r\n事务已提交");
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataCreate.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataCreate.getId()))
+                                                    .first();
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
 
         TempDataExtension.cleanData(name,
-                                    CommonQuickInput.class,
+                                    TestGeneralEntity.class,
                                     dataCreate.getId());
 
         System.out.println("\r\n事务提交成功");
@@ -117,16 +110,10 @@ public class X300BasicsOfTransactionTest {
     public void _301(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
-
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
-            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+            int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                              dataCreate)
                                      .executeAffrows();
 
@@ -135,7 +122,7 @@ public class X300BasicsOfTransactionTest {
                                     "新增数据失败");
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
 
@@ -152,17 +139,17 @@ public class X300BasicsOfTransactionTest {
 
         System.out.println("\r\n事务已回滚");
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataCreate.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataCreate.getId()))
+                                                    .first();
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate.getId());
 
         System.out.println("\r\n事务回滚成功");
@@ -181,22 +168,12 @@ public class X300BasicsOfTransactionTest {
     public void _310(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate1 = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate1 = entityExtension.initialization(new CommonQuickInput());
-        dataCreate1.setCategory("测试分类1");
-        dataCreate1.setContent("测试内容1");
-        dataCreate1.setKeyword("测试关键字1");
-        dataCreate1.setPublic_(true);
-
-        CommonQuickInput dataCreate2 = entityExtension.initialization(new CommonQuickInput());
-        dataCreate2.setCategory("测试分类2");
-        dataCreate2.setContent("测试内容2");
-        dataCreate2.setKeyword("测试关键字2");
-        dataCreate2.setPublic_(true);
+        TestGeneralEntity dataCreate2 = TempDataExtension.generateData(TestGeneralEntity.class);
 
         Tuple2<Boolean, Exception> tranCreate1 = naiveSql.transaction(() -> {
-            int rowsCreate1 = naiveSql.insert(CommonQuickInput.class,
+            int rowsCreate1 = naiveSql.insert(TestGeneralEntity.class,
                                               dataCreate1)
                                       .executeAffrows();
 
@@ -205,7 +182,7 @@ public class X300BasicsOfTransactionTest {
                                     "新增1数据失败");
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate1.getId(),
                                       dataCreate1);
 
@@ -213,7 +190,7 @@ public class X300BasicsOfTransactionTest {
                               dataCreate1.getId());
 
             Tuple2<Boolean, Exception> tranCreate2 = naiveSql.transaction(() -> {
-                int rowsCreate2 = naiveSql.insert(CommonQuickInput.class,
+                int rowsCreate2 = naiveSql.insert(TestGeneralEntity.class,
                                                   dataCreate2)
                                           .executeAffrows();
 
@@ -222,7 +199,7 @@ public class X300BasicsOfTransactionTest {
                                         "新增2数据失败");
 
                 TempDataExtension.putData(name,
-                                          CommonQuickInput.class,
+                                          TestGeneralEntity.class,
                                           dataCreate2.getId(),
                                           dataCreate2);
 
@@ -248,30 +225,30 @@ public class X300BasicsOfTransactionTest {
 
         System.out.println("\r\n事务1已回滚");
 
-        CommonQuickInput dataCheckCreate1 = naiveSql.select(CommonQuickInput.class)
-                                                    .where(x -> x.and(CQI_Fields.id,
-                                                                      FilterCompare.Eq,
-                                                                      dataCreate1.getId()))
-                                                    .first();
+        TestGeneralEntity dataCheckCreate1 = naiveSql.select(TestGeneralEntity.class)
+                                                     .where(x -> x.and(TGE_Fields.id,
+                                                                       FilterCompare.Eq,
+                                                                       dataCreate1.getId()))
+                                                     .first();
 
         Assertions.assertNull(dataCheckCreate1,
                               "事务回滚后依然能查询到新增的数据1");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate1.getId());
 
-        CommonQuickInput dataCheckCreate2 = naiveSql.select(CommonQuickInput.class)
-                                                    .where(x -> x.and(CQI_Fields.id,
-                                                                      FilterCompare.Eq,
-                                                                      dataCreate2.getId()))
-                                                    .first();
+        TestGeneralEntity dataCheckCreate2 = naiveSql.select(TestGeneralEntity.class)
+                                                     .where(x -> x.and(TGE_Fields.id,
+                                                                       FilterCompare.Eq,
+                                                                       dataCreate2.getId()))
+                                                     .first();
 
         Assertions.assertNull(dataCheckCreate2,
                               "事务回滚后依然能查询到新增的数据2");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate2.getId());
 
         System.out.println("\r\n事务回滚成功");
@@ -291,15 +268,9 @@ public class X300BasicsOfTransactionTest {
     public void _320(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+        int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                          dataCreate)
                                  .executeAffrows();
 
@@ -308,7 +279,7 @@ public class X300BasicsOfTransactionTest {
                                 "新增数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCreate.getId(),
                                   dataCreate);
 
@@ -328,20 +299,20 @@ public class X300BasicsOfTransactionTest {
     public void _321(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     tempData.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      tempData.getId()))
+                                                    .first();
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "事务提交后未能查询到新增的数据");
 
         TempDataExtension.cleanData(name,
-                                    CommonQuickInput.class,
+                                    TestGeneralEntity.class,
                                     tempData.getId());
 
         System.out.printf("\r\n已查询到新增数据，Id：%s，事务提交成功\r\n",
@@ -362,15 +333,9 @@ public class X300BasicsOfTransactionTest {
     public void _322(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
-
-        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+        int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                          dataCreate)
                                  .executeAffrows();
 
@@ -379,7 +344,7 @@ public class X300BasicsOfTransactionTest {
                                 "新增数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCreate.getId(),
                                   dataCreate);
 
@@ -399,20 +364,20 @@ public class X300BasicsOfTransactionTest {
     public void _323(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     tempData.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      tempData.getId()))
+                                                    .first();
 
         Assertions.assertNull(dataCheckCreate,
                               "事务回滚后依然能查询到新增的数据");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      tempData.getId());
 
         System.out.printf("\r\n未查询到新增数据，Id：%s，事务回滚成功\r\n",
@@ -434,16 +399,10 @@ public class X300BasicsOfTransactionTest {
     public void _330(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        EntityExtension entityExtension = new EntityExtension(null);
-
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         Tuple2<Boolean, Exception> tranCreate = naiveSql.transaction(() -> {
-            int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+            int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                              dataCreate)
                                      .executeAffrows();
 
@@ -452,7 +411,7 @@ public class X300BasicsOfTransactionTest {
                                     "新增数据失败");
 
             TempDataExtension.putData(name,
-                                      CommonQuickInput.class,
+                                      TestGeneralEntity.class,
                                       dataCreate.getId(),
                                       dataCreate);
 
@@ -469,7 +428,7 @@ public class X300BasicsOfTransactionTest {
         System.out.println("\r\n编程式事务已回滚");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      dataCreate.getId());
     }
 //

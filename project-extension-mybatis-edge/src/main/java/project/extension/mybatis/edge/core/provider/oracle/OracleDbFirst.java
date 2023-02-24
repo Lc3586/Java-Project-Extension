@@ -167,6 +167,15 @@ public class OracleDbFirst
                                                      byte[].class,
                                                      Byte[].class));
 
+        dbToJavaMap.putIfAbsent("nchar(1)",
+                                new DbTypeToJavaType("(String)",
+                                                     "(Character)",
+                                                     "%s.charAt(0)",
+                                                     "Character.toString(%s)",
+                                                     "char",
+                                                     "Character",
+                                                     char.class,
+                                                     Character.class));
         dbToJavaMap.putIfAbsent("nvarchar2(255)",
                                 new DbTypeToJavaType("(String)",
                                                      "(String)",
@@ -271,6 +280,9 @@ public class OracleDbFirst
                 break;
             case "char":
             case "nchar":
+                copyAndPutDbToJavaMap(dbTypeTextFull,
+                                      "nchar(1)");
+                break;
             case "nvarchar2":
             case "clob":
             case "nclob":
@@ -282,6 +294,7 @@ public class OracleDbFirst
             case "urowid":
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "nvarchar2(255)");
+                break;
             default:
                 copyAndPutDbToJavaMap(dbTypeTextFull,
                                       "unknown");
@@ -517,6 +530,22 @@ public class OracleDbFirst
     }
 
     /**
+     * 获取模式名/用户标识
+     *
+     * @return 用户标识
+     */
+    private String getUserId(boolean lower)
+            throws
+            ModuleException {
+        String userId = this.config.getProperties()
+                                   .getProperty(DruidDataSourceFactory.PROP_USERNAME);
+        if (lower)
+            return userId.toLowerCase(Locale.ROOT);
+        else
+            return userId;
+    }
+
+    /**
      * 从数据库查询用户标识
      *
      * @return 用户标识
@@ -635,7 +664,7 @@ public class OracleDbFirst
      * 获取数据库表结构信息
      *
      * @param database   数据库名
-     * @param tablename  表明
+     * @param tablename  表名
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */
@@ -662,7 +691,7 @@ public class OracleDbFirst
                 throw new ModuleException(Strings.getUnknownValue("tablename",
                                                                   tablename));
             if (tbname.length == 1) {
-                String userId = getUserIdFromDatabase();
+                String userId = getUserId(ignoreCase);
                 if (!StringUtils.hasText(userId))
                     return tables;
                 tbname = new String[]{userId,
@@ -673,7 +702,7 @@ public class OracleDbFirst
                                       tbname[1].toLowerCase(Locale.ROOT)};
             database = new String[]{tbname[0]};
         } else if (database == null || database.length == 0) {
-            String userId = getUserIdFromDatabase();
+            String userId = getUserId(ignoreCase);
             if (!StringUtils.hasText(userId))
                 return tables;
             database = new String[]{userId};
@@ -1165,7 +1194,7 @@ public class OracleDbFirst
 
         //获取当前模式名，也就是用户标识
         if (tbname.length == 1) {
-            String userId = getUserIdFromConnectionString(ignoreCase);
+            String userId = getUserId(ignoreCase);
             tbname = new String[]{userId,
                                   tbname[0]};
         }
@@ -1233,11 +1262,13 @@ public class OracleDbFirst
                 return JDBCType.CLOB;
             case "nclob":
                 return JDBCType.NCLOB;
-            case "nvarchar2(255)":
-                return JDBCType.NVARCHAR;
-
-            case "char(36 char)":
+            case "char(1)":
                 return JDBCType.CHAR;
+            case "nchar(1)":
+                return JDBCType.NCHAR;
+            case "nvarchar2(255)":
+            case "char(36 char)":
+                return JDBCType.NVARCHAR;
         }
 
         String dbTypeText = column.getDbTypeText() == null

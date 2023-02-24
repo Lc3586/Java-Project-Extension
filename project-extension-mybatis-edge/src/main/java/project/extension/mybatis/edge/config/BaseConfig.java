@@ -115,7 +115,7 @@ public class BaseConfig {
     }
 
     /**
-     * 默认的实体类表明/列名命名规则
+     * 默认的实体类表名/列名命名规则
      */
     public NameConvertType getNameConvertType() {
         return nameConvertType;

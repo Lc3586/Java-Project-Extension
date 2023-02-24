@@ -8,8 +8,8 @@ import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
-import project.extension.mybatis.edge.entity.CommonQuickInput;
-import project.extension.mybatis.edge.entityFields.CQI_Fields;
+import project.extension.mybatis.edge.entity.TestGeneralEntity;
+import project.extension.mybatis.edge.entityFields.TGE_Fields;
 import project.extension.mybatis.edge.extention.EntityExtension;
 import project.extension.mybatis.edge.model.FilterCompare;
 
@@ -52,15 +52,12 @@ public class X200BasicsOfCurdTest {
             Throwable {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
+
         EntityExtension entityExtension = new EntityExtension(null);
 
-        CommonQuickInput dataCreate = entityExtension.initialization(new CommonQuickInput());
-        dataCreate.setCategory("测试分类");
-        dataCreate.setContent("测试内容");
-        dataCreate.setKeyword("测试关键字");
-        dataCreate.setPublic_(true);
+        TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
-        int rowsCreate = naiveSql.insert(CommonQuickInput.class,
+        int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
                                          dataCreate)
                                  .executeAffrows();
 
@@ -71,27 +68,27 @@ public class X200BasicsOfCurdTest {
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 
-        CommonQuickInput dataCheckCreate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataCreate.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataCreate.getId()))
+                                                    .first();
 
         Assertions.assertNotNull(dataCheckCreate,
                                  "查询新增的数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   dataCheckCreate.getId(),
                                   dataCheckCreate);
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
-                                     CQI_Fields.id,
-                                     CQI_Fields.category,
-                                     CQI_Fields.content,
-                                     CQI_Fields.keyword,
-                                     CQI_Fields.public_);
+                                     TGE_Fields.id,
+                                     TGE_Fields.string,
+                                     TGE_Fields.text,
+                                     TGE_Fields.short_,
+                                     TGE_Fields.integer);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                           dataCheckCreate.getId());
@@ -111,20 +108,14 @@ public class X200BasicsOfCurdTest {
             Throwable {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        CommonQuickInput dataUpdate = new CommonQuickInput();
+        TestGeneralEntity dataUpdate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         dataUpdate.setId(tempData.getId());
-        dataUpdate.setCategory("测试分类1");
-        dataUpdate.setContent("测试内容1");
-        dataUpdate.setKeyword("测试关键字1");
-        dataUpdate.setPublic_(false);
-        dataUpdate.setCreateBy(tempData.getCreateBy());
-        dataUpdate.setCreateTime(tempData.getCreateTime());
 
-        int rowsUpdate = naiveSql.update(CommonQuickInput.class,
+        int rowsUpdate = naiveSql.update(TestGeneralEntity.class,
                                          dataUpdate)
                                  .executeAffrows();
 
@@ -135,27 +126,23 @@ public class X200BasicsOfCurdTest {
         System.out.printf("\r\n已更新数据，Id：%s\r\n",
                           dataUpdate.getId());
 
-        CommonQuickInput dataCheckUpdate = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     dataUpdate.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckUpdate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      dataUpdate.getId()))
+                                                    .first();
 
         Assertions.assertNotNull(dataCheckUpdate,
                                  "查询更新的数据失败");
 
         TempDataExtension.putData(name,
-                                  CommonQuickInput.class,
+                                  TestGeneralEntity.class,
                                   tempData.getId(),
                                   dataCheckUpdate);
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
-                                     CQI_Fields.id,
-                                     CQI_Fields.category,
-                                     CQI_Fields.content,
-                                     CQI_Fields.keyword,
-                                     CQI_Fields.public_);
+                                     TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查更新的数据，Id：%s\r\n",
                           dataCheckUpdate.getId());
@@ -173,10 +160,10 @@ public class X200BasicsOfCurdTest {
     public void _202(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-        CommonQuickInput tempData = TempDataExtension.getFirstData(name,
-                                                                   CommonQuickInput.class);
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
 
-        int rowsDelete = naiveSql.delete(CommonQuickInput.class,
+        int rowsDelete = naiveSql.delete(TestGeneralEntity.class,
                                          tempData)
                                  .executeAffrows();
 
@@ -187,17 +174,17 @@ public class X200BasicsOfCurdTest {
         System.out.printf("\r\n已删除数据，Id：%s\r\n",
                           tempData.getId());
 
-        CommonQuickInput dataCheckDelete = naiveSql.select(CommonQuickInput.class)
-                                                   .where(x -> x.and(CQI_Fields.id,
-                                                                     FilterCompare.Eq,
-                                                                     tempData.getId()))
-                                                   .first();
+        TestGeneralEntity dataCheckDelete = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      tempData.getId()))
+                                                    .first();
 
         Assertions.assertNull(dataCheckDelete,
                               "数据未删除");
 
         TempDataExtension.removeData(name,
-                                     CommonQuickInput.class,
+                                     TestGeneralEntity.class,
                                      tempData.getId());
 
         System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",

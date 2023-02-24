@@ -161,13 +161,13 @@ public class MySqlDbFirst
 
         dbToJavaMap.putIfAbsent("tinyblob",
                                 new DbTypeToJavaType("(byte[])",
-                                                     "(Byte[])",
+                                                     "(byte[])",
                                                      "Base64.getDecoder().decode(%s.getBytes(StandardCharsets.UTF_8))",
                                                      "new String(Base64.getEncoder().encode(%s), StandardCharsets.UTF_8)",
                                                      "byte[]",
-                                                     "Byte[]",
+                                                     "byte[]",
                                                      byte[].class,
-                                                     Byte[].class));
+                                                     byte[].class));
 
         dbToJavaMap.putIfAbsent("varchar",
                                 new DbTypeToJavaType("(String)",
@@ -508,7 +508,7 @@ public class MySqlDbFirst
      * 获取数据库表结构信息
      *
      * @param database   数据库名
-     * @param tablename  表明
+     * @param tablename  表名
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */
@@ -1022,7 +1022,7 @@ public class MySqlDbFirst
             throw new ModuleException(Strings.getUnknownValue("name",
                                                               name));
 
-        //获取当前模式名，也就是用户标识
+        //获取当前数据库
         if (tbname.length == 1) {
             String database = getDatabase(ignoreCase);
             tbname = new String[]{database,

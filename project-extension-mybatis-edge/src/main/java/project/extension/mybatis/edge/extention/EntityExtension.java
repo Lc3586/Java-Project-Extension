@@ -132,7 +132,7 @@ public class EntityExtension
             for (Field field : classz.getDeclaredFields()) {
                 ColumnSetting columnSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                       ColumnSetting.class);
-                if (columnSettingAttribute != null && columnSettingAttribute.primaryKey()) {
+                if (columnSettingAttribute != null && columnSettingAttribute.isPrimaryKey()) {
                     field.setAccessible(true);
                     Class<?> fieldType = field.getType();
                     if (fieldType.equals(Long.class)) {
