@@ -97,14 +97,18 @@ public class NaiveAdoProvider
     /**
      * 结束Sql查询后执行
      */
-    private void afterExecute(SqlSession sqlSession) {
+    private void afterExecute(SqlSession sqlSession,
+                              boolean success) {
         if (isTransactionAlreadyExisting())
             return;
 
         try {
             if (sqlSession.getConnection()
                           .getAutoCommit()) {
-                sqlSession.commit();
+                if (success)
+                    sqlSession.commit();
+                else
+                    sqlSession.rollback();
                 sqlSession.close();
             }
         } catch (Exception ex) {
@@ -448,23 +452,28 @@ public class NaiveAdoProvider
                                                    Integer resultMainTagLevel,
                                                    Collection<String> resultCustomTags,
                                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterHashMap,
-                                           resultType,
-                                           resultMainTagLevel,
-                                           resultCustomTags,
-                                           nameConvertType);
+        boolean success = false;
 
-        TResult result = sqlSession.selectOne(msId,
-                                              parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterHashMap,
+                                               resultType,
+                                               resultMainTagLevel,
+                                               resultCustomTags,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            TResult result = sqlSession.selectOne(msId,
+                                                  parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -479,24 +488,29 @@ public class NaiveAdoProvider
                                                    Integer resultMainTagLevel,
                                                    Collection<String> resultCustomTags,
                                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           resultType,
-                                           resultMainTagLevel,
-                                           resultCustomTags,
-                                           nameConvertType);
+        boolean success = false;
 
-        TResult result = sqlSession.selectOne(msId,
-                                              parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               resultType,
+                                               resultMainTagLevel,
+                                               resultCustomTags,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            TResult result = sqlSession.selectOne(msId,
+                                                  parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -509,23 +523,28 @@ public class NaiveAdoProvider
                                                           Integer resultMainTagLevel,
                                                           Collection<String> resultCustomTags,
                                                           NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterHashMap,
-                                           resultType,
-                                           resultMainTagLevel,
-                                           resultCustomTags,
-                                           nameConvertType);
+        boolean success = false;
 
-        List<TResult> result = sqlSession.selectList(msId,
-                                                     parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterHashMap,
+                                               resultType,
+                                               resultMainTagLevel,
+                                               resultCustomTags,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            List<TResult> result = sqlSession.selectList(msId,
+                                                         parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -540,24 +559,29 @@ public class NaiveAdoProvider
                                                           Integer resultMainTagLevel,
                                                           Collection<String> resultCustomTags,
                                                           NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           resultType,
-                                           resultMainTagLevel,
-                                           resultCustomTags,
-                                           nameConvertType);
+        boolean success = false;
 
-        List<TResult> result = sqlSession.selectList(msId,
-                                                     parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               resultType,
+                                               resultMainTagLevel,
+                                               resultCustomTags,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            List<TResult> result = sqlSession.selectList(msId,
+                                                         parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -569,22 +593,27 @@ public class NaiveAdoProvider
                                                                Class<TResult> resultType,
                                                                Collection<String> resultFields,
                                                                NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterHashMap,
-                                           resultType,
-                                           resultFields,
-                                           nameConvertType);
+        boolean success = false;
 
-        Map<String, Object> result = sqlSession.selectOne(msId,
-                                                          parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterHashMap,
+                                               resultType,
+                                               resultFields,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            Map<String, Object> result = sqlSession.selectOne(msId,
+                                                              parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -598,23 +627,28 @@ public class NaiveAdoProvider
                                                                Class<TResult> resultType,
                                                                Collection<String> resultFields,
                                                                NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           resultType,
-                                           resultFields,
-                                           nameConvertType);
+        boolean success = false;
 
-        Map<String, Object> result = sqlSession.selectOne(msId,
-                                                          parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               resultType,
+                                               resultFields,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            Map<String, Object> result = sqlSession.selectOne(msId,
+                                                              parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -626,22 +660,27 @@ public class NaiveAdoProvider
                                                                          Class<TResult> resultType,
                                                                          Collection<String> resultFields,
                                                                          NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterHashMap,
-                                           resultType,
-                                           resultFields,
-                                           nameConvertType);
+        boolean success = false;
 
-        List<Map<String, Object>> result = sqlSession.selectList(msId,
-                                                                 parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterHashMap,
+                                               resultType,
+                                               resultFields,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            List<Map<String, Object>> result = sqlSession.selectList(msId,
+                                                                     parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -655,23 +694,28 @@ public class NaiveAdoProvider
                                                                          Class<TResult> resultType,
                                                                          Collection<String> resultFields,
                                                                          NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.SELECT,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           resultType,
-                                           resultFields,
-                                           nameConvertType);
+        boolean success = false;
 
-        List<Map<String, Object>> result = sqlSession.selectList(msId,
-                                                                 parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.SELECT,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               resultType,
+                                               resultFields,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            List<Map<String, Object>> result = sqlSession.selectList(msId,
+                                                                     parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -681,23 +725,28 @@ public class NaiveAdoProvider
                                    Class<TParameter> parameterType,
                                    Map<String, Object> parameterHashMap,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.INSERT,
-                                           parameterType,
-                                           parameterHashMap,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.insert(msId,
-                                       parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.INSERT,
+                                               parameterType,
+                                               parameterHashMap,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.insert(msId,
+                                           parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -709,24 +758,29 @@ public class NaiveAdoProvider
                                    Integer parameterMainTagLevel,
                                    Collection<String> parameterCustomTags,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.INSERT,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.insert(msId,
-                                       parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.INSERT,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.insert(msId,
+                                           parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -736,23 +790,28 @@ public class NaiveAdoProvider
                                    Class<TParameter> parameterType,
                                    Map<String, Object> parameterHashMap,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.UPDATE,
-                                           parameterType,
-                                           parameterHashMap,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.update(msId,
-                                       parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.UPDATE,
+                                               parameterType,
+                                               parameterHashMap,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.update(msId,
+                                           parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -764,24 +823,29 @@ public class NaiveAdoProvider
                                    Integer parameterMainTagLevel,
                                    Collection<String> parameterCustomTags,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.UPDATE,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.update(msId,
-                                       parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.UPDATE,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.update(msId,
+                                           parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -791,23 +855,28 @@ public class NaiveAdoProvider
                                    Class<TParameter> parameterType,
                                    Map<String, Object> parameterHashMap,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.DELETE,
-                                           parameterType,
-                                           parameterHashMap,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.delete(msId,
-                                       parameterHashMap);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.DELETE,
+                                               parameterType,
+                                               parameterHashMap,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.delete(msId,
+                                           parameterHashMap);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
@@ -819,24 +888,29 @@ public class NaiveAdoProvider
                                    Integer parameterMainTagLevel,
                                    Collection<String> parameterCustomTags,
                                    NameConvertType nameConvertType) {
-        mappedStatementHandler.getOrCreate(getConfiguration(),
-                                           msId,
-                                           script,
-                                           SqlCommandType.DELETE,
-                                           parameterType,
-                                           parameterMainTagLevel,
-                                           parameterCustomTags,
-                                           Integer.class,
-                                           null,
-                                           null,
-                                           nameConvertType);
+        boolean success = false;
 
-        int result = sqlSession.delete(msId,
-                                       parameter);
+        try {
+            mappedStatementHandler.getOrCreate(getConfiguration(),
+                                               msId,
+                                               script,
+                                               SqlCommandType.DELETE,
+                                               parameterType,
+                                               parameterMainTagLevel,
+                                               parameterCustomTags,
+                                               Integer.class,
+                                               null,
+                                               null,
+                                               nameConvertType);
 
-        afterExecute(sqlSession);
-
-        return result;
+            int result = sqlSession.delete(msId,
+                                           parameter);
+            success = true;
+            return result;
+        } finally {
+            afterExecute(sqlSession,
+                         success);
+        }
     }
 
     @Override
