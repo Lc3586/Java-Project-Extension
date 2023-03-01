@@ -159,7 +159,7 @@ public class MySqlDbFirst
                                                      java.sql.Timestamp.class,
                                                      java.sql.Timestamp.class));
 
-        dbToJavaMap.putIfAbsent("tinyblob",
+        dbToJavaMap.putIfAbsent("longblob",
                                 new DbTypeToJavaType("(byte[])",
                                                      "(byte[])",
                                                      "Base64.getDecoder().decode(%s.getBytes(StandardCharsets.UTF_8))",

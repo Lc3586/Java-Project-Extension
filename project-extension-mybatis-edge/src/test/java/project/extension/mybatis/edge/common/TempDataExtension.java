@@ -243,7 +243,8 @@ public class TempDataExtension {
 
                 if (columnSetting != null
                         && (columnSetting.isPrimaryKey()
-                        || columnSetting.isIdentity()))
+                        || columnSetting.isIdentity()
+                        || columnSetting.isIgnore()))
                     continue;
 
                 if (Character.class.equals(field.getType())
@@ -257,7 +258,7 @@ public class TempDataExtension {
                 } else if (String.class.equals(field.getType())) {
                     if (columnSetting == null)
                         field.set(data,
-                                  "");
+                                  " ");
                     else {
                         int length = columnSetting.length();
                         if (length <= 0)
@@ -273,6 +274,10 @@ public class TempDataExtension {
                 } else if (UUID.class.equals(field.getType())) {
                     field.set(data,
                               UUID.randomUUID());
+                } else if (Boolean.class.equals(field.getType())
+                        || boolean.class.equals(field.getType())) {
+                    field.set(data,
+                              new Random().nextBoolean());
                 } else if (Byte.class.equals(field.getType())
                         || byte.class.equals(field.getType())) {
                     field.set(data,
@@ -299,18 +304,48 @@ public class TempDataExtension {
                               : Long.MIN_VALUE);
                 } else if (Float.class.equals(field.getType())
                         || float.class.equals(field.getType())) {
-                    field.set(data,
-                              new Random().nextBoolean()
-                              ? Float.MAX_VALUE
-                              : Float.MIN_VALUE);
+                    if (columnSetting == null || columnSetting.precision() == 0)
+                        field.set(data,
+                                  new Random().nextBoolean()
+                                  ? Float.MAX_VALUE
+                                  : Float.MIN_VALUE);
+                    else {
+                        int precision = columnSetting.precision();
+                        int scale = columnSetting.scale();
+                        char[] integer = new char[precision - scale];
+                        Arrays.fill(integer,
+                                    '9');
+                        char[] decimal = new char[scale];
+                        Arrays.fill(decimal,
+                                    '9');
+                        field.set(data,
+                                  new Float(String.format("%s.%s",
+                                                          new String(integer),
+                                                          new String(decimal))));
+                    }
                 } else if (Double.class.equals(field.getType())
                         || double.class.equals(field.getType())) {
-                    field.set(data,
-                              new Random().nextBoolean()
-                              ? Double.MAX_VALUE
-                              : Double.MIN_VALUE);
+                    if (columnSetting == null || columnSetting.precision() == 0)
+                        field.set(data,
+                                  new Random().nextBoolean()
+                                  ? Double.MAX_VALUE
+                                  : Double.MIN_VALUE);
+                    else {
+                        int precision = columnSetting.precision();
+                        int scale = columnSetting.scale();
+                        char[] integer = new char[precision - scale];
+                        Arrays.fill(integer,
+                                    '9');
+                        char[] decimal = new char[scale];
+                        Arrays.fill(decimal,
+                                    '9');
+                        field.set(data,
+                                  new Double(String.format("%s.%s",
+                                                           new String(integer),
+                                                           new String(decimal))));
+                    }
                 } else if (BigDecimal.class.equals(field.getType())) {
-                    if (columnSetting == null)
+                    if (columnSetting == null || columnSetting.precision() == 0)
                         field.set(data,
                                   new BigDecimal(new Random().nextBoolean()
                                                  ? Long.MAX_VALUE
@@ -318,7 +353,7 @@ public class TempDataExtension {
                     else {
                         int precision = columnSetting.precision();
                         int scale = columnSetting.scale();
-                        char[] integer = new char[precision];
+                        char[] integer = new char[precision - scale];
                         Arrays.fill(integer,
                                     '9');
                         char[] decimal = new char[scale];
@@ -347,9 +382,7 @@ public class TempDataExtension {
                 }
             }
 
-            new EntityExtension(null).initialization(data);
-
-            return data;
+            return new EntityExtension(null).initialization(data);
         } catch (Exception ex) {
             BusinessException businessException = new BusinessException(String.format("生成%s类型的数据失败",
                                                                                       type.getName()),

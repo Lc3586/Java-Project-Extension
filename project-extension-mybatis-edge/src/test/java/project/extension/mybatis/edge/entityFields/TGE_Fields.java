@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.entityFields;
 
 /**
- * 一般测试实体字段
+ * 测试读写常规数据实体字段
  *
  * @author LCTR
  * @date 2022-01-09
@@ -22,11 +22,6 @@ public class TGE_Fields {
      * 字符串
      */
     public static final String string = "string";
-
-    /**
-     * 长字符串
-     */
-    public static final String text = "text";
 
     /**
      * 8位整数
@@ -84,16 +79,6 @@ public class TGE_Fields {
     public static final String datetime = "datetime";
 
     /**
-     * 文件数据
-     */
-    public static final String bytes = "bytes";
-
-    /**
-     * 64位整数自动增长
-     */
-    public static final String longIdentity = "longIdentity";
-
-    /**
      * 全部字段
      */
     public static final String[] allFields
@@ -101,7 +86,6 @@ public class TGE_Fields {
             id,
             char_,
             string,
-            text,
             byte_,
             short_,
             integer,
@@ -112,8 +96,6 @@ public class TGE_Fields {
             boolean_,
             date,
 //            time,
-            datetime,
-//            bytes,
-//            longIdentity
+            datetime
     };
 }

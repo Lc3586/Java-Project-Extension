@@ -1,8 +1,12 @@
 package project.extension.mybatis.edge.core.provider.normal;
 
+import org.apache.ibatis.type.JdbcType;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
+import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.EntityMapping;
+import project.extension.mybatis.edge.annotations.MappingSetting;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.extention.CacheExtension;
@@ -15,6 +19,7 @@ import project.extension.tuple.Tuple2;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.sql.JDBCType;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -142,7 +147,9 @@ public abstract class SqlProvider {
                                                           key,
                                                           value,
                                                           allParameter,
-                                                          false).b);
+                                                          false,
+                                                          null,
+                                                          null).b);
         }
         return sql;
     }
@@ -392,7 +399,11 @@ public abstract class SqlProvider {
                                         ? data
                                         : field.get(data),
                                       parameter,
-                                      ignoreCase);
+                                      ignoreCase,
+                                      AnnotationUtils.getAnnotation(field,
+                                                                    ColumnSetting.class),
+                                      AnnotationUtils.getAnnotation(field,
+                                                                    MappingSetting.class));
         } catch (IllegalAccessException ex) {
             throw new ModuleException(Strings.getGetObjectFieldValueFailed(data.getClass()
                                                                                .getTypeName(),
@@ -423,18 +434,22 @@ public abstract class SqlProvider {
     /**
      * 字段转Sql参数语句
      *
-     * @param type          类型
-     * @param parameterName 参数名
-     * @param value         值
-     * @param parameter     参数集合
-     * @param ignoreCase    忽略大小写
+     * @param type           类型
+     * @param parameterName  参数名
+     * @param value          值
+     * @param parameter      参数集合
+     * @param ignoreCase     忽略大小写
+     * @param columnSetting  列设置
+     * @param mappingSetting 映射设置
      * @return Sql参数语句
      */
     public Tuple2<String, String> value2ParameterSql(Class<?> type,
                                                      String parameterName,
                                                      Object value,
                                                      Map<String, Object> parameter,
-                                                     boolean ignoreCase)
+                                                     boolean ignoreCase,
+                                                     ColumnSetting columnSetting,
+                                                     MappingSetting mappingSetting)
             throws
             ModuleException {
         if (value == null) return new Tuple2<>(parameterName,
@@ -471,11 +486,34 @@ public abstract class SqlProvider {
 
         parameter.put(parameterName,
                       value);
+
+        StringBuilder sb = new StringBuilder("#{");
+        sb.append(parameterName);
+        if (!type.equals(byte[].class)) {
+            sb.append(String.format(",javaType=%s",
+                                    type.getSimpleName()));
+        }
+
+        JdbcType jdbcType = null;
+        if (mappingSetting != null)
+            jdbcType = mappingSetting.jdbcType();
+        else if (columnSetting != null) {
+            //TODO 待完善
+            if (type.equals(String.class)) {
+
+            } else if (type.equals(Date.class)) {
+
+            }
+        }
+
+        if (jdbcType == null)
+            jdbcType = EntityTypeHandler.getJdbcType(type);
+        sb.append(String.format(",jdbcType=%s",
+                                jdbcType));
+        sb.append("}");
+
         return new Tuple2<>(parameterName,
-                            String.format("#{%s,javaType=%s,jdbcType=%s}",
-                                          parameterName,
-                                          type.getSimpleName(),
-                                          EntityTypeHandler.getJdbcType(type)));
+                            sb.toString());
     }
 
     /**
@@ -678,7 +716,9 @@ public abstract class SqlProvider {
                                           "value",
                                           target.getValue(),
                                           parameter,
-                                          false).b;
+                                          false,
+                                          null,
+                                          null).b;
             case Expression:
                 return String.format("(%s)",
                                      dynamicSetterExpression2ParameterSql(entityType,

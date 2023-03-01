@@ -756,8 +756,8 @@ public class EntityTypeHandler {
      * @return Jdbc数据类型
      */
     public static JdbcType getJdbcType(Class<?> type) {
-        if (type.equals(String.class)) return JdbcType.VARCHAR;
-        else if (type.equals(Character.class) || type.equals(char.class)) return JdbcType.CHAR;
+        if (type.equals(String.class)) return JdbcType.NVARCHAR;
+        else if (type.equals(Character.class) || type.equals(char.class)) return JdbcType.NCHAR;
         else if (type.equals(Boolean.class) || type.equals(boolean.class)) return JdbcType.BIT;
         else if (type.equals(Byte.class) || type.equals(byte.class)) return JdbcType.TINYINT;
         else if (type.equals(Short.class) || type.equals(short.class)) return JdbcType.SMALLINT;
@@ -769,7 +769,7 @@ public class EntityTypeHandler {
         else if (type.equals(Date.class)) return JdbcType.TIMESTAMP;
         else if (type.equals(java.sql.Date.class)) return JdbcType.DATE;
         else if (type.equals(java.sql.Time.class)) return JdbcType.TIME;
-        else if (type.equals(byte[].class)) return JdbcType.VARBINARY;
+        else if (type.equals(byte[].class)) return JdbcType.BLOB;
         else return JdbcType.UNDEFINED;
     }
 

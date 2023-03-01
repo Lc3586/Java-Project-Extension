@@ -3,6 +3,12 @@ package project.extension.mybatis.edge.common;
 import org.junit.jupiter.api.Assertions;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 断言扩展方法
@@ -38,6 +44,21 @@ public class AssertExtension {
             Object value1 = field.get(data1);
             Object value2 = field.get(data2);
 
+            Class<?> fieldType = field.getType();
+            if (fieldType.equals(java.sql.Date.class)
+                    || fieldType.equals(java.sql.Time.class)
+                    || fieldType.equals(Date.class)) {
+                value1 = value1.toString();
+                value2 = value2.toString();
+            } else if (fieldType.equals(byte[].class)) {
+                value1 = new String(Base64.getEncoder()
+                                          .encode((byte[]) value1),
+                                    StandardCharsets.UTF_8);
+                value2 = new String(Base64.getEncoder()
+                                          .encode((byte[]) value2),
+                                    StandardCharsets.UTF_8);
+            }
+
             Assertions.assertEquals(value1,
                                     value2,
                                     String.format("两个%s类型的数据对象中%s字段的值不相等：%s ≠ %s",
@@ -46,11 +67,25 @@ public class AssertExtension {
                                                   value1,
                                                   value2));
 
+            String value1Output = value1 == null
+                                  ? ""
+                                  : value1.toString();
+            String value2Output = value2 == null
+                                  ? ""
+                                  : value2.toString();
+
+            if (value1Output.length() > 100)
+                value1Output = value1Output.substring(0,
+                                                      100) + "......";
+            if (value2Output.length() > 100)
+                value2Output = value2Output.substring(0,
+                                                      100) + "......";
+
             System.out.printf("\r\n两个%s类型的数据对象中%s字段的值相等：%s = %s\r\n",
                               type.getName(),
                               fieldName,
-                              value1,
-                              value2);
+                              value1Output,
+                              value2Output);
         }
     }
 }

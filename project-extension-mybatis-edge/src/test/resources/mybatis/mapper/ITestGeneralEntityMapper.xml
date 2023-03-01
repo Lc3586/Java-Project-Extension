@@ -10,8 +10,6 @@
                 column="id"/>
         <result property="string"
                 column="string"/>
-        <result property="text"
-                column="text"/>
         <result property="short_"
                 column="short"/>
         <result property="integer"
@@ -32,8 +30,6 @@
                 column="time"/>
         <result property="datetime"
                 column="datetime"/>
-        <result property="bytes"
-                column="bytes"/>
     </resultMap>
 
     <sql id="tableName">
@@ -76,23 +72,7 @@
             <if test="_databaseId == 'postgresql'">
                 "String"
             </if>
-            = #{string}
-        </if>
-        <if test="text != null and text != ''">
-            AND
-            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
-                `text`
-            </if>
-            <if test="_databaseId == 'sqlserver'">
-                [Text]
-            </if>
-            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
-                "TEXT"
-            </if>
-            <if test="_databaseId == 'postgresql'">
-                "Text"
-            </if>
-            like '%#{text}%'
+            like '%#{string}%'
         </if>
         <if test="integer != null and integer != 0">
             AND
@@ -154,7 +134,6 @@
             <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
                 `id`,
                 <if test="string != null">`string`,</if>
-                <if test="text != null">`text`,</if>
                 <if test="short_ != null">`short`,</if>
                 <if test="integer != null">`integer`,</if>
                 <if test="long_ != null">`long`,</if>
@@ -165,12 +144,10 @@
                 <if test="date != null">`date`,</if>
                 <if test="time != null">`time`,</if>
                 <if test="datetime != null">`datetime`,</if>
-                <if test="bytes != null">`bytes`,</if>
             </if>
             <if test="_databaseId == 'sqlserver'">
                 [Id],
                 <if test="string != null">[String],</if>
-                <if test="text != null">[Text],</if>
                 <if test="short_ != null">[Short],</if>
                 <if test="integer != null">[Integer],</if>
                 <if test="long_ != null">[Long],</if>
@@ -181,12 +158,10 @@
                 <if test="date != null">[Date],</if>
                 <if test="time != null">[Time],</if>
                 <if test="datetime != null">[Datetime],</if>
-                <if test="bytes != null">[Bytes],</if>
             </if>
             <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
                 "ID",
                 <if test="string != null">"STRING",</if>
-                <if test="text != null">"TEXT",</if>
                 <if test="short_ != null">"SHORT",</if>
                 <if test="integer != null">"INTEGER",</if>
                 <if test="long_ != null">"LONG",</if>
@@ -197,12 +172,10 @@
                 <if test="date != null">"DATE",</if>
                 <if test="time != null">"TIME",</if>
                 <if test="datetime != null">"DATETIME",</if>
-                <if test="bytes != null">"BYTES",</if>
             </if>
             <if test="_databaseId == 'postgresql'">
                 "Id",
                 <if test="string != null">"String",</if>
-                <if test="text != null">"Text",</if>
                 <if test="short_ != null">"Short",</if>
                 <if test="integer != null">"Integer",</if>
                 <if test="long_ != null">"Long",</if>
@@ -213,14 +186,12 @@
                 <if test="date != null">"Date",</if>
                 <if test="time != null">"Time",</if>
                 <if test="datetime != null">"Datetime",</if>
-                <if test="bytes != null">"Bytes",</if>
             </if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{id},
             <if test="string != null">#{string},</if>
-            <if test="text != null">#{text},</if>
             <if test="short_ != null">#{short_},</if>
             <if test="integer != null">#{integer},</if>
             <if test="long_ != null">#{long_},</if>
@@ -231,7 +202,6 @@
             <if test="date != null">#{date},</if>
             <if test="time != null">#{time},</if>
             <if test="datetime != null">#{datetime},</if>
-            <if test="bytes != null">#{bytes},</if>
         </trim>
     </insert>
 
@@ -242,7 +212,6 @@
         <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
             <trim prefix="SET" suffixOverrides=",">
                 <if test="string != null">`string`=#{string},</if>
-                <if test="text != null">`text`=#{text},</if>
                 <if test="short_ != null">`short`=#{short_},</if>
                 <if test="integer != null">`integer`=#{integer},</if>
                 <if test="long_ != null">`long`=#{long_},</if>
@@ -253,14 +222,12 @@
                 <if test="date != null">`date`=#{date},</if>
                 <if test="time != null">`time`=#{time},</if>
                 <if test="datetime != null">`datetime`=#{datetime},</if>
-                <if test="bytes != null">`bytes`=#{bytes},</if>
             </trim>
             where `id` = #{id}
         </if>
         <if test="_databaseId == 'sqlserver'">
             <trim prefix="SET" suffixOverrides=",">
                 <if test="string != null">[String]=#{string},</if>
-                <if test="text != null">[Text]=#{text},</if>
                 <if test="short_ != null">[Short]=#{short_},</if>
                 <if test="integer != null">[Integer]=#{integer},</if>
                 <if test="long_ != null">[Long]=#{long_},</if>
@@ -271,14 +238,12 @@
                 <if test="date != null">[Date]=#{date},</if>
                 <if test="time != null">[Time]=#{time},</if>
                 <if test="datetime != null">[Datetime]=#{datetime},</if>
-                <if test="bytes != null">[Bytes]=#{bytes},</if>
             </trim>
             where [Id] = #{id}
         </if>
         <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
             <trim prefix="SET" suffixOverrides=",">
                 <if test="string != null">"STRING"=#{string},</if>
-                <if test="text != null">"TEXT"=#{text},</if>
                 <if test="short_ != null">"SHORT"=#{short_},</if>
                 <if test="integer != null">"INTEGER"=#{integer},</if>
                 <if test="long_ != null">"LONG"=#{long_},</if>
@@ -289,14 +254,12 @@
                 <if test="date != null">"DATE"=#{date},</if>
                 <if test="time != null">"TIME"=#{time},</if>
                 <if test="datetime != null">"DATETIME"=#{datetime},</if>
-                <if test="bytes != null">"BYTES"=#{bytes},</if>
             </trim>
             where "ID" = #{id}
         </if>
         <if test="_databaseId == 'postgresql'">
             <trim prefix="SET" suffixOverrides=",">
                 <if test="string != null">"String"=#{string},</if>
-                <if test="text != null">"Text"=#{text},</if>
                 <if test="short_ != null">"Short"=#{short_},</if>
                 <if test="integer != null">"Integer"=#{integer},</if>
                 <if test="long_ != null">"Long"=#{long_},</if>
@@ -307,7 +270,6 @@
                 <if test="date != null">"Date"=#{date},</if>
                 <if test="time != null">"Time"=#{time},</if>
                 <if test="datetime != null">"Datetime"=#{datetime},</if>
-                <if test="bytes != null">"Bytes"=#{bytes},</if>
             </trim>
             where "Id" = #{id}
         </if>

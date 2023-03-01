@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 快捷输入Mapper接口类
+ * 测试读写常规数据Mapper接口类
  *
  * @author LCTR
  * @date 2023-02-06

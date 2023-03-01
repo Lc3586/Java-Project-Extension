@@ -8,9 +8,14 @@ import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.TempDataExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
+import project.extension.mybatis.edge.entity.TestBlobEntity;
+import project.extension.mybatis.edge.entity.TestClobEntity;
 import project.extension.mybatis.edge.entity.TestGeneralEntity;
+import project.extension.mybatis.edge.entity.TestIdentityEntity;
+import project.extension.mybatis.edge.entityFields.TBE_Fields;
+import project.extension.mybatis.edge.entityFields.TCE_Fields;
 import project.extension.mybatis.edge.entityFields.TGE_Fields;
-import project.extension.mybatis.edge.extention.EntityExtension;
+import project.extension.mybatis.edge.entityFields.TIE_Fields;
 import project.extension.mybatis.edge.model.FilterCompare;
 
 /**
@@ -52,9 +57,6 @@ public class X200BasicsOfCurdTest {
             Throwable {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
 
-
-        EntityExtension entityExtension = new EntityExtension(null);
-
         TestGeneralEntity dataCreate = TempDataExtension.generateData(TestGeneralEntity.class);
 
         int rowsCreate = naiveSql.insert(TestGeneralEntity.class,
@@ -84,11 +86,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
-                                     TGE_Fields.id,
-                                     TGE_Fields.string,
-                                     TGE_Fields.text,
-                                     TGE_Fields.short_,
-                                     TGE_Fields.integer);
+                                     TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                           dataCheckCreate.getId());
@@ -189,5 +187,152 @@ public class X200BasicsOfCurdTest {
 
         System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",
                           tempData.getId());
+    }
+
+    /**
+     * 测试新增功能（主键为自增列）
+     *
+     * @param name 名称
+     */
+    @ParameterizedTest
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
+    @DisplayName("203.测试新增功能（主键为自增列）")
+    @Order(203)
+    public void _203(String name)
+            throws
+            Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
+
+        TestIdentityEntity dataCreate = TempDataExtension.generateData(TestIdentityEntity.class);
+
+        int rowsCreate = naiveSql.insert(TestIdentityEntity.class,
+                                         dataCreate)
+                                 .executeAffrows();
+
+        Assertions.assertEquals(1,
+                                rowsCreate,
+                                "新增数据失败");
+
+        System.out.printf("\r\n已新增数据，Id：%s\r\n",
+                          dataCreate.getId());
+
+        TestIdentityEntity dataCheckCreate = naiveSql.select(TestIdentityEntity.class)
+                                                     .where(x -> x.and(TIE_Fields.id,
+                                                                       FilterCompare.Eq,
+                                                                       dataCreate.getId()))
+                                                     .first();
+
+        Assertions.assertNotNull(dataCheckCreate,
+                                 "查询新增的数据失败");
+
+        TempDataExtension.putData(name,
+                                  TestIdentityEntity.class,
+                                  dataCheckCreate.getId(),
+                                  dataCheckCreate);
+
+        AssertExtension.assertEquals(dataCreate,
+                                     dataCheckCreate,
+                                     TIE_Fields.allFields);
+
+        System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
+                          dataCheckCreate.getId());
+    }
+
+    /**
+     * 测试新增功能（包含长文本数据列）
+     *
+     * @param name 名称
+     */
+    @ParameterizedTest
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
+    @DisplayName("204.测试新增功能（包含长文本数据列）")
+    @Order(204)
+    public void _204(String name)
+            throws
+            Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
+
+        TestClobEntity dataCreate = TempDataExtension.generateData(TestClobEntity.class);
+
+        int rowsCreate = naiveSql.insert(TestClobEntity.class,
+                                         dataCreate)
+                                 .executeAffrows();
+
+        Assertions.assertEquals(1,
+                                rowsCreate,
+                                "新增数据失败");
+
+        System.out.printf("\r\n已新增数据，Id：%s\r\n",
+                          dataCreate.getId());
+
+        TestClobEntity dataCheckCreate = naiveSql.select(TestClobEntity.class)
+                                                 .where(x -> x.and(TCE_Fields.id,
+                                                                   FilterCompare.Eq,
+                                                                   dataCreate.getId()))
+                                                 .first();
+
+        Assertions.assertNotNull(dataCheckCreate,
+                                 "查询新增的数据失败");
+
+        TempDataExtension.putData(name,
+                                  TestClobEntity.class,
+                                  dataCheckCreate.getId(),
+                                  dataCheckCreate);
+
+        AssertExtension.assertEquals(dataCreate,
+                                     dataCheckCreate,
+                                     TCE_Fields.allFields);
+
+        System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
+                          dataCheckCreate.getId());
+    }
+
+    /**
+     * 测试新增功能（包含文件数据列）
+     *
+     * @param name 名称
+     */
+    @ParameterizedTest
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
+    @DisplayName("205.测试新增功能（包含文件数据列）")
+    @Order(205)
+    public void _205(String name)
+            throws
+            Throwable {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
+
+        TestBlobEntity dataCreate = TempDataExtension.generateData(TestBlobEntity.class);
+
+        int rowsCreate = naiveSql.insert(TestBlobEntity.class,
+                                         dataCreate)
+                                 .executeAffrows();
+
+        Assertions.assertEquals(1,
+                                rowsCreate,
+                                "新增数据失败");
+
+        System.out.printf("\r\n已新增数据，Id：%s\r\n",
+                          dataCreate.getId());
+
+        TestBlobEntity dataCheckCreate = naiveSql.select(TestBlobEntity.class)
+                                                 .where(x -> x.and(TBE_Fields.id,
+                                                                   FilterCompare.Eq,
+                                                                   dataCreate.getId()))
+                                                 .first();
+
+        Assertions.assertNotNull(dataCheckCreate,
+                                 "查询新增的数据失败");
+
+        TempDataExtension.putData(name,
+                                  TestBlobEntity.class,
+                                  dataCheckCreate.getId(),
+                                  dataCheckCreate);
+
+        AssertExtension.assertEquals(dataCreate,
+                                     dataCheckCreate,
+                                     TBE_Fields.allFields);
+
+        System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
+                          dataCheckCreate.getId());
     }
 }

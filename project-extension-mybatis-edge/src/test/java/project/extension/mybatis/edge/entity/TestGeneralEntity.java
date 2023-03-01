@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.entity;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alibaba.fastjson.annotation.JSONType;
 import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -13,18 +12,16 @@ import project.extension.openapi.annotations.OpenApiDescription;
 import project.extension.openapi.annotations.OpenApiSubTag;
 
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Date;
 
 /**
- * 一般测试实体
+ * 测试读写常规数据
  *
  * @author LCTR
  * @date 2022-01-09
  */
 @TableSetting
-@JSONType(ignores = "serialVersionUID")
+//新增此属性防止mapper的xml文件报错
 @Alias("TestGeneralEntity")
 public class TestGeneralEntity {
     /**
@@ -39,6 +36,7 @@ public class TestGeneralEntity {
 
     /**
      * 字符
+     * <p>在达梦数据库中最好将char的精度乘以2</p>
      */
     @OpenApiDescription("字符")
     @OpenApiSubTag({"List",
@@ -48,21 +46,13 @@ public class TestGeneralEntity {
 
     /**
      * 字符串
+     * <p>在达梦数据库中最好将varchar2的精度乘以2</p>
      */
     @OpenApiDescription("字符串")
     @OpenApiSubTag({"List",
                     "Create"})
     @ColumnSetting(length = 200)
     private String string;
-
-    /**
-     * 长字符串
-     */
-    @OpenApiDescription("长字符串")
-    @OpenApiSubTag({"List",
-                    "Create"})
-    @ColumnSetting(length = -1)
-    private String text;
 
     /**
      * 8位整数
@@ -104,11 +94,14 @@ public class TestGeneralEntity {
 
     /**
      * 单精度浮点数
+     * <p>在mysql和mariadb数据库中需要指定为float(70, 30)</p>
      */
     @OpenApiDescription("单精度浮点数")
     @OpenApiSubTag({"List",
                     "Create"})
-    @ColumnSetting(alias = "float")
+    @ColumnSetting(alias = "float",
+                   precision = 38,
+                   scale = 30)
     private Float float_;
 
     /**
@@ -117,7 +110,9 @@ public class TestGeneralEntity {
     @OpenApiDescription("双精度浮点数")
     @OpenApiSubTag({"List",
                     "Create"})
-    @ColumnSetting(alias = "double")
+    @ColumnSetting(alias = "double",
+                   precision = 38,
+                   scale = 30)
     private Double double_;
 
     /**
@@ -126,8 +121,8 @@ public class TestGeneralEntity {
     @OpenApiDescription("高精度浮点数")
     @OpenApiSubTag({"List",
                     "Create"})
-    @ColumnSetting(precision = 20,
-                   scale = 10)
+    @ColumnSetting(precision = 38,
+                   scale = 30)
     private BigDecimal decimal;
 
     /**
@@ -163,6 +158,7 @@ public class TestGeneralEntity {
 
     /**
      * 日期时间
+     * <p>在mysql和mariadb数据库中需要指定为datetime(6)</p>
      */
     @OpenApiDescription("日期时间")
     @OpenApiSubTag({"List",
@@ -170,30 +166,6 @@ public class TestGeneralEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
     @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date datetime;
-
-    /**
-     * 文件数据
-     */
-    @OpenApiDescription("文件数据")
-    @OpenApiSubTag({"List",
-                    "Create"})
-    @ColumnSetting(isIgnore = true)
-    //TODO mybatis 默认类型处理类暂不支持
-    private byte[] bytes;
-
-    /**
-     * 64位整数自动增长
-     */
-    @OpenApiDescription("64位整数自动增长")
-    @OpenApiSubTag({"List",
-                    "Create"})
-    @ColumnSetting(isIdentity = true,
-                   isNullable = false,
-                   isIgnore = true)
-    //TODO 自增功能待实现
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
-    @JSONField(serializeUsing = ToStringSerializer.class)
-    private Long longIdentity;
 
     /**
      * 主键
@@ -226,17 +198,6 @@ public class TestGeneralEntity {
 
     public void setString(String string) {
         this.string = string;
-    }
-
-    /**
-     * 长字符串
-     */
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     /**
@@ -360,28 +321,6 @@ public class TestGeneralEntity {
         this.datetime = datetime;
     }
 
-    /**
-     * 二进制
-     */
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    public void setBytes(byte[] bytes) {
-        this.bytes = bytes;
-    }
-
-    /**
-     * 64位整数自动增长
-     */
-    public Long getLongIdentity() {
-        return longIdentity;
-    }
-
-    public void setLongIdentity(Long longIdentity) {
-        this.longIdentity = longIdentity;
-    }
-
     @Override
     public String toString() {
         return new ToStringBuilder(this,
@@ -392,8 +331,6 @@ public class TestGeneralEntity {
                         getChar_())
                 .append("string",
                         getString())
-                .append("text",
-                        getText())
                 .append("byte_",
                         getByte_())
                 .append("short_",
@@ -416,12 +353,6 @@ public class TestGeneralEntity {
                         getTime())
                 .append("datetime",
                         getDatetime())
-                .append("bytes",
-                        new String(Base64.getEncoder()
-                                         .encode(getBytes()),
-                                   StandardCharsets.UTF_8))
-                .append("longIdentity",
-                        getLongIdentity())
                 .toString();
     }
 }

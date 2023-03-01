@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="project.extension.mybatis.edge.mapper.ITestClobEntityMapper">
+    <resultMap type="TestClobEntity"
+               id="TestClobEntityResult">
+        <result property="id"
+                column="id"/>
+        <result property="text"
+                column="text"/>
+    </resultMap>
+
+    <sql id="tableName">
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            `test_clob_entity`
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            [TestClobEntity]
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            "TEST_CLOB_ENTITY"
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            "TestClobEntity"
+        </if>
+    </sql>
+
+    <sql id="selectAll">
+        select *
+        from
+        <include refid="tableName"/>
+        where 1 = 1
+    </sql>
+
+    <insert id="insert"
+            parameterType="TestClobEntity"
+            useGeneratedKeys="true">
+        insert into
+        <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `id`,
+                <if test="text != null">`text`,</if>
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Id],
+                <if test="text != null">[Text],</if>
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "ID",
+                <if test="text != null">"TEXT",</if>
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Id",
+                <if test="text != null">"Text",</if>
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="text != null">#{text,jdbcType=NCLOB},</if>
+        </trim>
+    </insert>
+
+    <select id="getById"
+            parameterType="String"
+            resultMap="TestClobEntityResult">
+        <include refid="selectAll"/>
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            AND `id` = #{id}
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            AND [Id] = #{id}
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            AND "ID" = #{id}
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            AND "Id" = #{id}
+        </if>
+    </select>
+</mapper>

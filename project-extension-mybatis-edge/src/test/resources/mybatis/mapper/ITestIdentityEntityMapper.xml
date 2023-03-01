@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="project.extension.mybatis.edge.mapper.ITestIdentityEntityMapper">
+    <resultMap type="TestIdentityEntity"
+               id="TestIdentityEntityResult">
+        <result property="id"
+                column="id"/>
+        <result property="number"
+                column="number"/>
+    </resultMap>
+
+    <sql id="tableName">
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            `test_identity_entity`
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            [TestIdentityEntity]
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            "TEST_IDENTITY_ENTITY"
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            "TestIdentityEntity"
+        </if>
+    </sql>
+
+    <sql id="selectAll">
+        select *
+        from
+        <include refid="tableName"/>
+        where 1 = 1
+    </sql>
+
+    <insert id="insert"
+            parameterType="TestIdentityEntity"
+            useGeneratedKeys="true"
+            keyProperty="id">
+        insert into
+        <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                <if test="number != null">`number`,</if>
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                <if test="number != null">[Number],</if>
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                <if test="number != null">"NUMBER",</if>
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                <if test="number != null">"Number",</if>
+            </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number != null">#{number},</if>
+        </trim>
+    </insert>
+
+    <select id="getById"
+            parameterType="Long"
+            resultMap="TestIdentityEntityResult">
+        <include refid="selectAll"/>
+        <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+            AND `id` = #{id}
+        </if>
+        <if test="_databaseId == 'sqlserver'">
+            AND [Id] = #{id}
+        </if>
+        <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+            AND "ID" = #{id}
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            AND "Id" = #{id}
+        </if>
+    </select>
+</mapper>
