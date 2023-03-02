@@ -16,7 +16,7 @@ public class TIE_Fields {
     /**
      * 编号
      */
-    public static final String number = "number";
+    public static final String no = "no";
 
     /**
      * 全部字段
@@ -24,6 +24,6 @@ public class TIE_Fields {
     public static final String[] allFields
             = new String[]{
             id,
-            number
+            no
     };
 }

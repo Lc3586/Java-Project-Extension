@@ -1,10 +1,12 @@
 package project.extension.mybatis.edge.core.mapper;
 
+import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import project.extension.cryptography.MD5Utils;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.MappedStatementArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
@@ -61,19 +63,37 @@ public class MappedStatementHandler {
     /**
      * 创建
      *
-     * @param configuration  配置
-     * @param msId           标识
-     * @param script         脚本
-     * @param sqlCommandType 查询语句类型
-     * @param parameterType  参数类型
-     * @param parameterMap   参数映射表
-     * @param resultMap      返回数据映射表
-     * @param <TParameter>   参数类型
+     * @param configuration    配置
+     * @param msId             标识
+     * @param script           脚本
+     * @param sqlCommandType   查询语句类型
+     * @param useGeneratedKeys 使用自增列
+     * @param keyProperty      主键属性
+     * @param keyColumn        主键列
+     * @param useSelectKey     从数据库获取主键值
+     * @param selectKeyScript  获取主键值的脚本
+     * @param selectKeyType    主键值的数据类型
+     * @param parameterType    参数类型
+     * @param parameterMap     参数映射表
+     * @param resultMap        返回数据映射表
+     * @param <TParameter>     参数类型
      */
     public <TParameter> MappedStatement create(Configuration configuration,
                                                String msId,
                                                String script,
                                                SqlCommandType sqlCommandType,
+                                               @Nullable
+                                                       boolean useGeneratedKeys,
+                                               @Nullable
+                                                       String keyProperty,
+                                               @Nullable
+                                                       String keyColumn,
+                                               @Nullable
+                                                       boolean useSelectKey,
+                                               @Nullable
+                                                       String selectKeyScript,
+                                               @Nullable
+                                                       Class<?> selectKeyType,
                                                Class<TParameter> parameterType,
                                                ParameterMap parameterMap,
                                                ResultMap resultMap) {
@@ -84,10 +104,33 @@ public class MappedStatementHandler {
                                                              script,
                                                              parameterType);
 
+        //支持自增列
+        if (useGeneratedKeys) configuration.setUseGeneratedKeys(true);
+
         MappedStatement.Builder builder = new MappedStatement.Builder(configuration,
                                                                       msId,
                                                                       sqlSource,
                                                                       sqlCommandType);
+
+        if (useSelectKey) {
+            SelectKeyGenerator selectKeyGenerator = new SelectKeyGenerator(getOrCreateSelectKey(configuration,
+                                                                                                msId,
+                                                                                                selectKeyScript,
+                                                                                                keyProperty,
+                                                                                                keyColumn,
+                                                                                                selectKeyType),
+                                                                           true);
+
+            builder.keyGenerator(selectKeyGenerator);
+
+            keyProperty = null;
+            keyColumn = null;
+        }
+
+        //指定自增主键
+        if (keyProperty != null) builder.keyProperty(keyProperty);
+        if (keyColumn != null) builder.keyColumn(keyColumn);
+
         //参数映射
         if (parameterMap != null) builder.parameterMap(parameterMap);
 
@@ -100,8 +143,7 @@ public class MappedStatementHandler {
                                                     ms));
 
         // 缓存
-        if (!configuration.hasStatement(msId))
-            configuration.addMappedStatement(ms);
+        if (!configuration.hasStatement(msId)) configuration.addMappedStatement(ms);
 
         return ms;
 
@@ -133,8 +175,10 @@ public class MappedStatementHandler {
                                                              String script,
                                                              SqlCommandType sqlCommandType,
                                                              @Nullable
-                                                                     Class<TParameter> parameterType,
-                                                             Map<String, Object> parameterHashMap,
+                                                                     Class<TParameter> inParameterType,
+                                                             Map<String, Object> inParameterHashMap,
+                                                             Map<String, Class<?>> outParameterHashMap,
+                                                             Map<String, Class<?>> inOutParameterHashMap,
                                                              @Nullable
                                                                      Class<TResult> resultType,
                                                              Collection<String> resultFields,
@@ -145,8 +189,10 @@ public class MappedStatementHandler {
         if (ms == null) {
             ParameterMap parameterMap = MapBuilder.getHashMapParameterMap(configuration,
                                                                           msId,
-                                                                          parameterType,
-                                                                          parameterHashMap);
+                                                                          inParameterType,
+                                                                          inParameterHashMap,
+                                                                          outParameterHashMap,
+                                                                          inOutParameterHashMap);
 
             ResultMap resultMap = MapBuilder.getHashMapResultMap(configuration,
                                                                  msId,
@@ -158,7 +204,13 @@ public class MappedStatementHandler {
                         msId,
                         script,
                         sqlCommandType,
-                        parameterType,
+                        false,
+                        null,
+                        null,
+                        false,
+                        null,
+                        null,
+                        inParameterType,
                         parameterMap,
                         resultMap);
         }
@@ -171,8 +223,22 @@ public class MappedStatementHandler {
                                                              String script,
                                                              SqlCommandType sqlCommandType,
                                                              @Nullable
+                                                                     boolean useGeneratedKeys,
+                                                             @Nullable
+                                                                     String keyProperty,
+                                                             @Nullable
+                                                                     String keyColumn,
+                                                             @Nullable
+                                                                     boolean useSelectKey,
+                                                             @Nullable
+                                                                     String selectKeyScript,
+                                                             @Nullable
+                                                                     Class<?> selectKeyType,
+                                                             @Nullable
                                                                      Class<TParameter> parameterType,
                                                              Map<String, Object> parameterHashMap,
+                                                             Map<String, Class<?>> outParameterHashMap,
+                                                             Map<String, Class<?>> inOutParameterHashMap,
                                                              Class<TResult> resultType,
                                                              @Nullable
                                                                      Integer resultMainTagLevel,
@@ -186,7 +252,9 @@ public class MappedStatementHandler {
             ParameterMap parameterMap = MapBuilder.getHashMapParameterMap(configuration,
                                                                           msId,
                                                                           parameterType,
-                                                                          parameterHashMap);
+                                                                          parameterHashMap,
+                                                                          outParameterHashMap,
+                                                                          inOutParameterHashMap);
 
             ResultMap resultMap = MapBuilder.getResultMap(configuration,
                                                           msId,
@@ -194,12 +262,19 @@ public class MappedStatementHandler {
                                                           resultMainTagLevel,
                                                           resultCustomTags,
                                                           false,
+                                                          false,
                                                           nameConvertType);
 
             ms = create(configuration,
                         msId,
                         script,
                         sqlCommandType,
+                        useGeneratedKeys,
+                        keyProperty,
+                        keyColumn,
+                        useSelectKey,
+                        selectKeyScript,
+                        selectKeyType,
                         parameterType,
                         parameterMap,
                         resultMap);
@@ -240,6 +315,12 @@ public class MappedStatementHandler {
                         msId,
                         script,
                         sqlCommandType,
+                        false,
+                        null,
+                        null,
+                        false,
+                        null,
+                        null,
                         parameterType,
                         parameterMap,
                         resultMap);
@@ -252,6 +333,18 @@ public class MappedStatementHandler {
                                                              String msId,
                                                              String script,
                                                              SqlCommandType sqlCommandType,
+                                                             @Nullable
+                                                                     boolean useGeneratedKeys,
+                                                             @Nullable
+                                                                     String keyProperty,
+                                                             @Nullable
+                                                                     String keyColumn,
+                                                             @Nullable
+                                                                     boolean useSelectKey,
+                                                             @Nullable
+                                                                     String selectKeyScript,
+                                                             @Nullable
+                                                                     Class<?> selectKeyType,
                                                              Class<TParameter> parameterType,
                                                              @Nullable
                                                                      Integer parameterMainTagLevel,
@@ -279,14 +372,62 @@ public class MappedStatementHandler {
                                                           resultMainTagLevel,
                                                           resultCustomTags,
                                                           false,
+                                                          false,
                                                           nameConvertType);
 
             ms = create(configuration,
                         msId,
                         script,
                         sqlCommandType,
+                        useGeneratedKeys,
+                        keyProperty,
+                        keyColumn,
+                        useSelectKey,
+                        selectKeyScript,
+                        selectKeyType,
                         parameterType,
                         parameterMap,
+                        resultMap);
+        }
+
+        return ms;
+    }
+
+    public MappedStatement getOrCreateSelectKey(Configuration configuration,
+                                                String msId,
+                                                String script,
+                                                String keyProperty,
+                                                String keyColumn,
+                                                Class<?> keyType) {
+        msId = String.format("%s-%s",
+                             msId,
+                             MD5Utils.hash(script));
+
+        MappedStatement ms = get(configuration,
+                                 msId);
+
+        if (ms == null) {
+            ResultMap resultMap = MapBuilder.getResultMap(configuration,
+                                                          msId,
+                                                          keyType,
+                                                          null,
+                                                          null,
+                                                          false,
+                                                          false,
+                                                          null);
+
+            ms = create(configuration,
+                        msId,
+                        script,
+                        SqlCommandType.SELECT,
+                        false,
+                        keyProperty,
+                        keyColumn,
+                        false,
+                        null,
+                        null,
+                        null,
+                        null,
                         resultMap);
         }
 

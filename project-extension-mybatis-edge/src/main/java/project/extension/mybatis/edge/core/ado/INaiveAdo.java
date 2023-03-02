@@ -470,8 +470,14 @@ public interface INaiveAdo {
      * @param sqlSession       指定SQL会话
      * @param msId             MappedStatement标识
      * @param script           脚本
+     * @param useGeneratedKeys 使用自增列
+     * @param keyProperty      主键属性
+     * @param keyColumn        主键列
+     * @param useSelectKey     从数据库获取主键值
+     * @param selectKeyScript  获取主键值的脚本
+     * @param selectKeyType    主键值的数据类型
      * @param parameterType    参数类型
-     * @param parameterHashMap 参数键值对映射表
+     * @param parameterHashMap 全部参数键值对映射表
      * @param nameConvertType  命名规则
      * @param <TParameter>     参数类型
      * @return 影响行数
@@ -480,8 +486,22 @@ public interface INaiveAdo {
                             String msId,
                             String script,
                             @Nullable
+                                    boolean useGeneratedKeys,
+                            @Nullable
+                                    String keyProperty,
+                            @Nullable
+                                    String keyColumn,
+                            @Nullable
+                                    boolean useSelectKey,
+                            @Nullable
+                                    String selectKeyScript,
+                            @Nullable
+                                    Class<?> selectKeyType,
+                            @Nullable
                                     Class<TParameter> parameterType,
                             Map<String, Object> parameterHashMap,
+                            Map<String, Class<?>> outParameterHashMap,
+                            Map<String, Class<?>> inOutParameterHashMap,
                             NameConvertType nameConvertType);
 
     /**
@@ -490,6 +510,12 @@ public interface INaiveAdo {
      * @param sqlSession            指定SQL会话
      * @param msId                  MappedStatement标识
      * @param script                脚本
+     * @param useGeneratedKeys      使用自增列
+     * @param keyProperty           主键属性
+     * @param keyColumn             主键列
+     * @param useSelectKey          从数据库获取主键值
+     * @param selectKeyScript       获取主键值的脚本
+     * @param selectKeyType         主键值的数据类型
      * @param parameter             参数
      * @param parameterType         参数类型
      * @param parameterMainTagLevel 参数模型主标签等级
@@ -501,6 +527,18 @@ public interface INaiveAdo {
     <TParameter> int insert(SqlSession sqlSession,
                             String msId,
                             String script,
+                            @Nullable
+                                    boolean useGeneratedKeys,
+                            @Nullable
+                                    String keyProperty,
+                            @Nullable
+                                    String keyColumn,
+                            @Nullable
+                                    boolean useSelectKey,
+                            @Nullable
+                                    String selectKeyScript,
+                            @Nullable
+                                    Class<?> selectKeyType,
                             TParameter parameter,
                             Class<TParameter> parameterType,
                             @Nullable

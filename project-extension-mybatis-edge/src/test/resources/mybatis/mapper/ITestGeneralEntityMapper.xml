@@ -8,8 +8,12 @@
                id="TestGeneralEntityResult">
         <result property="id"
                 column="id"/>
+        <result property="char_"
+                column="char"/>
         <result property="string"
                 column="string"/>
+        <result property="byte_"
+                column="byte"/>
         <result property="short_"
                 column="short"/>
         <result property="integer"
@@ -58,6 +62,22 @@
             parameterType="TestGeneralEntity"
             resultMap="TestGeneralEntityResult">
         <include refid="selectAll"/>
+        <if test="char_ != null and char_ != ''">
+            AND
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `char`
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Char]
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "CHAR"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Char"
+            </if>
+            = #{char_}
+        </if>
         <if test="string != null and string != ''">
             AND
             <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
@@ -73,6 +93,22 @@
                 "String"
             </if>
             like '%#{string}%'
+        </if>
+        <if test="byte_ != null and byte_ != 0">
+            AND
+            <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
+                `byte`
+            </if>
+            <if test="_databaseId == 'sqlserver'">
+                [Byte]
+            </if>
+            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
+                "BYTE"
+            </if>
+            <if test="_databaseId == 'postgresql'">
+                "Byte"
+            </if>
+            = #{byte_}
         </if>
         <if test="integer != null and integer != 0">
             AND
@@ -133,7 +169,9 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
                 `id`,
+                <if test="char_ != null">`char`,</if>
                 <if test="string != null">`string`,</if>
+                <if test="byte_ != null">`byte`,</if>
                 <if test="short_ != null">`short`,</if>
                 <if test="integer != null">`integer`,</if>
                 <if test="long_ != null">`long`,</if>
@@ -147,7 +185,9 @@
             </if>
             <if test="_databaseId == 'sqlserver'">
                 [Id],
+                <if test="char_ != null">[Char],</if>
                 <if test="string != null">[String],</if>
+                <if test="byte_ != null">[Byte],</if>
                 <if test="short_ != null">[Short],</if>
                 <if test="integer != null">[Integer],</if>
                 <if test="long_ != null">[Long],</if>
@@ -161,7 +201,9 @@
             </if>
             <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
                 "ID",
+                <if test="char_ != null">"CHAR",</if>
                 <if test="string != null">"STRING",</if>
+                <if test="byte_ != null">"BYTE",</if>
                 <if test="short_ != null">"SHORT",</if>
                 <if test="integer != null">"INTEGER",</if>
                 <if test="long_ != null">"LONG",</if>
@@ -175,7 +217,9 @@
             </if>
             <if test="_databaseId == 'postgresql'">
                 "Id",
+                <if test="char_ != null">"Char",</if>
                 <if test="string != null">"String",</if>
+                <if test="byte_ != null">"Byte",</if>
                 <if test="short_ != null">"Short",</if>
                 <if test="integer != null">"Integer",</if>
                 <if test="long_ != null">"Long",</if>
@@ -191,7 +235,9 @@
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             #{id},
+            <if test="char_ != null">#{char_},</if>
             <if test="string != null">#{string},</if>
+            <if test="byte_ != null">#{byte_},</if>
             <if test="short_ != null">#{short_},</if>
             <if test="integer != null">#{integer},</if>
             <if test="long_ != null">#{long_},</if>
@@ -211,7 +257,9 @@
         <include refid="tableName"/>
         <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
             <trim prefix="SET" suffixOverrides=",">
+                <if test="char_ != null">`char`=#{char_},</if>
                 <if test="string != null">`string`=#{string},</if>
+                <if test="byte_ != null">`byte`=#{byte_},</if>
                 <if test="short_ != null">`short`=#{short_},</if>
                 <if test="integer != null">`integer`=#{integer},</if>
                 <if test="long_ != null">`long`=#{long_},</if>
@@ -227,7 +275,9 @@
         </if>
         <if test="_databaseId == 'sqlserver'">
             <trim prefix="SET" suffixOverrides=",">
+                <if test="char_ != null">[Char]=#{char_},</if>
                 <if test="string != null">[String]=#{string},</if>
+                <if test="byte_ != null">[Byte]=#{byte_},</if>
                 <if test="short_ != null">[Short]=#{short_},</if>
                 <if test="integer != null">[Integer]=#{integer},</if>
                 <if test="long_ != null">[Long]=#{long_},</if>
@@ -243,7 +293,9 @@
         </if>
         <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
             <trim prefix="SET" suffixOverrides=",">
+                <if test="char_ != null">"CHAR"=#{char_},</if>
                 <if test="string != null">"STRING"=#{string},</if>
+                <if test="byte_ != null">"BYTE"=#{byte_},</if>
                 <if test="short_ != null">"SHORT"=#{short_},</if>
                 <if test="integer != null">"INTEGER"=#{integer},</if>
                 <if test="long_ != null">"LONG"=#{long_},</if>
@@ -259,7 +311,9 @@
         </if>
         <if test="_databaseId == 'postgresql'">
             <trim prefix="SET" suffixOverrides=",">
+                <if test="char_ != null">"Char"=#{char_},</if>
                 <if test="string != null">"String"=#{string},</if>
+                <if test="byte_ != null">"Byte"=#{byte_},</if>
                 <if test="short_ != null">"Short"=#{short_},</if>
                 <if test="integer != null">"Integer"=#{integer},</if>
                 <if test="long_ != null">"Long"=#{long_},</if>

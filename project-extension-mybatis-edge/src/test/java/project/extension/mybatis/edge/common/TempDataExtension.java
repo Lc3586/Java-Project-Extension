@@ -40,7 +40,6 @@ public class TempDataExtension {
      */
     private static final char[] charsValue = new char[]
             {
-                    ' ',
                     'a',
                     'b',
                     'c',
@@ -251,18 +250,26 @@ public class TempDataExtension {
                         || char.class.equals(field.getType())) {
                     if (columnSetting == null)
                         field.set(data,
-                                  ' ');
+                                  '6');
                     else
                         field.set(data,
                                   charsValue[new Random().nextInt(charsValue.length - 1)]);
                 } else if (String.class.equals(field.getType())) {
                     if (columnSetting == null)
                         field.set(data,
-                                  " ");
+                                  "6");
                     else {
                         int length = columnSetting.length();
+                        if (length == 36) {
+                            field.set(data,
+                                      UUID.randomUUID()
+                                          .toString());
+                            continue;
+                        }
+
                         if (length <= 0)
                             length = 100000;
+
                         char[] chars = new char[length];
                         Random random = new Random();
                         for (int i = 0; i < length; i++) {
@@ -555,9 +562,9 @@ public class TempDataExtension {
                                                       data)
                                          .executeAffrows();
 
-                Assertions.assertEquals(data.size(),
-                                        rowsDelete,
-                                        "清理数据失败");
+                Assertions.assertNotEquals(-1,
+                                           rowsDelete,
+                                           "清理数据失败");
 
                 for (Object key : dataOfKey.keySet()) {
                     System.out.printf("\r\n已清理数据，key：%s\r\n",

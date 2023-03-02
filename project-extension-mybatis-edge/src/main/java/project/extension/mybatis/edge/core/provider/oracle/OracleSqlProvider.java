@@ -22,9 +22,9 @@ public class OracleSqlProvider
     }
 
     @Override
-    public String tableName2Sql(String schema,
-                                String tableName,
-                                String alias) {
+    public String getName2Sql(String schema,
+                              String tableName,
+                              String alias) {
         return String.format(" %s%s%s ",
                              //`dbo`.
                              StringUtils.hasText(schema)

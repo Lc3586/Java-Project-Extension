@@ -393,6 +393,19 @@ public class Strings {
     }
 
     /**
+     * 设置输出参数的值失败
+     *
+     * @param name      参数名称
+     * @param fieldName 字段名称
+     */
+    public static String getSetOutParameterValue2FieldFailed(String name,
+                                                             String fieldName) {
+        return getString("SetOutParameterValue2FieldFailed",
+                         name,
+                         fieldName);
+    }
+
+    /**
      * 无效的值
      *
      * @param name  值名称

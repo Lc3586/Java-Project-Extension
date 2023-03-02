@@ -34,6 +34,10 @@ public class InserterDTO {
 
     private final Map<String, Object> parameter = new HashMap<>();
 
+    private final Map<String, Class<?>> outParameter = new HashMap<>();
+
+    private final Map<String, Class<?>> inOutParameter = new HashMap<>();
+
     /**
      * 模式名
      */
@@ -129,9 +133,24 @@ public class InserterDTO {
     }
 
     /**
-     * 参数
+     * 全部参数
+     * <p>不可手动设置null值</p>
      */
     public Map<String, Object> getParameter() {
         return parameter;
+    }
+
+    /**
+     * 输出参数
+     */
+    public Map<String, Class<?>> getOutParameter() {
+        return outParameter;
+    }
+
+    /**
+     * 输入输出参数
+     */
+    public Map<String, Class<?>> getInOutParameter() {
+        return inOutParameter;
     }
 }

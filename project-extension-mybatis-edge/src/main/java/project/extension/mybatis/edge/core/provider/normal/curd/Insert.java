@@ -15,7 +15,9 @@ import project.extension.mybatis.edge.model.CurdType;
 import project.extension.mybatis.edge.model.InserterDTO;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+import project.extension.tuple.Tuple3;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -98,6 +100,66 @@ public abstract class Insert<T>
         return sqlProvider.inserter2Script(inserter,
                                            noParameter,
                                            data);
+    }
+
+    /**
+     * 返回当前的获取序列值的脚本
+     *
+     * @return 脚本
+     */
+    protected Tuple3<Boolean, String, Class<?>> currentSelectKeyScript()
+            throws
+            ModuleException {
+        return sqlProvider.selectKey2Script(inserter);
+    }
+
+    /**
+     * 获取自增列
+     *
+     * @return a: 字段, b: 列名, c: 类型
+     */
+    protected Tuple3<Field, String, Class<?>> getIdentityFieldAndColumn() {
+        Field identityField = EntityTypeHandler.getIdentityKeyField(inserter.getEntityType());
+        if (identityField == null) return null;
+        return new Tuple3<>(identityField,
+                            EntityTypeHandler.getColumn(identityField,
+                                                        config.getNameConvertType()),
+                            identityField.getType());
+    }
+
+    /**
+     * 设置从数据库返回的自增列的值
+     *
+     * @param field      字段
+     * @param dataObject 数据对象
+     */
+    protected void setIdentityFieldValue(Field field,
+                                         Object dataObject) {
+        try {
+            field.setAccessible(true);
+            Object value = inserter.getParameter()
+                                   .get(field.getName());
+            Class<?> fieldType = field.getType();
+            Class<?> type = value.getClass();
+            if (!fieldType.equals(type)) {
+                if (fieldType.equals(byte.class) || fieldType.equals(Byte.class))
+                    value = Byte.parseByte(value.toString());
+                else if (fieldType.equals(short.class) || fieldType.equals(Short.class))
+                    value = Short.parseShort(value.toString());
+                else if (fieldType.equals(int.class) || fieldType.equals(Integer.class))
+                    value = Integer.parseInt(value.toString());
+                else if (fieldType.equals(long.class) || fieldType.equals(Long.class))
+                    value = Long.parseLong(value.toString());
+                else if (fieldType.equals(String.class))
+                    value = value.toString();
+            }
+            field.set(dataObject,
+                      value);
+        } catch (Exception ex) {
+            throw new ModuleException(Strings.getSetOutParameterValue2FieldFailed(field.getName(),
+                                                                                  field.getName()),
+                                      ex);
+        }
     }
 
     /**
@@ -207,10 +269,16 @@ public abstract class Insert<T>
             throws
             ModuleException {
         if (inserter.getDataList()
-                    .size() == 0)
-            return 0;
+                    .size() == 0) return 0;
 
         int rows = 0;
+
+        //自增列
+        boolean hasIdentityField = false;
+        //oracle自增列使用序列获取主键值
+        Tuple3<Boolean, String, Class<?>> useSelectKey = currentSelectKeyScript();
+
+        Tuple3<Field, String, Class<?>> identityFieldAndColumn = getIdentityFieldAndColumn();
 
         for (Object data : inserter.getDataList()) {
             String script = currentScript(false,
@@ -219,14 +287,34 @@ public abstract class Insert<T>
                                   inserter.getDtoType()
                                           .getTypeName());
 
+            if (identityFieldAndColumn != null) {
+                hasIdentityField = true;
+                inserter.getOutParameter()
+                        .put(identityFieldAndColumn.a.getName(),
+                             identityFieldAndColumn.c);
+            }
+
+            boolean useGeneratedKeys = hasIdentityField;
+
             //批量插入
-            int currentRows = aop.invokeWithAop(() -> this.ado.insert(
-                                                        getSqlSession(),
-                                                        msId,
-                                                        script,
-                                                        null,
-                                                        inserter.getParameter(),
-                                                        config.getNameConvertType()),
+            int currentRows = aop.invokeWithAop(() -> this.ado.insert(getSqlSession(),
+                                                                      msId,
+                                                                      script,
+                                                                      useGeneratedKeys && !useSelectKey.a,
+                                                                      useGeneratedKeys || useSelectKey.a
+                                                                      ? identityFieldAndColumn.a.getName()
+                                                                      : null,
+                                                                      useGeneratedKeys || useSelectKey.a
+                                                                      ? identityFieldAndColumn.b
+                                                                      : null,
+                                                                      useSelectKey.a,
+                                                                      useSelectKey.b,
+                                                                      useSelectKey.c,
+                                                                      null,
+                                                                      inserter.getParameter(),
+                                                                      inserter.getOutParameter(),
+                                                                      inserter.getInOutParameter(),
+                                                                      config.getNameConvertType()),
                                                 CurdType.插入,
                                                 config.getName(),
                                                 script,
@@ -235,7 +323,12 @@ public abstract class Insert<T>
                                                 inserter.getDtoType());
             if (currentRows < 0) {
                 throw new ModuleException(Strings.getRowsDataException(currentRows));
-            } else if (currentRows > 0) rows++;
+            } else if (currentRows > 0) {
+                rows++;
+
+                if (hasIdentityField) setIdentityFieldValue(identityFieldAndColumn.a,
+                                                            data);
+            }
         }
 
         return rows;

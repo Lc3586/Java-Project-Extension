@@ -93,6 +93,8 @@ public class Strings_zh_CN {
                        "获取%1$2s对象中%2$2s字段的值失败");
             values.put("GetObjectFieldValueFailed",
                        "未在%1$2s实体中找到%2$2s字段");
+            values.put("SetOutParameterValue2FieldFailed",
+                       "设置输出参数%1$2s的值到%2$2s字段失败");
             values.put("UnknownValue",
                        "%1$2s的值%2$2s无效");
             values.put("TypeFieldOnlySupportOperation",

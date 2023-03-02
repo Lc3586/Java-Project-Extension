@@ -28,7 +28,9 @@ public class TestIdentityEntity {
     @OpenApiSubTag({"List",
                     "Create"})
     @ColumnSetting(isPrimaryKey = true,
-                   isIdentity = true)
+                   isIdentity = true,
+                   //使用Oracle时需要指定自增主键的序列
+                   oracleIdentitySequence = "ISEQ$$_73261")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long id;
@@ -40,7 +42,7 @@ public class TestIdentityEntity {
     @OpenApiSubTag({"List",
                     "Create"})
     @ColumnSetting(length = 36)
-    private String number;
+    private String no;
 
     /**
      * 自增主键
@@ -56,12 +58,12 @@ public class TestIdentityEntity {
     /**
      * 编号
      */
-    public String getNumber() {
-        return number;
+    public String getNo() {
+        return no;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setNo(String no) {
+        this.no = no;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class TestIdentityEntity {
                 .append("id",
                         getId())
                 .append("number",
-                        getNumber())
+                        getNo())
                 .toString();
     }
 }

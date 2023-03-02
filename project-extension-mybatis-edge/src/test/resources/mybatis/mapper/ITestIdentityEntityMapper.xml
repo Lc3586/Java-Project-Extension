@@ -8,8 +8,8 @@
                id="TestIdentityEntityResult">
         <result property="id"
                 column="id"/>
-        <result property="number"
-                column="number"/>
+        <result property="no"
+                column="no"/>
     </resultMap>
 
     <sql id="tableName">
@@ -42,21 +42,49 @@
         <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="_databaseId == 'mysql' or _databaseId == 'mariadb'">
-                <if test="number != null">`number`,</if>
+                <if test="no != null">`no`,</if>
             </if>
             <if test="_databaseId == 'sqlserver'">
-                <if test="number != null">[Number],</if>
+                <if test="no != null">[No],</if>
             </if>
-            <if test="_databaseId == 'dm' or _databaseId == 'oracle'">
-                <if test="number != null">"NUMBER",</if>
+            <if test="_databaseId == 'dm'">
+                <if test="no != null">"NO",</if>
+            </if>
+            <if test="_databaseId == 'oracle'">
+                "ID",
+                <if test="no != null">"NO",</if>
             </if>
             <if test="_databaseId == 'postgresql'">
-                <if test="number != null">"Number",</if>
+                <if test="no != null">"No",</if>
             </if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="number != null">#{number},</if>
+            <if test="_databaseId == 'oracle'">
+                "ISEQ$$_73261".nextval,
+            </if>
+            <if test="no != null">#{no},</if>
+        </trim>
+    </insert>
+
+    <insert id="insert"
+            parameterType="TestIdentityEntity"
+            databaseId="oracle">
+        <selectKey keyProperty="id"
+                   order="BEFORE"
+                   resultType="java.lang.Long">
+            select "ISEQ$$_73261".nextval from dual
+        </selectKey>
+        insert into
+        <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            "ID",
+            <if test="no != null">"NO",</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="no != null">#{no},</if>
         </trim>
     </insert>
 

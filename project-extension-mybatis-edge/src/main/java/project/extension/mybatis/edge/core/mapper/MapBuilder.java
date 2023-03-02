@@ -1,9 +1,6 @@
 package project.extension.mybatis.edge.core.mapper;
 
-import org.apache.ibatis.mapping.ParameterMap;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
@@ -11,6 +8,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.Nullable;
 import project.extension.collections.CollectionsExtension;
+import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.MappingSetting;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.extention.SchemaExtension;
@@ -72,11 +70,23 @@ public class MapBuilder {
                                                                  tags)) {
                 MappingSetting mappingSettingAttribute = AnnotationUtils.findAnnotation(field,
                                                                                         MappingSetting.class);
-                if (mappingSettingAttribute != null && mappingSettingAttribute.ignore())
+
+                ColumnSetting columnSettingAttribute = AnnotationUtils.findAnnotation(field,
+                                                                                      ColumnSetting.class);
+
+                if (mappingSettingAttribute != null
+                        && mappingSettingAttribute.ignore())
                     continue;
-                parameterMappings.add(new ParameterMapping.Builder(config,
-                                                                   field.getName(),
-                                                                   registry.getTypeHandler(field.getType())).build());
+
+                ParameterMapping.Builder parameterMapping = new ParameterMapping.Builder(config,
+                                                                                         field.getName(),
+                                                                                         registry.getTypeHandler(field.getType()));
+
+                //自增主键
+                if (columnSettingAttribute != null && columnSettingAttribute.isIdentity())
+                    parameterMapping.mode(ParameterMode.OUT);
+
+                parameterMappings.add(parameterMapping.build());
             }
         }
 
@@ -89,17 +99,21 @@ public class MapBuilder {
     /**
      * 获取参数映射表
      *
-     * @param config           配置
-     * @param msId             标识
-     * @param parameterType    参数类型
-     * @param parameterHashMap key为字段名的键值对集合
-     * @param <TParameter>     参数类型
+     * @param config                配置
+     * @param msId                  标识
+     * @param parameterType         参数类型
+     * @param parameterHashMap      全部参数（key为字段名的键值对集合）
+     * @param outParameterHashMap   输出参数（key为字段名的键值对集合）
+     * @param inOutParameterHashMap 输入输出参数（key为字段名的键值对集合）
+     * @param <TParameter>          参数类型
      * @return 参数映射表
      */
     public static <TParameter> ParameterMap getHashMapParameterMap(Configuration config,
                                                                    String msId,
                                                                    Class<TParameter> parameterType,
-                                                                   Map<String, Object> parameterHashMap) {
+                                                                   Map<String, Object> parameterHashMap,
+                                                                   Map<String, Class<?>> outParameterHashMap,
+                                                                   Map<String, Class<?>> inOutParameterHashMap) {
         final TypeHandlerRegistry registry = config.getTypeHandlerRegistry();
 
         List<ParameterMapping> parameterMappings = new ArrayList<>();
@@ -129,6 +143,38 @@ public class MapBuilder {
                 }
         }
 
+        if (CollectionsExtension.anyPlus(outParameterHashMap))
+            for (String parameterName : outParameterHashMap.keySet()) {
+                ParameterMapping.Builder parameterMapping = new ParameterMapping.Builder(config,
+                                                                                         parameterName,
+                                                                                         registry.getTypeHandler(
+                                                                                                 outParameterHashMap.get(parameterName)));
+                parameterMapping.mode(ParameterMode.OUT);
+                parameterMapping.javaType(outParameterHashMap.get(parameterName));
+                parameterMappings.add(parameterMapping.build());
+
+                if (!parameterHashMap.containsKey(parameterName)) {
+                    parameterHashMap.put(parameterName,
+                                         null);
+                }
+            }
+
+        if (CollectionsExtension.anyPlus(inOutParameterHashMap))
+            for (String parameterName : inOutParameterHashMap.keySet()) {
+                ParameterMapping.Builder parameterMapping = new ParameterMapping.Builder(config,
+                                                                                         parameterName,
+                                                                                         registry.getTypeHandler(
+                                                                                                 inOutParameterHashMap.get(parameterName)));
+                parameterMapping.mode(ParameterMode.INOUT);
+                parameterMapping.javaType(outParameterHashMap.get(parameterName));
+                parameterMappings.add(parameterMapping.build());
+
+                if (!parameterHashMap.containsKey(parameterName)) {
+                    parameterHashMap.put(parameterName,
+                                         null);
+                }
+            }
+
         return new ParameterMap.Builder(config,
                                         msId,
                                         Map.class,
@@ -138,14 +184,15 @@ public class MapBuilder {
     /**
      * 获取返回数据映射表
      *
-     * @param config            配置
-     * @param msId              标识
-     * @param resultType        返回值类型
-     * @param mainTagLevel      主标签等级（null时默认为0）
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param nameConvertType   命名规则
-     * @param <TResult>         返回值类型
+     * @param config             配置
+     * @param msId               标识
+     * @param resultType         返回值类型
+     * @param mainTagLevel       主标签等级（null时默认为0）
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param nameConvertType    命名规则
+     * @param <TResult>          返回值类型
      * @return 返回数据映射表
      */
     public static <TResult> ResultMap getResultMap(Configuration config,
@@ -155,6 +202,7 @@ public class MapBuilder {
                                                            Integer mainTagLevel,
                                                    Collection<String> customTags,
                                                    boolean withOutPrimaryKey,
+                                                   boolean withOutIdentityKey,
                                                    NameConvertType nameConvertType) {
         if (resultType == null || resultType.equals(Object.class))
             return new ResultMap.Builder(config,
@@ -176,6 +224,7 @@ public class MapBuilder {
                                                                             : mainTagLevel,
                                                                             customTags,
                                                                             withOutPrimaryKey,
+                                                                            withOutIdentityKey,
                                                                             false);
             for (Field field : fields) {
                 TypeHandler<?> typeHandler = null;

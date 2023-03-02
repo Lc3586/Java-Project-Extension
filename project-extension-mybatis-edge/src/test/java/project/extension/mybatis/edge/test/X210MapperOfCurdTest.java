@@ -197,6 +197,9 @@ public class X210MapperOfCurdTest {
                                 rowsCreate,
                                 "新增数据失败");
 
+        Assertions.assertNotNull(dataCreate.getId(),
+                                 "新增数据读取自增Id失败");
+
         System.out.printf("\r\n已新增数据，Id：%s\r\n",
                           dataCreate.getId());
 

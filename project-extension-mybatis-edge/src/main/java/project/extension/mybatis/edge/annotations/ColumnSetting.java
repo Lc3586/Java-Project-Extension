@@ -44,6 +44,11 @@ public @interface ColumnSetting {
     boolean isIdentity() default false;
 
     /**
+     * Oracle数据库自增序列
+     */
+    String oracleIdentitySequence() default "";
+
+    /**
      * 可为空
      */
     boolean isNullable() default true;
@@ -57,7 +62,8 @@ public @interface ColumnSetting {
      * 长度
      * <p>-1 对应JdbcType.LONGNVARCHAR</p>
      * <p>-2 对应JdbcType.LONGVARCHAR</p>
-     * <p>-3 对应JdbcType.CLOB</p>
+     * <p>-3 对应JdbcType.NCLOB</p>
+     * <p>-4 对应JdbcType.CLOB</p>
      */
     int length() default 30;
 

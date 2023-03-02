@@ -4,6 +4,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
@@ -11,19 +12,18 @@ import project.extension.mybatis.edge.annotations.*;
 import project.extension.mybatis.edge.config.BaseConfig;
 import project.extension.mybatis.edge.extention.SqlExtension;
 import project.extension.mybatis.edge.globalization.Strings;
+import project.extension.mybatis.edge.model.DbType;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.annotations.OpenApiMainTag;
 import project.extension.openapi.annotations.OpenApiMainTags;
 import project.extension.openapi.annotations.OpenApiSchema;
 import project.extension.openapi.extention.SchemaExtension;
-import project.extension.openapi.model.OpenApiSchemaFormat;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -82,6 +82,25 @@ public class EntityTypeHandler {
         }
 
         return fieldWithColumns;
+    }
+
+    /**
+     * 获取自增字段
+     * <p>@ColumnSetting 设置主键</p>
+     *
+     * @param entityType 实体类型
+     * @param <T>        实体类型
+     * @return 字段
+     */
+    public static <T> Field getIdentityKeyField(Class<T> entityType) {
+        for (Field field : entityType.getDeclaredFields()) {
+            ColumnSetting executorSettingAttribute = AnnotationUtils.findAnnotation(field,
+                                                                                    ColumnSetting.class);
+            if (executorSettingAttribute != null && executorSettingAttribute.isIdentity())
+                return field;
+        }
+
+        return null;
     }
 
     /**
@@ -298,28 +317,33 @@ public class EntityTypeHandler {
     /**
      * 获取实体类型列集合
      *
-     * @param entityType        实体类型
-     * @param withOutPrimaryKey 排除主键
-     * @param nameConvertType   命名规则
+     * @param entityType         实体类型
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param nameConvertType    命名规则
      * @return 列名集合
      */
     public static List<String> getColumnsByEntityType(Class<?> entityType,
                                                       boolean withOutPrimaryKey,
+                                                      boolean withOutIdentityKey,
                                                       NameConvertType nameConvertType) {
         return getColumns(getColumnFieldsByEntityType(entityType,
-                                                      withOutPrimaryKey),
+                                                      withOutPrimaryKey,
+                                                      withOutIdentityKey),
                           nameConvertType);
     }
 
     /**
      * 获取实体类型列名集合
      *
-     * @param entityType        实体类型
-     * @param withOutPrimaryKey 排除主键
+     * @param entityType         实体类型
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
      * @return 列名集合
      */
     public static List<Field> getColumnFieldsByEntityType(Class<?> entityType,
-                                                          boolean withOutPrimaryKey) {
+                                                          boolean withOutPrimaryKey,
+                                                          boolean withOutIdentityKey) {
         List<Field> fields = new ArrayList<>();
         while (true) {
 //            EntityMapping entityMappingAttribute = AnnotationUtils.findAnnotation(entityType,
@@ -327,7 +351,8 @@ public class EntityTypeHandler {
 
             for (Field field : entityType.getDeclaredFields()) {
                 if (isIgnoreColumn(field,
-                                   withOutPrimaryKey)) continue;
+                                   withOutPrimaryKey,
+                                   withOutIdentityKey)) continue;
 
                 //必须是业务模型才会包括那些添加了实体映射设置的字段
 //                if (entityMappingAttribute != null
@@ -361,24 +386,27 @@ public class EntityTypeHandler {
     /**
      * 获取业务模型列相关的字段
      *
-     * @param dtoType           业务模型
-     * @param mainTagLevel      主标签等级
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param inherit           仅继承成员
-     * @param nameConvertType   命名规则
+     * @param dtoType            业务模型
+     * @param mainTagLevel       主标签等级
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param inherit            仅继承成员
+     * @param nameConvertType    命名规则
      * @return 列名集合
      */
     public static List<String> getColumnsByDtoType(Class<?> dtoType,
                                                    int mainTagLevel,
                                                    Collection<String> customTags,
                                                    boolean withOutPrimaryKey,
+                                                   boolean withOutIdentityKey,
                                                    boolean inherit,
                                                    NameConvertType nameConvertType) {
         return getColumns(getColumnFieldsByDtoType(dtoType,
                                                    mainTagLevel,
                                                    customTags,
                                                    withOutPrimaryKey,
+                                                   withOutIdentityKey,
                                                    inherit),
                           nameConvertType);
     }
@@ -386,16 +414,18 @@ public class EntityTypeHandler {
     /**
      * 获取业务模型列字段集合
      *
-     * @param dtoType           业务模型
-     * @param mainTagLevel      主标签等级
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param inherit           仅继承成员
+     * @param dtoType            业务模型
+     * @param mainTagLevel       主标签等级
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param inherit            仅继承成员
      */
     public static List<Field> getColumnFieldsByDtoType(Class<?> dtoType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
+                                                       boolean withOutIdentityKey,
                                                        boolean inherit) {
         List<Field> fields = new ArrayList<>();
 
@@ -409,10 +439,12 @@ public class EntityTypeHandler {
                 for (Field field : dtoType.getDeclaredFields()) {
                     getColumnField(field,
                                    entityMappingAttribute,
-                                   withOutPrimaryKey).ifPresent(x -> {
+                                   withOutPrimaryKey,
+                                   withOutIdentityKey).ifPresent(x -> {
                         //是否忽略列
                         if (!isIgnoreColumn(field,
-                                            withOutPrimaryKey)) fields.add(x);
+                                            withOutPrimaryKey,
+                                            withOutIdentityKey)) fields.add(x);
                     });
                 }
             }
@@ -438,16 +470,19 @@ public class EntityTypeHandler {
                 //过滤忽略的列
                 openApiFields = openApiFields.stream()
                                              .filter(x -> !isIgnoreColumn(x,
-                                                                          withOutPrimaryKey))
+                                                                          withOutPrimaryKey,
+                                                                          withOutIdentityKey))
                                              .collect(Collectors.toList());
             } else if (entityMappingAttribute == null)
                 //如果没有标签，则直接使用实体类的所有相关字段
                 openApiFields = getColumnFieldsByEntityType(getEntityType(dtoType),
-                                                            withOutPrimaryKey);
+                                                            withOutPrimaryKey,
+                                                            withOutIdentityKey);
 
             if (CollectionsExtension.anyPlus(openApiFields)) fields.addAll(openApiFields);
         } else if (entityMappingAttribute == null) fields.addAll(getColumnFieldsByEntityType(getEntityType(dtoType),
-                                                                                             withOutPrimaryKey));
+                                                                                             withOutPrimaryKey,
+                                                                                             withOutIdentityKey));
 
         return fields;
     }
@@ -458,10 +493,12 @@ public class EntityTypeHandler {
      * @param field                  字段
      * @param entityMappingAttribute 实体映射设置
      * @param withOutPrimaryKey      排除主键
+     * @param withOutIdentityKey     排除自增列
      */
     public static Optional<Field> getColumnField(Field field,
                                                  EntityMapping entityMappingAttribute,
-                                                 boolean withOutPrimaryKey) {
+                                                 boolean withOutPrimaryKey,
+                                                 boolean withOutIdentityKey) {
         if (isIgnoreField(field)) return Optional.empty();
 
         EntityMappingSetting entityMappingSettingAttribute = AnnotationUtils.findAnnotation(field,
@@ -471,8 +508,10 @@ public class EntityTypeHandler {
 
         if (entityMappingSettingAttribute != null) {
             //忽略字段或者忽略主键
-            if (entityMappingSettingAttribute.ignore() || (withOutPrimaryKey
-                    && entityMappingSettingAttribute.primaryKey())) return Optional.empty();
+            if (entityMappingSettingAttribute.ignore()
+                    || (withOutPrimaryKey && entityMappingSettingAttribute.isPrimaryKey())
+                    || (withOutIdentityKey && entityMappingSettingAttribute.isIdentity()))
+                return Optional.empty();
 
             //列名来自字段本身
             if (entityMappingSettingAttribute.self()) {
@@ -493,6 +532,11 @@ public class EntityTypeHandler {
                                                                               entityFieldName),
                                               ex);
                 }
+
+                if (entityField != null
+                        && ((withOutPrimaryKey && isPrimaryKey(entityField))
+                        || (withOutIdentityKey && isIgnoreField(entityField))))
+                    return Optional.empty();
             }
         } else {
             Class<?> entityType = entityMappingAttribute.entityType();
@@ -520,15 +564,18 @@ public class EntityTypeHandler {
     /**
      * 是否为忽略的列
      *
-     * @param field             字段
-     * @param withOutPrimaryKey 排除主键
+     * @param field              字段
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
      */
     public static boolean isIgnoreColumn(Field field,
-                                         boolean withOutPrimaryKey) {
+                                         boolean withOutPrimaryKey,
+                                         boolean withOutIdentityKey) {
         ColumnSetting columnSetting = AnnotationUtils.findAnnotation(field,
                                                                      ColumnSetting.class);
-        return columnSetting != null && (columnSetting.isIgnore() || (withOutPrimaryKey
-                && columnSetting.isPrimaryKey()));
+        return columnSetting != null && (columnSetting.isIgnore()
+                || (withOutPrimaryKey && columnSetting.isPrimaryKey())
+                || (withOutIdentityKey && columnSetting.isIdentity()));
     }
 
     /**
@@ -578,6 +625,7 @@ public class EntityTypeHandler {
                 Optional<Field> optionalField = getColumnField(mappingField,
                                                                AnnotationUtils.findAnnotation(entityMappingType,
                                                                                               EntityMapping.class),
+                                                               false,
                                                                false);
                 if (optionalField.isPresent()) return optionalField.get();
             }
@@ -621,15 +669,18 @@ public class EntityTypeHandler {
      *
      * @param column          列名
      * @param entityType      实体类型
+     * @param dbType          数据库类型
      * @param nameConvertType 命名规则
      * @param <T>             实体类型
      */
     public static <T> JdbcType getJdbcTypeByColumn(String column,
                                                    Class<T> entityType,
+                                                   DbType dbType,
                                                    NameConvertType nameConvertType) {
         return getJdbcType(getFieldByColumn(column,
                                             entityType,
-                                            nameConvertType));
+                                            nameConvertType),
+                           dbType);
     }
 
     /**
@@ -637,13 +688,16 @@ public class EntityTypeHandler {
      *
      * @param fieldName  字段名
      * @param entityType 实体类型
+     * @param dbType     数据库类型
      * @param <T>        实体类型
      */
     public static <T> JdbcType getJdbcType(String fieldName,
-                                           Class<T> entityType) {
+                                           Class<T> entityType,
+                                           DbType dbType) {
         return getJdbcType(getFieldByFieldName(fieldName,
                                                entityType,
-                                               null));
+                                               null),
+                           dbType);
     }
 
     /**
@@ -663,87 +717,116 @@ public class EntityTypeHandler {
      * <p>3、无法判断时会返回JdbcType.UNDEFINED</p>
      * <hr>
      *
-     * @param field 字段
+     * @param field  字段
+     * @param dbType 数据库类型
      */
-    public static JdbcType getJdbcType(Field field) {
-        MappingSetting mappingSettingAttribute = AnnotationUtils.findAnnotation(field,
-                                                                                MappingSetting.class);
+    public static JdbcType getJdbcType(Field field,
+                                       DbType dbType) {
+        return getJdbcType(field.getType(),
+                           dbType,
+                           AnnotationUtils.findAnnotation(field,
+                                                          ColumnSetting.class),
+                           AnnotationUtils.findAnnotation(field,
+                                                          MappingSetting.class),
+                           AnnotationUtils.findAnnotation(field,
+                                                          OpenApiSchema.class),
+                           AnnotationUtils.findAnnotation(field,
+                                                          JsonFormat.class),
+                           AnnotationUtils.findAnnotation(field,
+                                                          JSONField.class));
+    }
+
+    /**
+     * 获取字段的Jdbc数据类型
+     * <p>请使用@MappingSetting注解精确设置此数据类型</p>
+     * <p>@MappingSetting注解中未设置有效数据时会根据以下规则进行推导：</p>
+     * <p>1、String类型的字段</p>
+     * <p>1.1、@ColumnSetting注解中的数据长度</p>
+     * <p>1.2、无法判断时返回JdbcType.NVARCHAR</p>
+     * <hr>
+     * <p>2、Date类型的字段</p>
+     * <p>2.1、@OpenApiSchema注解中的format</p>
+     * <p>2.2、@JsonFormat注解中的pattern</p>
+     * <p>2.3、@JSONField注解中的format</p>
+     * <p>2.4、无法判断时返回JdbcType.TIMESTAMP</p>
+     * <hr>
+     * <p>3、无法判断时会返回JdbcType.UNDEFINED</p>
+     * <hr>
+     *
+     * @param fieldType               字段类型
+     * @param dbType                  数据库类型
+     * @param columnSettingAttribute  字段上的注解
+     * @param mappingSettingAttribute 字段上的注解
+     * @param openApiSchemaAttribute  字段上的注解
+     * @param jsonFormatAttribute     字段上的注解
+     * @param jsonFieldAttribute      字段上的注解
+     */
+    public static JdbcType getJdbcType(Class<?> fieldType,
+                                       @Nullable
+                                               DbType dbType,
+                                       @Nullable
+                                               ColumnSetting columnSettingAttribute,
+                                       @Nullable
+                                               MappingSetting mappingSettingAttribute,
+                                       @Nullable
+                                               OpenApiSchema openApiSchemaAttribute,
+                                       @Nullable
+                                               JsonFormat jsonFormatAttribute,
+                                       @Nullable
+                                               JSONField jsonFieldAttribute) {
         if (mappingSettingAttribute != null && !mappingSettingAttribute.jdbcType()
                                                                        .equals(JdbcType.UNDEFINED))
             return mappingSettingAttribute.jdbcType();
 
-        ColumnSetting columnSettingAttribute = AnnotationUtils.findAnnotation(field,
-                                                                              ColumnSetting.class);
-        if (field.getType()
-                 .equals(String.class)) {
-            if (columnSettingAttribute == null) return JdbcType.VARCHAR;
-            else if (columnSettingAttribute.length() == -1) return JdbcType.LONGNVARCHAR;
-            else if (columnSettingAttribute.length() == -2) return JdbcType.LONGVARCHAR;
-            else return JdbcType.VARCHAR;
-        } else if (field.getType()
-                        .equals(Character.class) || field.getType()
-                                                         .equals(char.class)) return JdbcType.CHAR;
-        else if (field.getType()
-                      .equals(Boolean.class) || field.getType()
-                                                     .equals(boolean.class)) return JdbcType.BIT;
-        else if (field.getType()
-                      .equals(Byte.class) || field.getType()
-                                                  .equals(byte.class)) return JdbcType.TINYINT;
-        else if (field.getType()
-                      .equals(Short.class) || field.getType()
-                                                   .equals(short.class)) return JdbcType.SMALLINT;
-        else if (field.getType()
-                      .equals(Integer.class) || field.getType()
-                                                     .equals(int.class)) return JdbcType.INTEGER;
-        else if (field.getType()
-                      .equals(Long.class) || field.getType()
-                                                  .equals(long.class)) return JdbcType.BIGINT;
-        else if (field.getType()
-                      .equals(Float.class) || field.getType()
-                                                   .equals(float.class)) return JdbcType.FLOAT;
-        else if (field.getType()
-                      .equals(Double.class) || field.getType()
-                                                    .equals(double.class)) return JdbcType.DOUBLE;
-        else if (field.getType()
-                      .equals(BigDecimal.class)) return JdbcType.DECIMAL;
-        else if (field.getType()
-                      .equals(java.sql.Date.class)) return JdbcType.DATE;
-        else if (field.getType()
-                      .equals(java.sql.Time.class)) return JdbcType.TIME;
-        else if (field.getType()
-                      .equals(Date.class)) {
-            OpenApiSchema openApiSchemaAttribute = AnnotationUtils.findAnnotation(field,
-                                                                                  OpenApiSchema.class);
-            if (openApiSchemaAttribute != null) {
-                switch (openApiSchemaAttribute.format()) {
-                    case OpenApiSchemaFormat.string_datetime:
-                    case OpenApiSchemaFormat.string_date_original:
-                    case OpenApiSchemaFormat.string_timespan:
-                        return JdbcType.TIMESTAMP;
-                    case OpenApiSchemaFormat.string_date:
-                        return JdbcType.DATE;
-                    case OpenApiSchemaFormat.string_time:
-                        return JdbcType.TIME;
-                }
+        if (fieldType.equals(String.class)) {
+            if (columnSettingAttribute != null) {
+                if (columnSettingAttribute.length() == -1) return JdbcType.LONGNVARCHAR;
+                else if (columnSettingAttribute.length() == -2) return JdbcType.LONGVARCHAR;
+                else if (columnSettingAttribute.length() == -3) return JdbcType.NCLOB;
+                else if (columnSettingAttribute.length() == -4) return JdbcType.CLOB;
             }
-
-            String format = null;
-            JsonFormat jsonFormatAttribute = AnnotationUtils.findAnnotation(field,
-                                                                            JsonFormat.class);
-            if (jsonFormatAttribute != null) format = jsonFormatAttribute.pattern();
-            if (!StringUtils.hasText(format)) {
-                JSONField jsonFieldAttribute = AnnotationUtils.findAnnotation(field,
-                                                                              JSONField.class);
-                if (jsonFieldAttribute != null) format = jsonFieldAttribute.format();
-            }
-            if (StringUtils.hasText(format)) {
-                if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?:\\d\\d?$",
-                                    format)) return JdbcType.TIMESTAMP;
-                else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d?$",
-                                         format)) return JdbcType.DATE;
-                else if (Pattern.matches("^\\d\\d?:\\d\\d?:\\d\\d?",
-                                         format)) return JdbcType.TIME;
-            }
+            return dbType.equals(DbType.JdbcPostgreSQL15)
+                   ? JdbcType.VARCHAR
+                   : JdbcType.NVARCHAR;
+        } else if (fieldType.equals(Character.class) || fieldType.equals(char.class)) return JdbcType.NCHAR;
+        else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class)) return JdbcType.BIT;
+        else if (fieldType.equals(Byte.class) || fieldType.equals(byte.class)) return JdbcType.TINYINT;
+        else if (fieldType.equals(Short.class) || fieldType.equals(short.class)) return JdbcType.SMALLINT;
+        else if (fieldType.equals(Integer.class) || fieldType.equals(int.class)) return JdbcType.INTEGER;
+        else if (fieldType.equals(Long.class) || fieldType.equals(long.class)) return JdbcType.BIGINT;
+        else if (fieldType.equals(Float.class) || fieldType.equals(float.class)) return JdbcType.FLOAT;
+        else if (fieldType.equals(Double.class) || fieldType.equals(double.class)) return JdbcType.DOUBLE;
+        else if (fieldType.equals(BigDecimal.class)) return JdbcType.DECIMAL;
+        else if (fieldType.equals(byte[].class)) return JdbcType.BLOB;
+        else if (fieldType.equals(java.sql.Date.class)) return JdbcType.DATE;
+        else if (fieldType.equals(java.sql.Time.class)) return JdbcType.TIME;
+        else if (fieldType.equals(Date.class)) {
+//            if (openApiSchemaAttribute != null) {
+//                switch (openApiSchemaAttribute.format()) {
+//                    case OpenApiSchemaFormat.string_datetime:
+//                    case OpenApiSchemaFormat.string_date_original:
+//                    case OpenApiSchemaFormat.string_timespan:
+//                        return JdbcType.TIMESTAMP;
+//                    case OpenApiSchemaFormat.string_date:
+//                        return JdbcType.DATE;
+//                    case OpenApiSchemaFormat.string_time:
+//                        return JdbcType.TIME;
+//                }
+//            }
+//
+//            String format = null;
+//            if (jsonFormatAttribute != null) format = jsonFormatAttribute.pattern();
+//            if (!StringUtils.hasText(format)) {
+//                if (jsonFieldAttribute != null) format = jsonFieldAttribute.format();
+//            }
+//            if (StringUtils.hasText(format)) {
+//                if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d? \\d\\d?:\\d\\d?:\\d\\d?$",
+//                                    format)) return JdbcType.TIMESTAMP;
+//                else if (Pattern.matches("^\\d\\d\\d\\d[\\-/]\\d\\d?[\\-/]\\d\\d?$",
+//                                         format)) return JdbcType.DATE;
+//                else if (Pattern.matches("^\\d\\d?:\\d\\d?:\\d\\d?",
+//                                         format)) return JdbcType.TIME;
+//            }
 
             return JdbcType.TIMESTAMP;
         } else return JdbcType.UNDEFINED;

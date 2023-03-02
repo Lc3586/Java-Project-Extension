@@ -6,7 +6,6 @@ import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.EntityMapping;
-import project.extension.mybatis.edge.annotations.MappingSetting;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.extention.CacheExtension;
@@ -16,10 +15,10 @@ import project.extension.mybatis.edge.model.*;
 import project.extension.mybatis.edge.model.OrderMethod;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+import project.extension.tuple.Tuple3;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
-import java.sql.JDBCType;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -146,10 +145,9 @@ public abstract class SqlProvider {
                                      : value2ParameterSql(value.getClass(),
                                                           key,
                                                           value,
-                                                          allParameter,
-                                                          false,
                                                           null,
-                                                          null).b);
+                                                          allParameter,
+                                                          false).b);
         }
         return sql;
     }
@@ -398,12 +396,10 @@ public abstract class SqlProvider {
                                       : dataIsValue
                                         ? data
                                         : field.get(data),
+                                      EntityTypeHandler.getJdbcType(field,
+                                                                    config.getDbType()),
                                       parameter,
-                                      ignoreCase,
-                                      AnnotationUtils.getAnnotation(field,
-                                                                    ColumnSetting.class),
-                                      AnnotationUtils.getAnnotation(field,
-                                                                    MappingSetting.class));
+                                      ignoreCase);
         } catch (IllegalAccessException ex) {
             throw new ModuleException(Strings.getGetObjectFieldValueFailed(data.getClass()
                                                                                .getTypeName(),
@@ -434,22 +430,20 @@ public abstract class SqlProvider {
     /**
      * 字段转Sql参数语句
      *
-     * @param type           类型
-     * @param parameterName  参数名
-     * @param value          值
-     * @param parameter      参数集合
-     * @param ignoreCase     忽略大小写
-     * @param columnSetting  列设置
-     * @param mappingSetting 映射设置
+     * @param type          类型
+     * @param parameterName 参数名
+     * @param value         值
+     * @param jdbcType      JDBC类型
+     * @param parameter     参数集合
+     * @param ignoreCase    忽略大小写
      * @return Sql参数语句
      */
     public Tuple2<String, String> value2ParameterSql(Class<?> type,
                                                      String parameterName,
                                                      Object value,
+                                                     JdbcType jdbcType,
                                                      Map<String, Object> parameter,
-                                                     boolean ignoreCase,
-                                                     ColumnSetting columnSetting,
-                                                     MappingSetting mappingSetting)
+                                                     boolean ignoreCase)
             throws
             ModuleException {
         if (value == null) return new Tuple2<>(parameterName,
@@ -489,25 +483,13 @@ public abstract class SqlProvider {
 
         StringBuilder sb = new StringBuilder("#{");
         sb.append(parameterName);
-        if (!type.equals(byte[].class)) {
-            sb.append(String.format(",javaType=%s",
-                                    type.getSimpleName()));
-        }
-
-        JdbcType jdbcType = null;
-        if (mappingSetting != null)
-            jdbcType = mappingSetting.jdbcType();
-        else if (columnSetting != null) {
-            //TODO 待完善
-            if (type.equals(String.class)) {
-
-            } else if (type.equals(Date.class)) {
-
-            }
-        }
 
         if (jdbcType == null)
             jdbcType = EntityTypeHandler.getJdbcType(type);
+
+        if (!jdbcType.equals(JdbcType.BLOB))
+            sb.append(String.format(",javaType=%s",
+                                    type.getSimpleName()));
         sb.append(String.format(",jdbcType=%s",
                                 jdbcType));
         sb.append("}");
@@ -715,10 +697,9 @@ public abstract class SqlProvider {
                 return value2ParameterSql(memberType,
                                           "value",
                                           target.getValue(),
-                                          parameter,
-                                          false,
                                           null,
-                                          null).b;
+                                          parameter,
+                                          false).b;
             case Expression:
                 return String.format("(%s)",
                                      dynamicSetterExpression2ParameterSql(entityType,
@@ -940,38 +921,39 @@ public abstract class SqlProvider {
     /**
      * 表名转Sql语句
      *
-     * @param tableName 表名
+     * @param name 表名
      * @return Sql语句
      */
-    public String tableName2Sql(String tableName) {
-        return tableName2Sql(null,
-                             tableName,
-                             null);
+    public String getName2Sql(String name) {
+        return getName2Sql(null,
+                           name,
+                           null);
     }
 
     /**
-     * 表名转Sql语句
+     * 对象名称转Sql语句
      *
-     * @param schema    模式名
-     * @param tableName 表名
+     * @param schema 模式名
+     * @param name   表名
      * @return Sql语句
      */
-    public String tableName2Sql(String schema,
-                                String tableName) {
-        return tableName2Sql(schema,
-                             tableName,
-                             null);
+    public String getName2Sql(String schema,
+                              String name) {
+        return getName2Sql(schema,
+                           name,
+                           null);
     }
 
     /**
      * 获取业务模型对应的列名
      *
-     * @param entityType        实体类型
-     * @param dtoType           业务模型类型
-     * @param mainTagLevel      主标签等级
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param inherit           仅继承成员
+     * @param entityType         实体类型
+     * @param dtoType            业务模型类型
+     * @param mainTagLevel       主标签等级
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param inherit            仅继承成员
      * @return 列名集合
      */
     public Collection<String> getColumns(Class<?> entityType,
@@ -979,6 +961,7 @@ public abstract class SqlProvider {
                                          int mainTagLevel,
                                          Collection<String> customTags,
                                          boolean withOutPrimaryKey,
+                                         boolean withOutIdentityKey,
                                          boolean inherit)
             throws
             ModuleException {
@@ -994,11 +977,13 @@ public abstract class SqlProvider {
 
         if (dtoType == null) columns = EntityTypeHandler.getColumnsByEntityType(entityType,
                                                                                 withOutPrimaryKey,
+                                                                                withOutIdentityKey,
                                                                                 config.getNameConvertType());
         else columns = EntityTypeHandler.getColumnFieldsByDtoType(dtoType,
                                                                   mainTagLevel,
                                                                   customTags,
                                                                   withOutPrimaryKey,
+                                                                  withOutIdentityKey,
                                                                   inherit)
                                         .stream()
                                         .map(x -> EntityTypeHandler.getColumn(x,
@@ -1015,20 +1000,20 @@ public abstract class SqlProvider {
     /**
      * 获取业务模型对应的字段+列名
      *
-     * @param entityType        实体类型
-     * @param mainTagLevel      主标签等级
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param inherit           仅继承成员
+     * @param entityType         实体类型
+     * @param mainTagLevel       主标签等级
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param inherit            仅继承成员
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean inherit)
-            throws
-            NoSuchFieldException {
+                                                       boolean withOutIdentityKey,
+                                                       boolean inherit) {
         return getFieldNameWithColumns(entityType,
                                        null,
                                        mainTagLevel,
@@ -1038,18 +1023,20 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
+                                       withOutIdentityKey,
                                        inherit);
     }
 
     /**
      * 获取业务模型对应的字段+列名
      *
-     * @param entityType        实体类型
-     * @param dtoType           业务模型类型
-     * @param mainTagLevel      主标签等级
-     * @param customTags        自定义标签
-     * @param withOutPrimaryKey 排除主键
-     * @param inherit           仅继承成员
+     * @param entityType         实体类型
+     * @param dtoType            业务模型类型
+     * @param mainTagLevel       主标签等级
+     * @param customTags         自定义标签
+     * @param withOutPrimaryKey  排除主键
+     * @param withOutIdentityKey 排除自增列
+     * @param inherit            仅继承成员
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
@@ -1057,9 +1044,8 @@ public abstract class SqlProvider {
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean inherit)
-            throws
-            NoSuchFieldException {
+                                                       boolean withOutIdentityKey,
+                                                       boolean inherit) {
         return getFieldNameWithColumns(entityType,
                                        dtoType,
                                        mainTagLevel,
@@ -1069,6 +1055,7 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
+                                       withOutIdentityKey,
                                        inherit);
     }
 
@@ -1083,6 +1070,7 @@ public abstract class SqlProvider {
      * @param ignoreFieldNames    忽略的字段
      * @param ignoreColumns       忽略的列
      * @param withOutPrimaryKey   排除主键
+     * @param withOutIdentityKey  排除自增列
      * @param inherit             仅继承成员
      * @return 字段+列名集合
      */
@@ -1095,17 +1083,19 @@ public abstract class SqlProvider {
                                                        Collection<String> ignoreFieldNames,
                                                        Collection<String> ignoreColumns,
                                                        boolean withOutPrimaryKey,
+                                                       boolean withOutIdentityKey,
                                                        boolean inherit)
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("%s:%s:%s:%s",
+        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:WOPK-%s:WOIK:%s",
                                         this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
                                         ? ""
                                         : dtoType.getTypeName(),
-                                        withOutPrimaryKey);
+                                        withOutPrimaryKey,
+                                        withOutIdentityKey);
         Map<String, String> fieldWithColumns = CacheExtension.getFieldWithColumns(cacheKey);
         if (CollectionsExtension.anyPlus(fieldWithColumns)) return fieldWithColumns;
 
@@ -1115,6 +1105,7 @@ public abstract class SqlProvider {
                                                                       mainTagLevel,
                                                                       customTags,
                                                                       withOutPrimaryKey,
+                                                                      withOutIdentityKey,
                                                                       inherit)) {
             fieldWithColumns.put(field.getName(),
                                  EntityTypeHandler.getColumn(field,
@@ -1195,9 +1186,9 @@ public abstract class SqlProvider {
      * @param alias     别名
      * @return Sql语句
      */
-    public String tableName2Sql(String schema,
-                                String tableName,
-                                String alias) {
+    public String getName2Sql(String schema,
+                              String tableName,
+                              String alias) {
         return String.format(" %s%s%s ",
                              //`dbo`.
                              StringUtils.hasText(schema)
@@ -1241,7 +1232,6 @@ public abstract class SqlProvider {
      * @param entityType  实体类型
      * @param dtoType     业务模型类型
      * @return SQL语句
-     * @throws ParseException 数据转换失败
      */
     public String dynamicFilter2Sql(List<DynamicFilter> filters,
                                     String alias,
@@ -2062,7 +2052,8 @@ public abstract class SqlProvider {
      * @return Sql语句
      */
     public String originalSql2AnySql(String originalSql) {
-        return String.format("SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END \n\nFROM (%s) AS %s ",
+        return String.format("SELECT CASE WHEN COUNT(1) > 0 THEN 1 ELSE 0 END \n\n"
+                                     + "FROM (%s) AS %s ",
                              originalSql,
                              getValueWithCharacter(String.format("t_%s",
                                                                  new Date().getTime())));
@@ -2089,7 +2080,8 @@ public abstract class SqlProvider {
      * @return Sql语句
      */
     public String originalSql2CountSql(String originalSql) {
-        return String.format("SELECT COUNT(1) \r\nFROM (%s) AS %s ",
+        return String.format("SELECT COUNT(1) \r\n"
+                                     + "FROM (%s) AS %s ",
                              originalSql,
                              getValueWithCharacter(String.format("t_%s",
                                                                  new Date().getTime())));
@@ -2185,6 +2177,7 @@ public abstract class SqlProvider {
                                                       executor.getMainTagLevel(),
                                                       executor.getCustomTags(),
                                                       false,
+                                                      false,
                                                       false),
                                          alias);
 
@@ -2194,9 +2187,9 @@ public abstract class SqlProvider {
                       : StringUtils.hasText(executor.getWithSQL())
                         ? withSql2Sql(executor.getWithSQL(),
                                       alias)
-                        : tableName2Sql(executor.getSchema(),
-                                        executor.getTableName(),
-                                        alias);
+                        : getName2Sql(executor.getSchema(),
+                                      executor.getTableName(),
+                                      alias);
 
         //WHERE部分
         String where;
@@ -2253,7 +2246,11 @@ public abstract class SqlProvider {
         if (!StringUtils.hasText(orderBy))
             orderBy = "";
 
-        String sql = String.format("SELECT %s \r\nFROM %s \r\n%s \r\n%s \r\n%s",
+        String sql = String.format("SELECT %s \r\n"
+                                           + "FROM %s \r\n"
+                                           + "%s \r\n"
+                                           + "%s \r\n"
+                                           + "%s",
                                    columns,
                                    from,
                                    where,
@@ -2412,8 +2409,8 @@ public abstract class SqlProvider {
             throws
             ModuleException {
         //表名
-        String tableName = tableName2Sql(inserter.getSchema(),
-                                         inserter.getTableName());
+        String tableName = getName2Sql(inserter.getSchema(),
+                                       inserter.getTableName());
 
         //指定字段和列
         Map<String, String> fieldWithColumns = getFieldNameWithColumns(inserter.getEntityType(),
@@ -2425,6 +2422,7 @@ public abstract class SqlProvider {
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
                                                                        false,
+                                                                       true,
                                                                        true);
 
         //列
@@ -2437,10 +2435,79 @@ public abstract class SqlProvider {
                                                    inserter.getParameter(),
                                                    data);
 
-        return String.format("<script>\r\n\tINSERT INTO %s \r\n\t\t(%s) \r\n\tVALUES \r\n\t\t(%s)\r\n</script>",
-                             tableName,
-                             columns,
-                             parameters);
+        StringBuilder sb = new StringBuilder("<script>\n");
+
+        switch (config.getDbType()) {
+            case JdbcOracle12c:
+            case JdbcOracle18c:
+            case JdbcOracle19c:
+            case JdbcOracle21c:
+                //Oracle自增列使用序列赋值
+                Field identityField = EntityTypeHandler.getIdentityKeyField(inserter.getEntityType());
+                if (identityField != null) {
+                    ColumnSetting columnSetting = AnnotationUtils.getAnnotation(identityField,
+                                                                                ColumnSetting.class);
+                    if (columnSetting != null) {
+                        sb.append(String.format("        INSERT INTO %s \r\n",
+                                                tableName));
+                        sb.append(String.format("            (%s, %s) \r\n",
+                                                EntityTypeHandler.getColumn(identityField,
+                                                                            config.getNameConvertType()),
+                                                columns));
+                        sb.append("        VALUES \r\n");
+                        sb.append(String.format("            (#{%s}, %s)\r\n",
+                                                identityField.getName(),
+                                                parameters));
+                        break;
+                    }
+                }
+            default:
+                sb.append(String.format("        INSERT INTO %s \r\n",
+                                        tableName));
+                sb.append(String.format("            (%s) \r\n",
+                                        columns));
+                sb.append("        VALUES \r\n");
+                sb.append(String.format("            (%s)\r\n",
+                                        parameters));
+                break;
+        }
+
+        sb.append("</script>");
+        return sb.toString();
+    }
+
+    /**
+     * 返回当前的获取序列值的脚本
+     *
+     * @param inserter 插入设置
+     * @return 脚本
+     */
+    public Tuple3<Boolean, String, Class<?>> selectKey2Script(InserterDTO inserter)
+            throws
+            ModuleException {
+        //Oracle自增列使用序列赋值
+        Field identityField = EntityTypeHandler.getIdentityKeyField(inserter.getEntityType());
+        if (identityField != null) {
+            ColumnSetting columnSetting = AnnotationUtils.getAnnotation(identityField,
+                                                                        ColumnSetting.class);
+            if (columnSetting != null) {
+                switch (config.getDbType()) {
+                    case JdbcOracle12c:
+                    case JdbcOracle18c:
+                    case JdbcOracle19c:
+                    case JdbcOracle21c:
+                        return new Tuple3<>(true,
+                                            String.format("SELECT %s.nextval FROM DUAL",
+                                                          getName2Sql(inserter.getSchema(),
+                                                                      columnSetting.oracleIdentitySequence())),
+                                            identityField.getType());
+                }
+            }
+        }
+
+        return new Tuple3<>(false,
+                            null,
+                            null);
     }
 
     /**
@@ -2449,13 +2516,11 @@ public abstract class SqlProvider {
      * @param inserter 插入设置
      * @return 脚本
      */
-    public String inserter2ForeachScript(InserterDTO inserter)
-            throws
-            Exception {
+    public String inserter2ForeachScript(InserterDTO inserter) {
         //#TODO 待调整
         //表名
-        String tableName = tableName2Sql(inserter.getSchema(),
-                                         inserter.getTableName());
+        String tableName = getName2Sql(inserter.getSchema(),
+                                       inserter.getTableName());
 
         //指定字段和列
         Map<String, String> fieldWithColumns = getFieldNameWithColumns(inserter.getEntityType(),
@@ -2466,6 +2531,7 @@ public abstract class SqlProvider {
                                                                        null,
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
+                                                                       false,
                                                                        true,
                                                                        true);
 
@@ -2479,7 +2545,14 @@ public abstract class SqlProvider {
                                                                         field))
                                             .collect(Collectors.joining(", "));
 
-        return String.format("<script>\r\n\tINSERT INTO %s \r\n\t\t(%s) \r\n\tVALUES \r\n\t<foreach item=\"item\" collection=\"list\" separator=\",\">\r\n\t\t(%s)\r\n\t</foreach>\r\n</script>",
+        return String.format("<script>\r\n"
+                                     + "        INSERT INTO %s \r\n"
+                                     + "            (%s) \r\n"
+                                     + "        VALUES \r\n"
+                                     + "        <foreach item=\"item\" collection=\"list\" separator=\",\">\r\n"
+                                     + "            (%s)\r\n"
+                                     + "        </foreach>\r\n"
+                                     + "</script>",
                              tableName,
                              columns,
                              parameters);
@@ -2502,9 +2575,9 @@ public abstract class SqlProvider {
         String alias = updater.getAlias();
 
         //表名
-        String tableName = tableName2Sql(updater.getSchema(),
-                                         updater.getTableName(),
-                                         alias);
+        String tableName = getName2Sql(updater.getSchema(),
+                                       updater.getTableName(),
+                                       alias);
 
         //SET部分 列+参数
         String set;
@@ -2544,6 +2617,7 @@ public abstract class SqlProvider {
                                                                                null,
                                                                                updater.getIgnoreFieldNames(),
                                                                                null,
+                                                                               true,
                                                                                true,
                                                                                true);
             set = fieldWithColumns2UpdateSql(updater.getEntityType(),
@@ -2589,7 +2663,12 @@ public abstract class SqlProvider {
                                                                   where);
         }
 
-        String sql = String.format("<script>\r\n\tUPDATE %s \r\n\tSET \r\n\t\t%s \r\n\t%s \r\n</script>",
+        String sql = String.format("<script>\r\n"
+                                           + "        UPDATE %s \r\n"
+                                           + "        SET \r\n"
+                                           + "            %s \r\n"
+                                           + "        %s \r\n"
+                                           + "</script>",
                                    tableName,
                                    set,
                                    where);
@@ -2621,9 +2700,9 @@ public abstract class SqlProvider {
         String alias = deleter.getAlias();
 
         //表名
-        String tableName = tableName2Sql(deleter.getSchema(),
-                                         deleter.getTableName(),
-                                         alias);
+        String tableName = getName2Sql(deleter.getSchema(),
+                                       deleter.getTableName(),
+                                       alias);
 
         //WHERE部分
         String where = "";
@@ -2660,7 +2739,10 @@ public abstract class SqlProvider {
                                                                   where);
         }
 
-        String sql = String.format("<script>\r\n\tDELETE FROM %s \r\n\t%s \r\n</script>",
+        String sql = String.format("<script>\r\n"
+                                           + "        DELETE FROM %s \r\n"
+                                           + "        %s \r\n"
+                                           + "</script>",
                                    tableName,
                                    where);
 

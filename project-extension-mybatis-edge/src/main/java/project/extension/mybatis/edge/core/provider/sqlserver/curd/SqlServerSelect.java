@@ -74,6 +74,7 @@ public class SqlServerSelect<T>
                 } else {
                     //使用任意一个列作为默认的排序条件
                     List<Field> fields = EntityTypeHandler.getColumnFieldsByEntityType(entityType,
+                                                                                       false,
                                                                                        false);
                     orderBy.getDynamicOrder()
                            .setFieldName(fields.get(0)

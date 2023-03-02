@@ -39,7 +39,12 @@ public @interface EntityMappingSetting {
     /**
      * 主键
      */
-    boolean primaryKey() default false;
+    boolean isPrimaryKey() default false;
+
+    /**
+     * 自增
+     */
+    boolean isIdentity() default false;
 
     /**
      * 忽略
