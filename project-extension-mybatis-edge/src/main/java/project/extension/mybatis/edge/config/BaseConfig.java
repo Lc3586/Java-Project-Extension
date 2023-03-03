@@ -276,9 +276,9 @@ public class BaseConfig {
         if (!CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
             config.setScanMapperXmlLocations(this.getScanMapperXmlLocations());
 
-        if (config.isEnable() && !CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
-            throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
-                                                                                 "scanMapperXmlLocations"));
+//        if (config.isEnable() && !CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
+//            throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
+//                                                                                 "scanMapperXmlLocations"));
 //
 //        config.getProperties()
 //              .computeIfAbsent(DruidDataSourceFactory.PROP_URL,
