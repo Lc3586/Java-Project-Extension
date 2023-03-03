@@ -84,7 +84,7 @@ public class Strings_en_US {
             values.put("EntityInitializationFailed",
                        "初始化实体数据失败");
             values.put("EntityPrimaryKeyUndefined",
-                       "请在实体里设置主键@ColumnSetting(primaryKey = true)");
+                       "请在实体里设置主键@ColumnSetting(isPrimaryKey = true)");
             values.put("EntityCompositePrimaryKeyMustBeTupleType",
                        "实体存在联合主键时，主键类型必须为Tuple元组类型");
             values.put("EntityField4ColumnUndefined",
