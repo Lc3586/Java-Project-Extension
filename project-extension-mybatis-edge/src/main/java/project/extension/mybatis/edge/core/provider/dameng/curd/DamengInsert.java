@@ -4,6 +4,10 @@ import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.dameng.DamengSqlProvider;
 import project.extension.mybatis.edge.core.provider.normal.curd.Insert;
+import project.extension.standard.exception.ModuleException;
+import project.extension.tuple.Tuple3;
+
+import java.lang.reflect.Field;
 
 /**
  * Dameng数据插入对象

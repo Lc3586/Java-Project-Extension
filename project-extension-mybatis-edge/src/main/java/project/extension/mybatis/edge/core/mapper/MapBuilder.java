@@ -112,8 +112,8 @@ public class MapBuilder {
                                                                    String msId,
                                                                    Class<TParameter> parameterType,
                                                                    Map<String, Object> parameterHashMap,
-                                                                   Map<String, Class<?>> outParameterHashMap,
-                                                                   Map<String, Class<?>> inOutParameterHashMap) {
+                                                                   Map<String, Field> outParameterHashMap,
+                                                                   Map<String, Field> inOutParameterHashMap) {
         final TypeHandlerRegistry registry = config.getTypeHandlerRegistry();
 
         List<ParameterMapping> parameterMappings = new ArrayList<>();
@@ -148,9 +148,11 @@ public class MapBuilder {
                 ParameterMapping.Builder parameterMapping = new ParameterMapping.Builder(config,
                                                                                          parameterName,
                                                                                          registry.getTypeHandler(
-                                                                                                 outParameterHashMap.get(parameterName)));
+                                                                                                 outParameterHashMap.get(parameterName)
+                                                                                                                    .getType()));
                 parameterMapping.mode(ParameterMode.OUT);
-                parameterMapping.javaType(outParameterHashMap.get(parameterName));
+                parameterMapping.javaType(outParameterHashMap.get(parameterName)
+                                                             .getType());
                 parameterMappings.add(parameterMapping.build());
 
                 if (!parameterHashMap.containsKey(parameterName)) {
@@ -164,9 +166,11 @@ public class MapBuilder {
                 ParameterMapping.Builder parameterMapping = new ParameterMapping.Builder(config,
                                                                                          parameterName,
                                                                                          registry.getTypeHandler(
-                                                                                                 inOutParameterHashMap.get(parameterName)));
+                                                                                                 inOutParameterHashMap.get(parameterName)
+                                                                                                                      .getType()));
                 parameterMapping.mode(ParameterMode.INOUT);
-                parameterMapping.javaType(outParameterHashMap.get(parameterName));
+                parameterMapping.javaType(outParameterHashMap.get(parameterName)
+                                                             .getType());
                 parameterMappings.add(parameterMapping.build());
 
                 if (!parameterHashMap.containsKey(parameterName)) {

@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.model;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,9 +35,9 @@ public class InserterDTO {
 
     private final Map<String, Object> parameter = new HashMap<>();
 
-    private final Map<String, Class<?>> outParameter = new HashMap<>();
+    private final Map<String, Field> outParameter = new HashMap<>();
 
-    private final Map<String, Class<?>> inOutParameter = new HashMap<>();
+    private final Map<String, Field> inOutParameter = new HashMap<>();
 
     /**
      * 模式名
@@ -143,14 +144,14 @@ public class InserterDTO {
     /**
      * 输出参数
      */
-    public Map<String, Class<?>> getOutParameter() {
+    public Map<String, Field> getOutParameter() {
         return outParameter;
     }
 
     /**
      * 输入输出参数
      */
-    public Map<String, Class<?>> getInOutParameter() {
+    public Map<String, Field> getInOutParameter() {
         return inOutParameter;
     }
 }

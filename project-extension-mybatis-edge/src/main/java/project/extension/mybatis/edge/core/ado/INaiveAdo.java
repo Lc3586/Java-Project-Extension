@@ -13,6 +13,7 @@ import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -500,8 +501,8 @@ public interface INaiveAdo {
                             @Nullable
                                     Class<TParameter> parameterType,
                             Map<String, Object> parameterHashMap,
-                            Map<String, Class<?>> outParameterHashMap,
-                            Map<String, Class<?>> inOutParameterHashMap,
+                            Map<String, Field> outParameterHashMap,
+                            Map<String, Field> inOutParameterHashMap,
                             NameConvertType nameConvertType);
 
     /**

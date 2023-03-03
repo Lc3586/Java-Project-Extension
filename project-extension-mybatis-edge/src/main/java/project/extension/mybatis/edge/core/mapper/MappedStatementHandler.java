@@ -12,6 +12,7 @@ import project.extension.mybatis.edge.aop.MappedStatementArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.model.NameConvertType;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -177,8 +178,8 @@ public class MappedStatementHandler {
                                                              @Nullable
                                                                      Class<TParameter> inParameterType,
                                                              Map<String, Object> inParameterHashMap,
-                                                             Map<String, Class<?>> outParameterHashMap,
-                                                             Map<String, Class<?>> inOutParameterHashMap,
+                                                             Map<String, Field> outParameterHashMap,
+                                                             Map<String, Field> inOutParameterHashMap,
                                                              @Nullable
                                                                      Class<TResult> resultType,
                                                              Collection<String> resultFields,
@@ -237,8 +238,8 @@ public class MappedStatementHandler {
                                                              @Nullable
                                                                      Class<TParameter> parameterType,
                                                              Map<String, Object> parameterHashMap,
-                                                             Map<String, Class<?>> outParameterHashMap,
-                                                             Map<String, Class<?>> inOutParameterHashMap,
+                                                             Map<String, Field> outParameterHashMap,
+                                                             Map<String, Field> inOutParameterHashMap,
                                                              Class<TResult> resultType,
                                                              @Nullable
                                                                      Integer resultMainTagLevel,
