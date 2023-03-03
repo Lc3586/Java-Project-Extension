@@ -4,11 +4,8 @@ import org.junit.jupiter.api.Assertions;
 
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 断言扩展方法
@@ -76,10 +73,12 @@ public class AssertExtension {
 
             if (value1Output.length() > 100)
                 value1Output = value1Output.substring(0,
-                                                      100) + "......";
+                                                      100) + String.format("等共计%s个字符",
+                                                                           value1Output.length() - 100);
             if (value2Output.length() > 100)
                 value2Output = value2Output.substring(0,
-                                                      100) + "......";
+                                                      100) + String.format("等共计%s个字符",
+                                                                           value2Output.length() - 100);
 
             System.out.printf("\r\n两个%s类型的数据对象中%s字段的值相等：%s = %s\r\n",
                               type.getName(),

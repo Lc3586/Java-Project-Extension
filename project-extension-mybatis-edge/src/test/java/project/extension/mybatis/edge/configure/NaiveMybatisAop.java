@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +23,27 @@ public class NaiveMybatisAop {
      * 日志组件
      */
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private String valueMap2String(String name,
+                                   Object value) {
+        String value2String;
+        if (value.getClass()
+                 .equals(byte[].class))
+            value2String = new String(Base64.getEncoder()
+                                            .encode((byte[]) value),
+                                      StandardCharsets.UTF_8);
+        else
+            value2String = value.toString();
+
+        if (value2String.length() > 100)
+            value2String = value2String.substring(0,
+                                                  100) + String.format("等共计%s个字符",
+                                                                       value2String.length() - 100);
+
+        return String.format("\t\t%s -> %s",
+                             name,
+                             value2String);
+    }
 
     /**
      * 添加监听
@@ -52,11 +75,9 @@ public class NaiveMybatisAop {
                     arg.getParameter()
                        .keySet()
                        .stream()
-                       .map(x -> String.format("\t\t%s -> %s",
-                                               x,
-                                               arg.getParameter()
-                                                  .get(x)
-                                                  .toString()))
+                       .map(x -> valueMap2String(x,
+                                                 arg.getParameter()
+                                                    .get(x)))
                        .collect(Collectors.joining("\r\n")),
                     arg.getEntityType()
                        .getTypeName(),
@@ -90,11 +111,9 @@ public class NaiveMybatisAop {
                     arg.getParameter()
                        .keySet()
                        .stream()
-                       .map(x -> String.format("\t\t%s -> %s",
-                                               x,
-                                               arg.getParameter()
-                                                  .get(x)
-                                                  .toString()))
+                       .map(x -> valueMap2String(x,
+                                                 arg.getParameter()
+                                                    .get(x)))
                        .collect(Collectors.joining("\r\n")),
                     arg.getEntityType()
                        .getTypeName(),
