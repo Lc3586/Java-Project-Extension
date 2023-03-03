@@ -1,4 +1,4 @@
-package project.extension.mybatis.edge.configure;
+package project.extension.mybatis.edge.config;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Properties;
 
 /**
- * mybatis多数据源配置
+ * 数据源配置
  *
  * @author LCTR
- * @date 2023-02-20
+ * @date 2023-03-03
  */
 @Configuration
-public class DatabaseIdProviderConfigure {
+public class DatabaseIdProviderConfig {
     @Bean
     public DatabaseIdProvider databaseIdProvider() {
         VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
