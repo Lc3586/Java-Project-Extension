@@ -178,8 +178,9 @@ public class NaiveDataSourceProvider
             }
 
             try {
-                sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
-                                                                  .toArray(new Class[0]));
+                if (CollectionsExtension.anyPlus(dataSourceConfig.getScanEntitiesPackages()))
+                    sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
+                                                                      .toArray(new Class[0]));
             } catch (Exception ex) {
                 throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
                                                                                    "scanEntitiesPackages",
@@ -192,8 +193,9 @@ public class NaiveDataSourceProvider
             }
 
             try {
-                sqlSessionFactoryBean.setMapperLocations(ScanExtension.scanResourceFromLocation(dataSourceConfig.getScanMapperXmlLocations())
-                                                                      .toArray(new Resource[0]));
+                if (CollectionsExtension.anyPlus(dataSourceConfig.getScanMapperXmlLocations()))
+                    sqlSessionFactoryBean.setMapperLocations(ScanExtension.scanResourceFromLocation(dataSourceConfig.getScanMapperXmlLocations())
+                                                                          .toArray(new Resource[0]));
             } catch (Exception ex) {
                 throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
                                                                                    "scanMapperXmlLocations",

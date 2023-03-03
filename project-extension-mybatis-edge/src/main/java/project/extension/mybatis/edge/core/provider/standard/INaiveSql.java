@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import project.extension.action.IAction0;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
-import project.extension.mybatis.edge.core.provider.standard.*;
 import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
 import project.extension.mybatis.edge.core.provider.standard.curd.IInsert;
 import project.extension.mybatis.edge.core.provider.standard.curd.ISelect;
@@ -16,6 +15,7 @@ import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * NaiveSql
@@ -318,4 +318,13 @@ public interface INaiveSql {
      * @param <TMapper>类型
      */
     <TMapper> TMapper getMapper(Class<TMapper> mapperType);
+
+    /**
+     * 从键值对数据集中获取字段对应的值
+     *
+     * @param mapResult 键值对数据集
+     * @param fieldName 字段名
+     */
+    Object getMapValueByFieldName(Map<String, Object> mapResult,
+                                  String fieldName);
 }

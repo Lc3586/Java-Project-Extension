@@ -4,6 +4,7 @@ import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.stereotype.Component;
 import project.extension.action.IAction0;
 import project.extension.ioc.IOCExtension;
+import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.config.DataSourceConfig;
@@ -24,6 +25,7 @@ import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * ORM构造器
@@ -306,5 +308,13 @@ public class OrmProvider
     @Override
     public <TMapper> TMapper getMapper(Class<TMapper> mapperType) {
         return ado.getMapper(mapperType);
+    }
+
+    @Override
+    public Object getMapValueByFieldName(Map<String, Object> mapResult,
+                                         String fieldName) {
+        return EntityTypeHandler.getMapValueByFieldName(mapResult,
+                                                        fieldName,
+                                                        dataSourceConfig.getNameConvertType());
     }
 }

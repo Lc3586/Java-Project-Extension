@@ -19,6 +19,7 @@ import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * 有生命周期的Orm对象
@@ -331,5 +332,12 @@ public class DbContextScopedNaiveSql
     @Override
     public <TMapper> TMapper getMapper(Class<TMapper> mapperType) {
         return getOriginalOrm().getMapper(mapperType);
+    }
+
+    @Override
+    public Object getMapValueByFieldName(Map<String, Object> mapResult,
+                                         String fieldName) {
+        return getOriginalOrm().getMapValueByFieldName(mapResult,
+                                                       fieldName);
     }
 }
