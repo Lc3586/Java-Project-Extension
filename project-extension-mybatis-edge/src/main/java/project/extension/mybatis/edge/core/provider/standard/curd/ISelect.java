@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.core.provider.standard.curd;
 
+import project.extension.mybatis.edge.model.DbType;
 import project.extension.mybatis.edge.model.DynamicFilter;
 import project.extension.mybatis.edge.model.Pagination;
 import project.extension.standard.exception.ModuleException;
@@ -96,9 +97,11 @@ public interface ISelect<T>
      * 设置子查询
      * <p>实现SELECT * FROM (SELECT * FROM A)的效果</p>
      *
-     * @param sql 子查询语句
+     * @param sql     子查询语句
+     * @param dbTypes 指定此sql语句兼容的数据库
      */
-    ISelect<T> withSql(String sql);
+    ISelect<T> withSql(String sql,
+                       DbType... dbTypes);
 
     /**
      * 设置子查询
@@ -109,9 +112,11 @@ public interface ISelect<T>
      *                  <p>a: 参数名，b: 值</p>
      *                  <p>用法示例一：@id，在sql语句中使用@前缀加名称作为参数（且参数名不区分大小写）</p>
      *                  <p>用法示例二：#{id,javaType=String,jdbcType=VARCHAR}，sql语句中直接使用mybatis语法作为参数</p>
+     * @param dbTypes   指定此sql语句兼容的数据库
      */
     ISelect<T> withSql(String sql,
-                       List<Tuple2<String, Object>> parameter);
+                       List<Tuple2<String, Object>> parameter,
+                       DbType... dbTypes);
 
     /**
      * 设置子查询
@@ -122,9 +127,11 @@ public interface ISelect<T>
      *                  <p>键: 参数名，值: 值</p>
      *                  <p>用法示例一：@id，在sql语句中使用@前缀加名称作为参数（且参数名不区分大小写）</p>
      *                  <p>用法示例二：#{id,javaType=String,jdbcType=VARCHAR}，sql语句中直接使用mybatis语法作为参数</p>
+     * @param dbTypes   指定此sql语句兼容的数据库
      */
     ISelect<T> withSql(String sql,
-                       Map<String, Object> parameter);
+                       Map<String, Object> parameter,
+                       DbType... dbTypes);
 
     /**
      * 指定分组列名

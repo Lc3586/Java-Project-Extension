@@ -28,9 +28,9 @@ public class MapperExtension {
      * @param <P>       参数类型
      * @param <R>       返回值类型
      */
-    public static <P, R> R pagination(Function<P, R> func,
-                                      P parameter,
-                                      Class<P> parameterType)
+    public static <P, R> List<R> pagination(Function<P, List<R>> func,
+                                            P parameter,
+                                            Class<P> parameterType)
             throws
             Throwable {
         Field paginationField = CollectionsExtension.tryGet(
@@ -60,18 +60,17 @@ public class MapperExtension {
      * @param parameter  查询方法的参数
      * @param <P>        参数类型
      * @param <R>        返回值类型
-     * @return
      */
-    public static <P, R> R pagination(Pagination pagination,
-                                      Function<P, R> func,
-                                      P parameter) {
+    public static <P, R> List<R> pagination(Pagination pagination,
+                                            Function<P, List<R>> func,
+                                            P parameter) {
         if (pagination != null && !pagination.getNope() && pagination.getUserPageHelper()) {
-            Page<List> page = PageHelper.startPage(
-                                                pagination.getPageNum(),
-                                                pagination.getPageSize())
-                                        .doSelectPage(() -> func.apply(parameter));
+            Page<R> page = PageHelper.startPage(
+                                             pagination.getPageNum(),
+                                             pagination.getPageSize())
+                                     .doSelectPage(() -> func.apply(parameter));
             pagination.setRecordCount(page.getTotal());
-            return (R) page.getResult();
+            return page.getResult();
         }
 
         return func.apply(parameter);

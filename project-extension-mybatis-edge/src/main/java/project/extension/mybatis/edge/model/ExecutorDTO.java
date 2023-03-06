@@ -47,7 +47,7 @@ public class ExecutorDTO {
     private final List<String> customFieldNames = new ArrayList<>();
 
     @ExecutorSetting(ExecutorParameter.自定义SQL)
-    private String withSQL;
+    private final Map<DbType, String> withSQL = new HashMap<>();
 
     @ExecutorSetting(ExecutorParameter.自定义过滤SQL)
     private final List<String> withWhereSQLs = new ArrayList<>();
@@ -179,12 +179,8 @@ public class ExecutorDTO {
      * <p>实现SELECT * FROM (SELECT `id`, `name` FROM `table1`)的效果，这条语句中的子查询为此字段设置的值</p>
      * <p>如果在此sql语句中使用了别名，那么必须使用添加了@ExecutorSetting(ExecutorParameter.数据表别名)注解的字段设置其他别名</p>
      */
-    public String getWithSQL() {
+    public Map<DbType, String> getWithSQL() {
         return withSQL;
-    }
-
-    public void setWithSQL(String withSQL) {
-        this.withSQL = withSQL;
     }
 
     /**

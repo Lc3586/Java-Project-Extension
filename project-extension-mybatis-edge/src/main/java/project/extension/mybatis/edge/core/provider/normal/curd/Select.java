@@ -12,10 +12,7 @@ import project.extension.mybatis.edge.core.provider.OrderByProvider;
 import project.extension.mybatis.edge.core.provider.WhereProvider;
 import project.extension.mybatis.edge.core.provider.normal.SqlProvider;
 import project.extension.mybatis.edge.core.provider.standard.curd.*;
-import project.extension.mybatis.edge.model.CurdType;
-import project.extension.mybatis.edge.model.DynamicFilter;
-import project.extension.mybatis.edge.model.ExecutorDTO;
-import project.extension.mybatis.edge.model.Pagination;
+import project.extension.mybatis.edge.model.*;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
 
@@ -247,15 +244,23 @@ public abstract class Select<T>
     }
 
     @Override
-    public ISelect<T> withSql(String sql) {
-        executor.setWithSQL(sql);
+    public ISelect<T> withSql(String sql,
+                              DbType... dbTypes) {
+        if (dbTypes == null)
+            dbTypes = new DbType[]{config.getDbType()};
+        for (DbType dbType : dbTypes)
+            executor.getWithSQL()
+                    .put(dbType,
+                         sql);
         return this;
     }
 
     @Override
     public ISelect<T> withSql(String sql,
-                              List<Tuple2<String, Object>> parameter) {
-        executor.setWithSQL(sql);
+                              List<Tuple2<String, Object>> parameter,
+                              DbType... dbTypes) {
+        withSql(sql,
+                dbTypes);
         if (parameter != null && parameter.size() > 0)
             executor.getCustomParameter()
                     .putAll(parameter.stream()
@@ -266,8 +271,10 @@ public abstract class Select<T>
 
     @Override
     public ISelect<T> withSql(String sql,
-                              Map<String, Object> parameter) {
-        executor.setWithSQL(sql);
+                              Map<String, Object> parameter,
+                              DbType... dbTypes) {
+        withSql(sql,
+                dbTypes);
         if (parameter != null && parameter.size() > 0)
             executor.getCustomParameter()
                     .putAll(parameter);

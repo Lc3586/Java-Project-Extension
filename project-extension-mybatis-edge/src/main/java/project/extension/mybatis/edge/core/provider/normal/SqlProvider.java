@@ -2182,14 +2182,22 @@ public abstract class SqlProvider {
                                          alias);
 
         //FROM部分
-        String from = StringUtils.hasText(customFromSql)
-                      ? customFromSql
-                      : StringUtils.hasText(executor.getWithSQL())
-                        ? withSql2Sql(executor.getWithSQL(),
-                                      alias)
-                        : getName2Sql(executor.getSchema(),
-                                      executor.getTableName(),
-                                      alias);
+        String from;
+        if (StringUtils.hasText(customFromSql))
+            from = customFromSql;
+        else if (executor.getWithSQL()
+                         .size() > 0) {
+            String withSql = executor.getWithSQL()
+                                     .get(config.getDbType());
+            if (withSql == null)
+                withSql = CollectionsExtension.firstValue(executor.getWithSQL());
+
+            from = withSql2Sql(withSql,
+                               alias);
+        } else
+            from = getName2Sql(executor.getSchema(),
+                               executor.getTableName(),
+                               alias);
 
         //WHERE部分
         String where;

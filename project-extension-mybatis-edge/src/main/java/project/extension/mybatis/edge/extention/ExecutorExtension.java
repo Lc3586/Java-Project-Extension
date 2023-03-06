@@ -1,17 +1,11 @@
 package project.extension.mybatis.edge.extention;
 
-import org.apache.ibatis.binding.MapperMethod;
 import org.springframework.core.annotation.AnnotationUtils;
-import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.ExecutorSetting;
-import project.extension.mybatis.edge.model.DynamicSqlSetting;
-import project.extension.mybatis.edge.model.ExecutorParameter;
 import project.extension.openapi.extention.SchemaExtension;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,7 +87,7 @@ public class ExecutorExtension {
      */
     public static Map<String, Field> getParameters(Class<?> parameterType,
                                                    String... executorParameters) {
-        Map<String, Field> paramters = new HashMap<>();
+        Map<String, Field> parameters = new HashMap<>();
         Class<?> classz = parameterType;
 
         while (true) {
@@ -106,7 +100,7 @@ public class ExecutorExtension {
                     for (String executorParameter : executorParameters) {
                         if (executorSettingAttribute.parameter()
                                                     .equals(executorParameter))
-                            paramters.put(executorParameter,
+                            parameters.put(executorParameter,
                                           field);
                     }
                 }
@@ -118,121 +112,121 @@ public class ExecutorExtension {
             classz = superClassz;
         }
 
-        return paramters;
+        return parameters;
     }
+//
+//    /**
+//     * 获取指定的参数值集合
+//     * <p>支持以下配置方式（可同时使用）：</p>
+//     * <p>1、首先在类上添加注解, @Pagination</p>
+//     * <p>2、设置动态过滤条件，相关字段上添加注解, @Pagination(PaginationParameter.动态过滤条件)</p>
+//     * <p>3、设置自定义过滤SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义过滤SQL)</p>
+//     * <p>4、设置高级排序，相关字段上添加注解, @Pagination(PaginationParameter.高级排序)</p>
+//     * <p>5、设置自定义排序SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义排序SQL)</p>
+//     * <p>6、设置自定义SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义SQL)</p>
+//     *
+//     * @param parameter          参数
+//     * @param executorParameters 参数类型
+//     * @return 参数集合，键：参数类型，值：字段名
+//     */
+//    public static Map<String, Object> getParameterValues(Object parameter,
+//                                                         String... executorParameters)
+//            throws
+//            IllegalAccessException {
+//        Map<String, Object> paramterValues = new HashMap<>();
+//
+//        Map<String, Field> paramters = getParameters(parameter.getClass(),
+//                                                     executorParameters);
+//        for (String key : paramters.keySet()) {
+//            Field field = paramters.get(key);
+//            field.setAccessible(true);
+//
+//            Object value = field.get(parameter);
+//            if (value != null)
+//                paramterValues.put(key,
+//                                   value);
+//        }
+//
+//        return paramterValues;
+//    }
 
-    /**
-     * 获取指定的参数值集合
-     * <p>支持以下配置方式（可同时使用）：</p>
-     * <p>1、首先在类上添加注解, @Pagination</p>
-     * <p>2、设置动态过滤条件，相关字段上添加注解, @Pagination(PaginationParameter.动态过滤条件)</p>
-     * <p>3、设置自定义过滤SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义过滤SQL)</p>
-     * <p>4、设置高级排序，相关字段上添加注解, @Pagination(PaginationParameter.高级排序)</p>
-     * <p>5、设置自定义排序SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义排序SQL)</p>
-     * <p>6、设置自定义SQL，相关字段上添加注解, @Pagination(PaginationParameter.自定义SQL)</p>
-     *
-     * @param parameter          参数
-     * @param executorParameters 参数类型
-     * @return 参数集合，键：参数类型，值：字段名
-     */
-    public static Map<String, Object> getParameterValues(Object parameter,
-                                                         String... executorParameters)
-            throws
-            IllegalAccessException {
-        Map<String, Object> paramterValues = new HashMap<>();
-
-        Map<String, Field> paramters = getParameters(parameter.getClass(),
-                                                     executorParameters);
-        for (String key : paramters.keySet()) {
-            Field field = paramters.get(key);
-            field.setAccessible(true);
-
-            Object value = field.get(parameter);
-            if (value != null)
-                paramterValues.put(key,
-                                   value);
-        }
-
-        return paramterValues;
-    }
-
-    /**
-     * 获取参数字符串
-     *
-     * @param executorParameter 参数
-     * @param values            值集合
-     * @return 参数字符串
-     */
-    public static String getParameterString(String executorParameter,
-                                            String... values) {
-        if (values == null || values.length == 0)
-            return String.format("￥{%s}",
-                                 executorParameter);
-        else
-            return String.format("￥{%s&%s}",
-                                 executorParameter,
-                                 String.join("&",
-                                             values));
-    }
-
-    /**
-     * 获取动态Sql设置
-     *
-     * @param parameter 参数
-     * @return 配置
-     */
-    public static DynamicSqlSetting getDynamicSetting(Object parameter)
-            throws
-            IllegalAccessException {
-        DynamicSqlSetting setting = null;
-        if (parameter.getClass()
-                     .equals(MapperMethod.ParamMap.class)) {
-            //多参数
-            MapperMethod.ParamMap<Object> parameterMap = (MapperMethod.ParamMap<Object>) parameter;
-            setting = (DynamicSqlSetting) parameterMap.get("arg0");
-        } else {
-            Map<String, Object> dynamicSqlSettingValues = ExecutorExtension.getParameterValues(
-                    parameter,
-                    ExecutorParameter.返回值类型,
-                    ExecutorParameter.主键类型,
-                    ExecutorParameter.数据库类型);
-            setting = new DynamicSqlSetting(
-                    (Class<?>) CollectionsExtension.tryGet(dynamicSqlSettingValues,
-                                                           ExecutorParameter.实体类型,
-                                                           Integer.class).b,
-                    (Class<?>) CollectionsExtension.tryGet(dynamicSqlSettingValues,
-                                                           ExecutorParameter.返回值类型,
-                                                           Object.class).b);
-        }
-        return setting;
-    }
-
-    /**
-     * 获取参数
-     *
-     * @param parameter
-     * @return
-     */
-    public static List<Object> getExecutorParameters(Object parameter) {
-        List<Object> executorParameters = new ArrayList<>();
-        if (parameter.getClass()
-                     .equals(MapperMethod.ParamMap.class)) {
-            //多参数
-            MapperMethod.ParamMap<Object> parameterMap = (MapperMethod.ParamMap<Object>) parameter;
-            for (int i = 0; true; i++) {
-                String name = String.format("arg%s",
-                                            i);
-                if (parameterMap.containsKey(name)) {
-                    Object item = parameterMap.get(name);
-                    if (!item.getClass()
-                             .equals(DynamicSqlSetting.class))
-                        executorParameters.add(item);
-                } else
-                    break;
-            }
-        } else
-            executorParameters.add(parameter);
-
-        return executorParameters;
-    }
+//    /**
+//     * 获取参数字符串
+//     *
+//     * @param executorParameter 参数
+//     * @param values            值集合
+//     * @return 参数字符串
+//     */
+//    public static String getParameterString(String executorParameter,
+//                                            String... values) {
+//        if (values == null || values.length == 0)
+//            return String.format("￥{%s}",
+//                                 executorParameter);
+//        else
+//            return String.format("￥{%s&%s}",
+//                                 executorParameter,
+//                                 String.join("&",
+//                                             values));
+//    }
+//
+//    /**
+//     * 获取动态Sql设置
+//     *
+//     * @param parameter 参数
+//     * @return 配置
+//     */
+//    public static DynamicSqlSetting getDynamicSetting(Object parameter)
+//            throws
+//            IllegalAccessException {
+//        DynamicSqlSetting setting = null;
+//        if (parameter.getClass()
+//                     .equals(MapperMethod.ParamMap.class)) {
+//            //多参数
+//            MapperMethod.ParamMap<Object> parameterMap = (MapperMethod.ParamMap<Object>) parameter;
+//            setting = (DynamicSqlSetting) parameterMap.get("arg0");
+//        } else {
+//            Map<String, Object> dynamicSqlSettingValues = ExecutorExtension.getParameterValues(
+//                    parameter,
+//                    ExecutorParameter.返回值类型,
+//                    ExecutorParameter.主键类型,
+//                    ExecutorParameter.数据库类型);
+//            setting = new DynamicSqlSetting(
+//                    (Class<?>) CollectionsExtension.tryGet(dynamicSqlSettingValues,
+//                                                           ExecutorParameter.实体类型,
+//                                                           Integer.class).b,
+//                    (Class<?>) CollectionsExtension.tryGet(dynamicSqlSettingValues,
+//                                                           ExecutorParameter.返回值类型,
+//                                                           Object.class).b);
+//        }
+//        return setting;
+//    }
+//
+//    /**
+//     * 获取参数
+//     *
+//     * @param parameter
+//     * @return
+//     */
+//    public static List<Object> getExecutorParameters(Object parameter) {
+//        List<Object> executorParameters = new ArrayList<>();
+//        if (parameter.getClass()
+//                     .equals(MapperMethod.ParamMap.class)) {
+//            //多参数
+//            MapperMethod.ParamMap<Object> parameterMap = (MapperMethod.ParamMap<Object>) parameter;
+//            for (int i = 0; true; i++) {
+//                String name = String.format("arg%s",
+//                                            i);
+//                if (parameterMap.containsKey(name)) {
+//                    Object item = parameterMap.get(name);
+//                    if (!item.getClass()
+//                             .equals(DynamicSqlSetting.class))
+//                        executorParameters.add(item);
+//                } else
+//                    break;
+//            }
+//        } else
+//            executorParameters.add(parameter);
+//
+//        return executorParameters;
+//    }
 }
