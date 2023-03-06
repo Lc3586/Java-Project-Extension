@@ -30,4 +30,11 @@ public interface IAuthenticationService {
      * 尝试获取操作者
      */
     Optional<Operator> tryGetOperator();
+
+    /**
+     * 是否拥有授权
+     *
+     * @param permission 权限标识符
+     */
+    boolean isAuthorized(String... permission);
 }

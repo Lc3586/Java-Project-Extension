@@ -46,7 +46,16 @@ public class JasyptUtils {
                 return envProperty;
         }
 
-        return System.getenv("JAVA_JASYPT_PASSWORD");
+        return getPasswordFromEnv("JAVA_JASYPT_PASSWORD");
+    }
+
+    /**
+     * 从环境变量中获取密码
+     *
+     * @return 密码
+     */
+    public static String getPasswordFromEnv(String env) {
+        return System.getenv(env);
     }
 
     /**
