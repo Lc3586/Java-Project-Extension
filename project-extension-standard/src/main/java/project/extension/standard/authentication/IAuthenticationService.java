@@ -24,12 +24,12 @@ public interface IAuthenticationService {
     /**
      * 获取操作者
      */
-    Operator getOperator();
+    AuthenticationInfo getOperator();
 
     /**
      * 尝试获取操作者
      */
-    Optional<Operator> tryGetOperator();
+    Optional<AuthenticationInfo> tryGetOperator();
 
     /**
      * 是否拥有授权

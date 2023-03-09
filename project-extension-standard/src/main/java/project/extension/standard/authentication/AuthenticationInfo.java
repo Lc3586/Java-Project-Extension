@@ -3,15 +3,16 @@ package project.extension.standard.authentication;
 import project.extension.openapi.annotations.OpenApiDescription;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * 操作者
- * <p>一般为当前登录人</p>
+ * 身份验证信息
+ * <p>当前登录人信息</p>
  *
  * @author LCTR
  * @date 2022-12-08
  */
-public class Operator {
+public class AuthenticationInfo {
     /**
      * 用户标识
      */
@@ -19,16 +20,46 @@ public class Operator {
     private String key;
 
     /**
-     * 用户名/账号
+     * 用户类型
      */
-    @OpenApiDescription("用户名/账号")
-    private String username;
+    @OpenApiDescription("用户类型")
+    private String userType;
+
+    /**
+     * 角色类型
+     */
+    @OpenApiDescription("角色类型")
+    private List<String> roleTypes;
+
+    /**
+     * 角色名称
+     */
+    @OpenApiDescription("角色名称")
+    private List<String> roleNames;
+
+    /**
+     * 账号/用户名
+     */
+    @OpenApiDescription("账号/用户名")
+    private String account;
 
     /**
      * 昵称
      */
     @OpenApiDescription("昵称")
     private String nickname;
+
+    /**
+     * 性别
+     */
+    @OpenApiDescription("性别")
+    private String sex;
+
+    /**
+     * 头像
+     */
+    @OpenApiDescription("头像")
+    private String face;
 
     /**
      * 姓名
@@ -78,14 +109,47 @@ public class Operator {
     }
 
     /**
-     * 用户名/账号
+     * 用户类型
      */
-    public String getUsername() {
-        return username;
+    public String getUserType() {
+        return userType;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    /**
+     * 角色类型
+     */
+    public List<String> getRoleTypes() {
+        return roleTypes;
+    }
+
+    public void setRoleTypes(List<String> roleTypes) {
+        this.roleTypes = roleTypes;
+    }
+
+    /**
+     * 角色名称
+     */
+    public List<String> getRoleNames() {
+        return roleNames;
+    }
+
+    public void setRoleNames(List<String> roleNames) {
+        this.roleNames = roleNames;
+    }
+
+    /**
+     * 账号/用户名
+     */
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     /**
@@ -97,6 +161,28 @@ public class Operator {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    /**
+     * 性别
+     */
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    /**
+     * 头像
+     */
+    public String getFace() {
+        return face;
+    }
+
+    public void setFace(String face) {
+        this.face = face;
     }
 
     /**
