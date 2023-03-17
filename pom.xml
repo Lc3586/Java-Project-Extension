@@ -79,6 +79,7 @@
         <module>project-extension-mybatis-edge</module>
         <module>project-extension-standard</module>
         <module>project-extension-document</module>
+        <module>project-extension-wechat</module>
     </modules>
     <packaging>pom</packaging>
 

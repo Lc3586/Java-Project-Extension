@@ -14,7 +14,6 @@ import java.util.Map;
  * @author LCTR
  * @date 2022-12-19
  */
-@Repository
 public interface INaiveDataSourceProvider {
     /**
      * 默认数据源
@@ -89,10 +88,8 @@ public interface INaiveDataSourceProvider {
 
     /**
      * 加载所有的数据源
-     *
-     * @param enabledOnly 仅获取启用的数据源
      */
-    Map<String, DataSource> loadAllDataSources(boolean enabledOnly);
+    Map<String, DataSource> loadAllDataSources();
 
     /**
      * 获取数据源

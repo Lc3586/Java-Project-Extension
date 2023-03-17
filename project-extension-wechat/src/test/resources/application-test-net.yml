@@ -1,0 +1,113 @@
+#项目拓展
+project:
+  extension:
+    wechat:
+      #当前服务器的公网IP
+      userHostAddress:
+      #默认的公众号名称
+      mP: master
+      #默认的商户号名称
+      pay: master
+      #默认的公众号令牌
+      token:
+      #默认的AES加密密钥
+      aesKey:
+      #默认的p12证书地址
+      certFilePath:
+      #默认的证书密码
+      certPassword:
+      #默认的pem公钥文件地址
+      privateKeyPath:
+      #默认启用微信验证签名验证中间件
+      enableSignatureVerificationMiddleware: true
+      #默认启用微信网页授权中间件
+      enableOAuthMiddleware: true
+      #默认启用微信收付通通知中间件
+      enablePayNotifyMiddleware: true
+      #多公众号配置
+      multiMP:
+        #默认公众号
+        master:
+          #启用
+          enable: true
+          #公众账号标识
+          appId:
+          #公众账号密钥
+          appSecret:
+          #令牌
+          token:
+          #AES加密密钥
+          aesKey:
+          #启用微信验证签名验证中间件
+          enableSignatureVerificationMiddleware: true
+          #需要进行签名验证的接口
+          signatureVerificationUrls:
+          #令牌验证接口
+          tokenVerificationUrl:
+          #          #语言
+          #          language: zh_CN
+          #启用中间件时无需配置以下选项
+      #          #启用微信网页授权中间件
+      #          enableOAuthMiddleware: true
+      #          #基础授权接口
+      #          oAuthBaseUrl:
+      #          #用户信息授权接口
+      #          oAuthUserInfoUrl:
+      #多商户号配置
+      multiPay:
+        #默认商户号
+        master:
+          #启用
+          enable: true
+          #公众账号标识
+          appId:
+          #商户号
+          mchId:
+          #商户API秘钥
+          mchKey:
+          #服务商模式下的子商户公众号标识
+          subAppId:
+          #服务商模式下的子商户号
+          subMchId:
+          #p12证书文件的绝对路径或者以classpath:开头的类路径
+          certFilePath:
+          #证书密码
+          certPassword:
+          #微信支付分serviceId
+          serviceId:
+          #V3接口秘钥
+          apiV3Key:
+          #V3证书序列号
+          certSerialNo:
+          #apiclient_key.pem证书文件的绝对路径或者以classpath:开头的类路径
+          privateKeyPath:
+          #apiclient_cert.pem证书文件的绝对路径或者以classpath:开头的类路径
+          privateCertPath:
+          #启用中间件时无需配置以下选项
+      #          #启用微信收付通通知中间件
+      #          enablePayNotifyMiddleware: true
+      #          #接收收付通通知的URL
+      #          payNotifyUrl:
+      #          #接收收付通通知的URL
+      #          payNotifyV3Url:
+      #          #接收微信支付分的URL
+      #          payScoreNotifyV3Url:
+      #          #接收微信支付退款结果通知的回调地址
+      #          refundNotifyUrl:
+      #          #接收微信支付退款结果通知的回调地址
+      #          refundNotifyV3Url:
+
+      #开发配置
+      dev:
+        #调试模式
+        debug: true
+        #开发令牌验证接口（如未配置此属性，则中间件会自动生成）
+        tokenVerificationUrl:
+#        #编码格式
+#        encoding: UTF-8
+
+jasypt:
+  encryptor:
+    password: ${JAVA_LOCAL_49_JASYPT_PASSWORD}
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

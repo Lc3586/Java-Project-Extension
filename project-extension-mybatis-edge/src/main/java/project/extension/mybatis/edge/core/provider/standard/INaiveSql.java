@@ -25,7 +25,6 @@ import java.util.Map;
  * @author LCTR
  * @date 2022-06-10
  */
-@Repository
 public interface INaiveSql {
     /**
      * 数据查询对象

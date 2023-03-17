@@ -1,0 +1,9 @@
+# 日志配置
+logging:
+  level:
+    project.extension.mybatis.edge: debug
+    org.springframework: warn
+
+spring:
+  profiles:
+    active: ${env}

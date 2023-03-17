@@ -246,6 +246,19 @@ public class NaiveDataSourceProvider
     }
 
     /**
+     * 检查数据源是否可用
+     *
+     * @param dataSource 数据源名称
+     */
+    private void checkDataSourceBeforeGet(String dataSource) {
+        if (!isExists(dataSource))
+            throw new ModuleException(Strings.getConfigDataSourceUndefined(dataSource));
+
+        if (!isEnable(dataSource))
+            throw new ModuleException(Strings.getConfigDataSourceNotActive(dataSource));
+    }
+
+    /**
      * 获取数据源在Spring IOC容器中的名称
      *
      * @param dataSource 数据源
@@ -329,11 +342,11 @@ public class NaiveDataSourceProvider
     }
 
     @Override
-    public Map<String, DataSource> loadAllDataSources(boolean enabledOnly)
+    public Map<String, DataSource> loadAllDataSources()
             throws
             ModuleException {
         if (dataSourceMap.size() == 0) {
-            for (String dataSource : baseConfig.getAllDataSource(enabledOnly)) {
+            for (String dataSource : allDataSources(true)) {
                 loadAndRegisterDataSource(dataSource);
             }
         }
@@ -343,16 +356,19 @@ public class NaiveDataSourceProvider
 
     @Override
     public DataSource getDataSources(String dataSource) {
-        return loadAllDataSources(false).get(dataSource);
+        checkDataSourceBeforeGet(dataSource);
+        return loadAllDataSources().get(dataSource);
     }
 
     @Override
     public DataSourceTransactionManager getTransactionManager(String dataSource) {
+        checkDataSourceBeforeGet(dataSource);
         return transactionManagerMap.get(dataSource);
     }
 
     @Override
     public SqlSessionFactory getSqlSessionFactory(String dataSource) {
+        checkDataSourceBeforeGet(dataSource);
         return sqlSessionFactoryMap.get(dataSource);
     }
 }

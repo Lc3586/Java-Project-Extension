@@ -1,14 +1,10 @@
 package project.extension.mybatis.edge.core.provider.standard;
-
-import org.springframework.stereotype.Repository;
-
 /**
  * 多库ORM
  *
  * @author LCTR
  * @date 2023-01-10
  */
-@Repository
 public interface IMultiNaiveSql {
     /**
      * 获取主库ORM

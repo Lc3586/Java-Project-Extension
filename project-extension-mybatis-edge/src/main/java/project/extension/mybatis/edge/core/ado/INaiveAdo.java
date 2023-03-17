@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import project.extension.func.IFunc0;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @author LCTR
  * @date 2022-12-22
  */
+@Repository
 public interface INaiveAdo {
     /**
      * 获取解析事务的方法
