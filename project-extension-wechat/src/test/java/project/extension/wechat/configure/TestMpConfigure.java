@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
  * @author LCTR
  * @date 2023-03-17
  */
-public class TestMPConfigure {
+public class TestMpConfigure {
     /**
      * 全部的测试数据源
      */
@@ -16,15 +16,13 @@ public class TestMPConfigure {
 
     static {
         multiMPTestMap.put("PERSON",
-                           "");
-        multiMPTestMap.put("CORP",
-                           "");
+                           "master");
     }
 
     /**
      * 获取全部用于测试的公众号名称集合
      */
-    public static String[] getMultiTestMPName() {
+    public static String[] getMultiTestMpName() {
         return multiMPTestMap.keySet()
                              .toArray(new String[0]);
     }
@@ -34,7 +32,7 @@ public class TestMPConfigure {
      *
      * @param name 名称
      */
-    public static String getTestMP(String name) {
+    public static String getTestMp(String name) {
         return multiMPTestMap.get(name);
     }
 }

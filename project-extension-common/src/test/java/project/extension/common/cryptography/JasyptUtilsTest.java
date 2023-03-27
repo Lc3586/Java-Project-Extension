@@ -98,4 +98,42 @@ public class JasyptUtilsTest {
         System.out.printf("明文：%s%n",
                           data1);
     }
+
+    /**
+     * 加密
+     */
+    @Test
+    @DisplayName("加密")
+    public void encryptEnv() {
+        String password = JasyptUtils.getPasswordFromEnv("JAVA_LOCAL_49_JASYPT_PASSWORD");
+        String text = "33e16f3df65243a2b7353e3bd261cb17";
+        System.out.printf("明文：%s%n",
+                          text);
+        String data1 = JasyptUtils.encrypt(text,
+                                           password);
+        System.out.printf("密文1：%s%n",
+                          data1);
+        String data2 = String.format("ENC(%s)",
+                                     data1);
+        System.out.printf("密文2：%s%n",
+                          data2);
+    }
+
+    /**
+     * 解密
+     */
+    @Test
+    @DisplayName("解密")
+    public void decryptEnv()
+            throws
+            Throwable {
+        String password = JasyptUtils.getPasswordFromEnv("JAVA_LOCAL_49_JASYPT_PASSWORD");
+        String text = "ENC(iXb0v7Wnr1ZgfGZ1eAyCOg==)";
+        System.out.printf("密文：%s%n",
+                          text);
+        String data1 = JasyptUtils.decrypt(text,
+                                           password);
+        System.out.printf("明文：%s%n",
+                          data1);
+    }
 }

@@ -22,24 +22,24 @@ public class Strings_zh_CN {
         if (values == null) {
             values = new HashMap<>();
             //公众号相关错误信息
-            values.put("ConfigMPNameUndefined",
+            values.put("ConfigMpNameUndefined",
                        "在配置文件的project.extension.mybatis.multiDataSource中没有为数据源配置名称");
-            values.put("ConfigMPUndefined",
-                       "配置文件project.extension.wechat.multiMP中未找到名称为%1$2s的公众号配置");
-            values.put("ConfigMPRepeat",
-                       "配置文件project.extension.wechat.multiMP中存在多个名称为%1$2s的公众号");
-            values.put("ConfigMPOptionUndefined",
-                       "配置文件project.extension.wechat.multiMP - name为%1$2s的公众号缺失%2$2s设置，并且也没有设置默认的%2$2s");
-            values.put("ConfigMPNotActive",
-                       "未启用配置文件中的project.extension.wechat.multiMP.%1$2s公众号");
-            values.put("ConfigMPOptionInvalid",
-                       "配置文件project.extension.wechat.multiMP - name为%1$2s的公众号的%2$2s设置无效，设置的值：%3$2s");
-            values.put("CreateWeChatMPServiceFailed",
-                       "创建微信公众号服务失败，配置来源于project.extension.wechat.multiMP中名称为%1$2s的公众号配置");
-            values.put("WeChatMPService4VersionUndefined",
+            values.put("ConfigMpUndefined",
+                       "配置文件project.extension.wechat.multiMp中未找到名称为%1$2s的公众号配置");
+            values.put("ConfigMpRepeat",
+                       "配置文件project.extension.wechat.multiMp中存在多个名称为%1$2s的公众号");
+            values.put("ConfigMpOptionUndefined",
+                       "配置文件project.extension.wechat.multiMp - name为%1$2s的公众号缺失%2$2s设置，并且也没有设置默认的%2$2s");
+            values.put("ConfigMpNotActive",
+                       "未启用配置文件中的project.extension.wechat.multiMp.%1$2s公众号");
+            values.put("ConfigMpOptionInvalid",
+                       "配置文件project.extension.wechat.multiMp - name为%1$2s的公众号的%2$2s设置无效，设置的值：%3$2s");
+            values.put("CreateWeChatMpServiceFailed",
+                       "创建微信公众号服务失败，配置来源于project.extension.wechat.multiMp中名称为%1$2s的公众号配置");
+            values.put("WeChatMpService4VersionUndefined",
                        "找不到%1$2s版本的名称为%2$2s的微信公众号服务");
-            values.put("UseDefaultWeChatMPServiceMethod",
-                       "请使用请使用INaiveWeChatServiceProvider.getDefaultWeChatMPService方法获取默认的微信公众号服务");
+            values.put("UseDefaultWeChatMpServiceMethod",
+                       "请使用请使用INaiveWeChatServiceProvider.getDefaultWeChatMpService方法获取默认的微信公众号服务");
 
             //商户号相关错误信息
             values.put("ConfigPayNameUndefined",
@@ -64,14 +64,16 @@ public class Strings_zh_CN {
             //通用错误信息
             values.put("ConfigIdentical",
                        "%1$2s配置和%2$2s配置禁止拥有相同的值");
-            values.put("ConfigRequiredWhenDisabledMiddleware",
-                       "未启用%1$2s中间件时%2$2s配置不可为空");
+            values.put("ConfigRequiredWhenDisabledServlet",
+                       "未启用%1$2s服务时%2$2s配置不可为空");
             values.put("SetupMiddlewareFailed",
                        "设置%1$2s中间件失败");
-            values.put("MiddlewarePreHandleFailed",
-                       "%1$2s中间件预处理失败");
+            values.put("ServletHandleFailed",
+                       "%1$2s服务处理失败");
             values.put("HandlerUndefined",
                        "找不到%1$2s处理类，请检查是否正确配置了该处理类");
+            values.put("WxMpMessageRouterUndefined",
+                       "找不到%1$2s公众号的消息路由，请检查是否使用IWeChatMpService.setWxMpMessageRouter()配置了该消息路由");
             values.put("FunctionNotImplemented",
                        "方法尚未实现");
             values.put("CreateInstanceFailed",
@@ -82,7 +84,7 @@ public class Strings_zh_CN {
                        "暂不支持%1$2s类型的日期");
             values.put("FormatDateFailed",
                        "格式化日期%1$2s到%2$2s格式失败");
-            values.put("DateFormatNonStandard",
+            values.put("DataFormatNonStandard",
                        "%1$2s 要求 %2$2s 格式必须为：%3$2s其中一种");
             values.put("UnknownValue",
                        "%1$2s的值%2$2s无效");

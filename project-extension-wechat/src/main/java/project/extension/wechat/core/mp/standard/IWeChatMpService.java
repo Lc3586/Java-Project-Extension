@@ -2,21 +2,45 @@ package project.extension.wechat.core.mp.standard;
 
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
+import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
+import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import project.extension.wechat.model.*;
 
 /**
  * 微信公众号服务
  *
+ * <p>使用此方法获取默认的公众号服务org.springframework.beans.factory.BeanFactory#getBean(INaiveWeChatServiceProvider.DEFAULT_MP_SERVICE_IOC_NAME, IWeChatMpService.class)</p>
+ *
  * @author LCTR
  * @date 2023-03-14
  */
-public interface IWeChatMPService {
+public interface IWeChatMpService {
     /**
      * 获取原生的微信服务对象
      */
-    WxMpService getMPService();
+    WxMpService getMpService();
+
+    /**
+     * 获取微信客户端配置存储对象
+     */
+    void setMpConfigStorage(WxMpConfigStorage mpConfigStorage);
+
+    /**
+     * 获取微信客户端配置存储对象
+     */
+    WxMpConfigStorage getMpConfigStorage();
+
+    /**
+     * 设置消息路由
+     */
+    void setWxMpMessageRouter(WxMpMessageRouter router);
+
+    /**
+     * 获取消息路由
+     */
+    WxMpMessageRouter getWxMpMessageRouter();
 
     /**
      * 获取Token

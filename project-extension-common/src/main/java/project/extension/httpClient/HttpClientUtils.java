@@ -12,15 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import project.extension.collections.MapExtension;
 import project.extension.tuple.Tuple2;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -183,21 +174,31 @@ public class HttpClientUtils {
     /**
      * 执行Get请求
      *
-     * @param url     地址
-     * @param params  参数键值对集合
-     * @param headers 请求头
-     * @return (响应状态, 响应数据)
+     * @param url                     地址
+     * @param params                  参数键值对集合
+     * @param headers                 请求头
+     * @param instanceFollowRedirects 是否自动重定向（默认为true）
      */
-    public static Tuple2<HttpStatus, String> getData(String url,
-                                                     @Nullable
-                                                             Map<String, Object> params,
-                                                     @Nullable
-                                                             MultiValueMap<String, String> headers) {
-        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        httpRequestFactory.setConnectionRequestTimeout(10 * 1000);
-        httpRequestFactory.setConnectTimeout(10 * 1000);
-        httpRequestFactory.setReadTimeout(10 * 1000);
-        RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
+    public static ResponseEntity<String> doGet(String url,
+                                               @Nullable
+                                                       Map<String, Object> params,
+                                               @Nullable
+                                                       MultiValueMap<String, String> headers,
+                                               @Nullable
+                                                       Boolean instanceFollowRedirects) {
+        if (instanceFollowRedirects == null)
+            instanceFollowRedirects = true;
+
+        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory;
+        if (instanceFollowRedirects)
+            clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        else
+            clientHttpRequestFactory = new DisableRedirectClientHttpRequestFactory();
+
+        clientHttpRequestFactory.setConnectionRequestTimeout(10 * 1000);
+        clientHttpRequestFactory.setConnectTimeout(10 * 1000);
+        clientHttpRequestFactory.setReadTimeout(10 * 1000);
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
 
         HttpHeaders httpHeaders = null;
         if (headers != null)
@@ -231,61 +232,31 @@ public class HttpClientUtils {
                                              entity,
                                              String.class);
 
+        return response;
+    }
+
+    /**
+     * 执行Get请求
+     *
+     * @param url                     地址
+     * @param params                  参数键值对集合
+     * @param headers                 请求头
+     * @param instanceFollowRedirects 是否自动重定向（默认为true）
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> getData(String url,
+                                                     @Nullable
+                                                             Map<String, Object> params,
+                                                     @Nullable
+                                                             MultiValueMap<String, String> headers,
+                                                     @Nullable
+                                                             Boolean instanceFollowRedirects) {
+        ResponseEntity<String> response = doGet(url,
+                                                params,
+                                                headers,
+                                                instanceFollowRedirects);
+
         return new Tuple2<>(response.getStatusCode(),
                             response.getBody());
     }
-
-//    public static String sendPost(String url,
-//                                  String param) {
-//        PrintWriter out = null;
-//        BufferedReader in = null;
-//        StringBuilder result = new StringBuilder();
-//        try {
-//            URL realUrl = new URL(url);
-//            URLConnection conn = realUrl.openConnection();
-//            conn.setRequestProperty("accept",
-//                                    "*/*");
-//            conn.setRequestProperty("connection",
-//                                    "Keep-Alive");
-//            conn.setRequestProperty("user-agent",
-//                                    "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)");
-//            conn.setRequestProperty("Accept-Charset",
-//                                    "utf-8");
-//            conn.setRequestProperty("contentType",
-//                                    "utf-8");
-//            conn.setDoOutput(true);
-//            conn.setDoInput(true);
-//            out = new PrintWriter(conn.getOutputStream());
-//            out.print(param);
-//            out.flush();
-//            in = new BufferedReader(new InputStreamReader(conn.getInputStream(),
-//                                                          StandardCharsets.UTF_8));
-//            String line;
-//            while ((line = in.readLine()) != null) {
-//                result.append(line);
-//            }
-//        } catch (ConnectException e) {
-//            log.info("调用HttpUtils.sendPost ConnectException, url=" + url + ",param=" + param,
-//                     e);
-//        } catch (SocketTimeoutException e) {
-//            log.info("调用HttpUtils.sendPost SocketTimeoutException, url=" + url + ",param=" + param,
-//                     e);
-//        } catch (IOException e) {
-//            log.info("调用HttpUtils.sendPost IOException, url=" + url + ",param=" + param,
-//                     e);
-//        } catch (Exception e) {
-//            log.info("调用HttpsUtil.sendPost Exception, url=" + url + ",param=" + param,
-//                     e);
-//        } finally {
-//            try {
-//                if (in != null) {
-//                    in.close();
-//                }
-//            } catch (Exception ex) {
-//                log.error("调用HttpsUtil.sendPost Exception, url=" + url + ",param=" + param,
-//                          ex);
-//            }
-//        }
-//        return result.toString();
-//    }
 }

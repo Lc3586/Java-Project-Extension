@@ -1,5 +1,7 @@
 package project.extension.string;
 
+import org.springframework.web.util.UriComponentsBuilder;
+import project.extension.tuple.Tuple2;
 import sun.security.util.BitArray;
 
 import javax.xml.bind.DatatypeConverter;
@@ -7,6 +9,8 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 字符串拓展方法
@@ -15,6 +19,12 @@ import java.util.Locale;
  * @date 2022-04-02
  */
 public class StringExtension {
+    private static final Pattern urlPattern = Pattern.compile("^(.*?)://(.*?)$",
+                                                              Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern urlQueryParameterPattern = Pattern.compile("^https?://(.*?)\\?(.*?)$",
+                                                                            Pattern.CASE_INSENSITIVE);
+
     /**
      * 判断是否相等并忽略大小写
      *
@@ -254,5 +264,69 @@ public class StringExtension {
             ret.set(a,
                     chars[a] == '1');
         return ret;
+    }
+
+    /**
+     * 获取链接地址的架构和主机地址
+     *
+     * @param url 链接地址
+     * @return a: 架构, b: 主机地址
+     */
+    public static Tuple2<String, String> getSchemeAndHost(String url) {
+        Matcher matcher = urlPattern.matcher(url);
+        if (matcher.find() && matcher.groupCount() == 2)
+            return new Tuple2<>(matcher.group(1),
+                                matcher.group(2));
+        return null;
+    }
+
+    /**
+     * 拼接链接地址
+     *
+     * @param scheme 架构
+     * @param host   主机地址
+     * @param paths  其他地址
+     * @return 链接地址
+     */
+    public static String getUrl(String scheme,
+                                String host,
+                                String... paths) {
+        UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
+                                                           .scheme(scheme)
+                                                           .host(host);
+
+        if (paths != null)
+            for (String path : paths) {
+                builder.path(path);
+            }
+
+        return builder.build()
+                      .toString();
+    }
+
+    /**
+     * 从链接地址中获取参数的值
+     *
+     * @param url 链接地址
+     * @param key 参数名
+     * @return 参数值
+     */
+    public static String getQueryParameter(String url,
+                                           String key) {
+        Matcher matcher = urlQueryParameterPattern.matcher(url);
+        if (matcher.find() && matcher.groupCount() == 2) {
+            String queryString = matcher.group(2);
+            String[] parameters = queryString.split("&");
+            for (String parameter : parameters) {
+                if (parameter.startsWith(key)) {
+                    if (parameter.contains("="))
+                        return parameter.split("=")[1];
+                    else
+                        return null;
+                }
+            }
+        }
+
+        return null;
     }
 }

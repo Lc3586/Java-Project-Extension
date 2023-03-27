@@ -59,8 +59,8 @@ public class Strings {
     /**
      * 在配置文件中没有为公众号配置名称
      */
-    public static String getConfigMPNameUndefined() {
-        return getString("ConfigMPNameUndefined");
+    public static String getConfigMpNameUndefined() {
+        return getString("ConfigMpNameUndefined");
     }
 
     /**
@@ -68,8 +68,8 @@ public class Strings {
      *
      * @param name 公众号名称
      */
-    public static String getConfigMPUndefined(String name) {
-        return getString("ConfigMPUndefined",
+    public static String getConfigMpUndefined(String name) {
+        return getString("ConfigMpUndefined",
                          name);
     }
 
@@ -78,8 +78,8 @@ public class Strings {
      *
      * @param name 公众号名称
      */
-    public static String getConfigMPRepeat(String name) {
-        return getString("ConfigMPRepeat",
+    public static String getConfigMpRepeat(String name) {
+        return getString("ConfigMpRepeat",
                          name);
     }
 
@@ -88,8 +88,8 @@ public class Strings {
      *
      * @param name 公众号名称
      */
-    public static String getConfigMPNotActive(String name) {
-        return getString("ConfigMPNotActive",
+    public static String getConfigMpNotActive(String name) {
+        return getString("ConfigMpNotActive",
                          name);
     }
 
@@ -99,9 +99,9 @@ public class Strings {
      * @param name   公众号名称
      * @param option 配置项名称
      */
-    public static String getConfigMPOptionUndefined(String name,
+    public static String getConfigMpOptionUndefined(String name,
                                                     String option) {
-        return getString("ConfigMPOptionUndefined",
+        return getString("ConfigMpOptionUndefined",
                          name,
                          option);
     }
@@ -113,24 +113,24 @@ public class Strings {
      * @param option 配置项名称
      * @param value  配置项值
      */
-    public static String getConfigMPOptionInvalid(String name,
+    public static String getConfigMpOptionInvalid(String name,
                                                   String option,
                                                   String value) {
-        return getString("ConfigMPOptionInvalid",
+        return getString("ConfigMpOptionInvalid",
                          name,
                          option,
                          value);
     }
 
     /**
-     * 未启用中间件时此配置不可为空
+     * 未启用服务时此配置不可为空
      *
-     * @param name   中间件名称
+     * @param name   服务名称
      * @param option 配置名称
      */
-    public static String getConfigRequiredWhenDisabledMiddleware(String name,
-                                                                 String option) {
-        return getString("ConfigRequiredWhenDisabledMiddleware",
+    public static String getConfigRequiredWhenDisabledServlet(String name,
+                                                              String option) {
+        return getString("ConfigRequiredWhenDisabledServlet",
                          name,
                          option);
     }
@@ -153,8 +153,8 @@ public class Strings {
      *
      * @param name 公众号名称
      */
-    public static String getCreateWeChatMPServiceFailed(String name) {
-        return getString("CreateWeChatMPServiceFailed",
+    public static String getCreateWeChatMpServiceFailed(String name) {
+        return getString("CreateWeChatMpServiceFailed",
                          name);
     }
 
@@ -164,18 +164,18 @@ public class Strings {
      * @param name    公众号名称
      * @param version 接口版本
      */
-    public static String getWeChatMPService4VersionUndefined(String name,
+    public static String getWeChatMpService4VersionUndefined(String name,
                                                              String version) {
-        return getString("WeChatMPService4VersionUndefined",
+        return getString("WeChatMpService4VersionUndefined",
                          name,
                          version);
     }
 
     /**
-     * 请使用INaiveWeChatServiceProvider.getDefaultWeChatMPService方法获取默认的微信公众号服务
+     * 请使用INaiveWeChatServiceProvider.getDefaultWeChatMpService方法获取默认的微信公众号服务
      */
-    public static String getUseDefaultWeChatMPServiceMethod() {
-        return getString("UseDefaultWeChatMPServiceMethod");
+    public static String getUseDefaultWeChatMpServiceMethod() {
+        return getString("UseDefaultWeChatMpServiceMethod");
     }
 
     /**
@@ -285,23 +285,33 @@ public class Strings {
     }
 
     /**
-     * 中间件预处理失败
+     * 服务处理失败
      *
      * @param name 中间件名称
      */
-    public static String getMiddlewarePreHandleFailed(String name) {
-        return getString("MiddlewarePreHandleFailed",
+    public static String getServletHandleFailed(String name) {
+        return getString("ServletHandleFailed",
                          name);
     }
 
     /**
      * 找不到指定处理类
      *
-     * @param name 中间件名称
+     * @param name 服务名称
      */
     public static String getHandlerUndefined(String name) {
         return getString("HandlerUndefined",
                          name);
+    }
+
+    /**
+     * 找不到指定公众号的消息路由
+     *
+     * @param mp 公众号
+     */
+    public static String getWxMpMessageRouterUndefined(String mp) {
+        return getString("WxMpMessageRouterUndefined",
+                         mp);
     }
 
     /**
@@ -358,16 +368,16 @@ public class Strings {
     }
 
     /**
-     * 日期格式不规范
+     * 数据格式不规范
      *
      * @param object 指定对象
      * @param value  指定值
      * @param format 格式
      */
-    public static String getDateFormatNonStandard(String object,
+    public static String getDataFormatNonStandard(String object,
                                                   String value,
                                                   String format) {
-        return getString("DateFormatNonStandard",
+        return getString("DataFormatNonStandard",
                          object,
                          value,
                          format);

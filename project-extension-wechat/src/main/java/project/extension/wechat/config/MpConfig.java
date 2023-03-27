@@ -1,14 +1,12 @@
 package project.extension.wechat.config;
 
-import java.util.List;
-
 /**
  * 公众号配置
  *
  * @author LCTR
  * @date 2023-03-15
  */
-public class MPConfig {
+public class MpConfig {
     /**
      * 名称
      */
@@ -42,25 +40,19 @@ public class MPConfig {
     private String aesKey;
 
     /**
-     * 启用微信验证签名验证中间件
+     * 启用微信终端服务
      *
      * @默认值 true
      */
-    private Boolean enableSignatureVerificationMiddleware = true;
+    private Boolean enableMpEndpointServlet = true;
 
     /**
-     * 需要进行签名验证的接口
+     * 微信客户端终端的接口
+     * <p>如果启用了微信终端服务，则必须配置此项</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatSignatureVerificationMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet
      */
-    private List<String> signatureVerificationUrls;
-
-    /**
-     * 令牌验证接口
-     *
-     * @see project.extension.wechat.core.mp.handler.WeChatSignatureVerificationMiddleware
-     */
-    private String tokenVerificationUrl;
+    private String mpEndpointUrl;
 
     /**
      * 语言
@@ -70,27 +62,27 @@ public class MPConfig {
     private String language = "zh_CN";
 
     /**
-     * 启用微信网页授权中间件
+     * 启用微信网页授权服务
      *
      * @默认值 true
      */
-    private Boolean enableOAuthMiddleware = true;
+    private Boolean enableOAuth2Servlet = true;
 
     /**
      * 基础授权接口
      * <p>scope为snsapi_base</p>
-     * <p>如果启用了微信网页授权中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信网页授权服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet
      */
     private String oAuthBaseUrl;
 
     /**
      * 用户信息授权接口
      * <p>scope为snsapi_userinfo</p>
-     * <p>如果启用了微信网页授权中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信网页授权服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet
      */
     private String oAuthUserInfoUrl;
 
@@ -163,42 +155,30 @@ public class MPConfig {
     }
 
     /**
-     * 启用微信验证签名验证中间件
+     * 启用微信终端服务
      *
      * @默认值 true
      */
-    public Boolean isEnableSignatureVerificationMiddleware() {
-        return enableSignatureVerificationMiddleware;
+    public Boolean isEnableMpEndpointServlet() {
+        return enableMpEndpointServlet;
     }
 
-    public void setEnableSignatureVerificationMiddleware(Boolean enableSignatureVerificationMiddleware) {
-        this.enableSignatureVerificationMiddleware = enableSignatureVerificationMiddleware;
-    }
-
-    /**
-     * 需要进行签名验证的接口
-     *
-     * @see project.extension.wechat.core.mp.handler.WeChatSignatureVerificationMiddleware
-     */
-    public List<String> getSignatureVerificationUrls() {
-        return signatureVerificationUrls;
-    }
-
-    public void setSignatureVerificationUrls(List<String> signatureVerificationUrls) {
-        this.signatureVerificationUrls = signatureVerificationUrls;
+    public void setEnableMpEndpointServlet(Boolean enableMpEndpointServlet) {
+        this.enableMpEndpointServlet = enableMpEndpointServlet;
     }
 
     /**
-     * 令牌验证接口
+     * 微信客户端终端的接口
+     * <p>如果启用了微信终端服务，则必须配置此项</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatSignatureVerificationMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet
      */
-    public String getTokenVerificationUrl() {
-        return tokenVerificationUrl;
+    public String getMpEndpointUrl() {
+        return mpEndpointUrl;
     }
 
-    public void setTokenVerificationUrl(String tokenVerificationUrl) {
-        this.tokenVerificationUrl = tokenVerificationUrl;
+    public void setMpEndpointUrl(String mpEndpointUrl) {
+        this.mpEndpointUrl = mpEndpointUrl;
     }
 
     /**
@@ -215,24 +195,24 @@ public class MPConfig {
     }
 
     /**
-     * 启用微信网页授权中间件
+     * 启用微信网页授权服务
      *
      * @默认值 true
      */
-    public Boolean isEnableOAuthMiddleware() {
-        return enableOAuthMiddleware;
+    public Boolean isEnableOAuth2Servlet() {
+        return enableOAuth2Servlet;
     }
 
-    public void setEnableOAuthMiddleware(Boolean enableOAuthMiddleware) {
-        this.enableOAuthMiddleware = enableOAuthMiddleware;
+    public void setEnableOAuth2Servlet(Boolean enableOAuth2Servlet) {
+        this.enableOAuth2Servlet = enableOAuth2Servlet;
     }
 
     /**
      * 基础授权接口
      * <p>scope为snsapi_base</p>
-     * <p>如果启用了微信网页授权中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信网页授权服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet
      */
     public String getOAuthBaseUrl() {
         return oAuthBaseUrl;
@@ -245,9 +225,9 @@ public class MPConfig {
     /**
      * 用户信息授权接口
      * <p>scope为snsapi_userinfo</p>
-     * <p>如果启用了微信网页授权中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信网页授权服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware
+     * @see project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet
      */
     public String getOAuthUserInfoUrl() {
         return oAuthUserInfoUrl;

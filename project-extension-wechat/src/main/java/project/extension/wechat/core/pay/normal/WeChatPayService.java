@@ -13,7 +13,6 @@ import com.github.binarywang.wxpay.service.WxPayService;
 import com.github.binarywang.wxpay.service.impl.WxPayServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import project.extension.standard.exception.ModuleException;
-import project.extension.wechat.config.BaseConfig;
 import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
 
@@ -25,14 +24,10 @@ import project.extension.wechat.core.pay.standard.IWeChatPayService;
  */
 public class WeChatPayService
         implements IWeChatPayService {
-    public WeChatPayService(BaseConfig baseConfig,
-                            PayConfig payConfig) {
-        this.baseConfig = baseConfig;
+    public WeChatPayService(PayConfig payConfig) {
         this.payConfig = payConfig;
         this.payService = createPayService();
     }
-
-    private final BaseConfig baseConfig;
 
     private final PayConfig payConfig;
 
@@ -49,7 +44,7 @@ public class WeChatPayService
         payConfig.setKeyPath(StringUtils.trimToNull(this.payConfig.getCertFilePath()));
         //以下是apiV3以及支付分相关
         payConfig.setServiceId(StringUtils.trimToNull(this.payConfig.getServiceId()));
-        payConfig.setPayScoreNotifyUrl(StringUtils.trimToNull(this.baseConfig.getPayScoreNotifyV3Url()));
+        payConfig.setPayScoreNotifyUrl(StringUtils.trimToNull(this.payConfig.getPayScoreNotifyV3Url()));
         payConfig.setPrivateKeyPath(StringUtils.trimToNull(this.payConfig.getPrivateKeyPath()));
         payConfig.setPrivateCertPath(StringUtils.trimToNull(this.payConfig.getPrivateCertPath()));
         payConfig.setCertSerialNo(StringUtils.trimToNull(this.payConfig.getCertSerialNo()));
@@ -66,7 +61,7 @@ public class WeChatPayService
     @Override
     public WxPayNativeOrderResult createOrder4Native(WxPayUnifiedOrderRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getPayNotifyUrl());
             return payService.createOrder(WxPayConstants.TradeType.Specific.NATIVE,
                                           parameter);
         } catch (Exception ex) {
@@ -78,7 +73,7 @@ public class WeChatPayService
     @Override
     public WxPayAppOrderResult createOrder4App(WxPayUnifiedOrderRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getPayNotifyUrl());
             return payService.createOrder(WxPayConstants.TradeType.Specific.APP,
                                           parameter);
         } catch (Exception ex) {
@@ -90,7 +85,7 @@ public class WeChatPayService
     @Override
     public WxPayMpOrderResult createOrder4JsApi(WxPayUnifiedOrderRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getPayNotifyUrl());
             return payService.createOrder(WxPayConstants.TradeType.Specific.JSAPI,
                                           parameter);
         } catch (Exception ex) {
@@ -102,7 +97,7 @@ public class WeChatPayService
     @Override
     public WxPayMwebOrderResult createOrder4MWeb(WxPayUnifiedOrderRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getPayNotifyUrl());
             return payService.createOrder(WxPayConstants.TradeType.Specific.MWEB,
                                           parameter);
         } catch (Exception ex) {
@@ -114,7 +109,7 @@ public class WeChatPayService
     @Override
     public WxPayMicropayResult createOrder4MicroPay(WxPayUnifiedOrderRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getPayNotifyUrl());
             return payService.createOrder(WxPayConstants.TradeType.Specific.MICROPAY,
                                           parameter);
         } catch (Exception ex) {
@@ -126,7 +121,7 @@ public class WeChatPayService
     @Override
     public String createOrderV34Native(WxPayUnifiedOrderV3Request parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyV3Url());
+            parameter.setNotifyUrl(payConfig.getPayNotifyV3Url());
             return payService.createOrderV3(TradeTypeEnum.NATIVE,
                                             parameter);
         } catch (Exception ex) {
@@ -138,7 +133,7 @@ public class WeChatPayService
     @Override
     public WxPayUnifiedOrderV3Result.AppResult createOrderV34App(WxPayUnifiedOrderV3Request parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyV3Url());
+            parameter.setNotifyUrl(payConfig.getPayNotifyV3Url());
             return payService.createOrderV3(TradeTypeEnum.APP,
                                             parameter);
         } catch (Exception ex) {
@@ -150,7 +145,7 @@ public class WeChatPayService
     @Override
     public WxPayUnifiedOrderV3Result.JsapiResult createOrderV34JsApi(WxPayUnifiedOrderV3Request parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyV3Url());
+            parameter.setNotifyUrl(payConfig.getPayNotifyV3Url());
             return payService.createOrderV3(TradeTypeEnum.JSAPI,
                                             parameter);
         } catch (Exception ex) {
@@ -162,7 +157,7 @@ public class WeChatPayService
     @Override
     public String createOrderV34H5(WxPayUnifiedOrderV3Request parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getPayNotifyV3Url());
+            parameter.setNotifyUrl(payConfig.getPayNotifyV3Url());
             return payService.createOrderV3(TradeTypeEnum.H5,
                                             parameter);
         } catch (Exception ex) {
@@ -174,7 +169,7 @@ public class WeChatPayService
     @Override
     public WxPayRefundResult refund(WxPayRefundRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getRefundNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getRefundNotifyUrl());
             return payService.refund(parameter);
         } catch (Exception ex) {
             throw new ModuleException(ex.getMessage(),
@@ -185,7 +180,7 @@ public class WeChatPayService
     @Override
     public WxPayRefundResult refundV2(WxPayRefundRequest parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getRefundNotifyUrl());
+            parameter.setNotifyUrl(payConfig.getRefundNotifyUrl());
             return payService.refundV2(parameter);
         } catch (Exception ex) {
             throw new ModuleException(ex.getMessage(),
@@ -196,7 +191,7 @@ public class WeChatPayService
     @Override
     public WxPayRefundV3Result refundV3(WxPayRefundV3Request parameter) {
         try {
-            parameter.setNotifyUrl(baseConfig.getRefundNotifyV3Url());
+            parameter.setNotifyUrl(payConfig.getRefundNotifyV3Url());
             return payService.refundV3(parameter);
         } catch (Exception ex) {
             throw new ModuleException(ex.getMessage(),

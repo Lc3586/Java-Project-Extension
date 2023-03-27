@@ -1,7 +1,5 @@
 package project.extension.wechat.config;
 
-import project.extension.wechat.core.pay.handler.WeChatPayNotifyMiddleware;
-
 /**
  * 商户号配置
  *
@@ -83,52 +81,52 @@ public class PayConfig {
     private String privateCertPath;
 
     /**
-     * 启用微信收付通通知中间件
+     * 启用微信收付通通知服务
      *
      * @默认值 true
      */
-    private Boolean enablePayNotifyMiddleware = true;
+    private Boolean enablePayNotifyServlet = true;
 
     /**
      * 接收收付通通知的URL
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     private String payNotifyUrl;
 
     /**
      * 接收收付通通知的URL
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     private String payNotifyV3Url;
 
     /**
      * 接收微信支付分的URL
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     private String payScoreNotifyV3Url;
 
     /**
      * 接收微信支付退款结果通知的回调地址，通知URL必须为外网可访问的url，不允许带参数。
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     private String refundNotifyUrl;
 
     /**
      * 接收微信支付退款结果通知的回调地址，通知URL必须为外网可访问的url，不允许带参数。
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     private String refundNotifyV3Url;
 
@@ -291,23 +289,23 @@ public class PayConfig {
     }
 
     /**
-     * 启用微信收付通通知中间件
+     * 启用微信收付通通知服务
      *
      * @默认值 true
      */
-    public Boolean isEnablePayNotifyMiddleware() {
-        return enablePayNotifyMiddleware;
+    public Boolean isEnablePayNotifyServlet() {
+        return enablePayNotifyServlet;
     }
 
-    public void setEnablePayNotifyMiddleware(Boolean enablePayNotifyMiddleware) {
-        this.enablePayNotifyMiddleware = enablePayNotifyMiddleware;
+    public void setEnablePayNotifyServlet(Boolean enablePayNotifyServlet) {
+        this.enablePayNotifyServlet = enablePayNotifyServlet;
     }
 
     /**
      * 接收收付通通知的URL
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     public String getPayNotifyUrl() {
         return payNotifyUrl;
@@ -320,9 +318,9 @@ public class PayConfig {
     /**
      * 接收收付通通知的URL
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     public String getPayNotifyV3Url() {
         return payNotifyV3Url;
@@ -335,9 +333,9 @@ public class PayConfig {
     /**
      * 接收微信支付分的URL
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     public String getPayScoreNotifyV3Url() {
         return payScoreNotifyV3Url;
@@ -349,9 +347,9 @@ public class PayConfig {
 
     /**
      * 接收微信支付退款结果通知的回调地址，通知URL必须为外网可访问的url，不允许带参数。
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     public String getRefundNotifyUrl() {
         return refundNotifyUrl;
@@ -364,9 +362,9 @@ public class PayConfig {
     /**
      * 接收微信支付退款结果通知的回调地址，通知URL必须为外网可访问的url，不允许带参数。
      * <p>V3版本</p>
-     * <p>如果启用了微信收付通通知中间件，则无需配置此项，且已有的配置会被自动覆盖</p>
+     * <p>如果启用了微信收付通通知服务，则无需配置此项，且已有的配置会被自动覆盖</p>
      *
-     * @see WeChatPayNotifyMiddleware
+     * @see project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet
      */
     public String getRefundNotifyV3Url() {
         return refundNotifyV3Url;

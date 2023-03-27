@@ -3,14 +3,19 @@ package project.extension.wechat.core.mp.normal;
 import me.chanjar.weixin.common.bean.WxJsapiSignature;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
+import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.api.impl.WxMpServiceImpl;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
+import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import project.extension.standard.exception.ModuleException;
-import project.extension.wechat.config.MPConfig;
-import project.extension.wechat.core.mp.standard.IWeChatMPService;
+import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.MpConfig;
+import project.extension.wechat.core.mp.standard.IWeChatMpService;
+import project.extension.wechat.globalization.Strings;
 import project.extension.wechat.model.SendTemplateMessageResult;
 
 /**
@@ -19,16 +24,22 @@ import project.extension.wechat.model.SendTemplateMessageResult;
  * @author LCTR
  * @date 2023-03-15
  */
-public class WeChatMPService
-        implements IWeChatMPService {
-    public WeChatMPService(MPConfig mpConfig) {
+public class WeChatMpService
+        implements IWeChatMpService {
+    public WeChatMpService(BaseConfig baseConfig,
+                           MpConfig mpConfig) {
+        this.baseConfig = baseConfig;
         this.mpConfig = mpConfig;
         this.mpService = createMPService();
     }
 
-    private final MPConfig mpConfig;
+    private final BaseConfig baseConfig;
+
+    private final MpConfig mpConfig;
 
     private final WxMpService mpService;
+
+    private WxMpMessageRouter wxMpMessageRouter = null;
 
     private WxMpService createMPService() {
         WxMpService wxMpService = new WxMpServiceImpl();
@@ -42,8 +53,30 @@ public class WeChatMPService
     }
 
     @Override
-    public WxMpService getMPService() {
+    public WxMpService getMpService() {
         return mpService;
+    }
+
+    @Override
+    public void setMpConfigStorage(WxMpConfigStorage mpConfigStorage) {
+        getMpService().setWxMpConfigStorage(mpConfigStorage);
+    }
+
+    @Override
+    public WxMpConfigStorage getMpConfigStorage() {
+        return mpService.getWxMpConfigStorage();
+    }
+
+    @Override
+    public void setWxMpMessageRouter(WxMpMessageRouter router) {
+        this.wxMpMessageRouter = router;
+    }
+
+    @Override
+    public WxMpMessageRouter getWxMpMessageRouter() {
+        if (this.wxMpMessageRouter == null)
+            throw new ModuleException(Strings.getWxMpMessageRouterUndefined(mpConfig.getName()));
+        return this.wxMpMessageRouter;
     }
 
     @Override
@@ -68,12 +101,22 @@ public class WeChatMPService
 
     @Override
     public String getBaseOAuth2Url() {
-        return mpConfig.getOAuthBaseUrl();
+        return UriComponentsBuilder.newInstance()
+                                   .scheme(baseConfig.getRootUrlScheme())
+                                   .host(baseConfig.getRootUrlHost())
+                                   .path(mpConfig.getOAuthBaseUrl())
+                                   .build()
+                                   .toString();
     }
 
     @Override
     public String getUserInfoOAuth2Url() {
-        return mpConfig.getOAuthUserInfoUrl();
+        return UriComponentsBuilder.newInstance()
+                                   .scheme(baseConfig.getRootUrlScheme())
+                                   .host(baseConfig.getRootUrlHost())
+                                   .path(mpConfig.getOAuthUserInfoUrl())
+                                   .build()
+                                   .toString();
     }
 
     @Override

@@ -2,19 +2,20 @@ package project.extension.wechat.core;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import project.extension.ioc.IOCExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.wechat.config.BaseConfig;
-import project.extension.wechat.config.MPConfig;
+import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
-import project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware;
-import project.extension.wechat.core.mp.handler.WeChatSignatureVerificationMiddleware;
-import project.extension.wechat.core.mp.standard.IWeChatMPService;
-import project.extension.wechat.core.mp.normal.WeChatMPService;
-import project.extension.wechat.core.pay.handler.WeChatPayNotifyMiddleware;
+import project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet;
+import project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet;
+import project.extension.wechat.core.mp.standard.IWeChatMpService;
+import project.extension.wechat.core.mp.normal.WeChatMpService;
+import project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
 import project.extension.wechat.core.pay.normal.WeChatPayService;
 import project.extension.wechat.globalization.Strings;
@@ -38,11 +39,13 @@ public class NaiveWeChatServiceProvider
         implements INaiveWeChatServiceProvider {
     public NaiveWeChatServiceProvider(BaseConfig baseConfig) {
         this.baseConfig = baseConfig;
+        this.loadAllWeChatMpService();
+        this.loadAllWeChatPayService();
     }
 
     private final BaseConfig baseConfig;
 
-    private final Map<String, IWeChatMPService> mpServiceMap = new HashMap<>();
+    private final Map<String, IWeChatMpService> mpServiceMap = new HashMap<>();
 
     private final Map<String, IWeChatPayService> payServiceMap = new HashMap<>();
 
@@ -60,62 +63,77 @@ public class NaiveWeChatServiceProvider
     /**
      * 加载并注册微信公众号服务
      *
-     * @param mp 公众号名称
+     * @param mp                              公众号名称
+     * @param endpointServletRegistrationBean 微信终端服务注册类
+     * @param oAuth2ServletRegistrationBean   微信网页授权服务注册类
      */
-    private void loadAndRegisterMPService(String mp) {
-        MPConfig mpConfig = baseConfig.getMPConfig(mp);
+    private void loadAndRegisterMpService(String mp,
+                                          @Nullable
+                                                  ServletRegistrationBean<WeChatMpEndpointServlet> endpointServletRegistrationBean,
+                                          @Nullable
+                                                  ServletRegistrationBean<WeChatOAuth2Servlet> oAuth2ServletRegistrationBean) {
+        MpConfig mpConfig = baseConfig.getMpConfig(mp);
         if (!mpConfig.isEnable())
             return;
 
-        IWeChatMPService weChatMPService;
+        IWeChatMpService weChatMpService;
         try {
-            weChatMPService = new WeChatMPService(mpConfig);
+            weChatMpService = new WeChatMpService(baseConfig,
+                                                  mpConfig);
         } catch (Exception ex) {
-            throw new ModuleException(Strings.getCreateWeChatMPServiceFailed(mpConfig.getName()),
+            throw new ModuleException(Strings.getCreateWeChatMpServiceFailed(mpConfig.getName()),
                                       ex);
         }
 
         mpServiceMap.put(mpConfig.getName(),
-                         weChatMPService);
+                         weChatMpService);
 
         //是否为默认的公众号
         boolean _default = mpConfig.getName()
-                                   .equals(defaultMP());
-
-        //设置中间件
-        if (baseConfig.isEnableSignatureVerificationMiddleware() && mpConfig.isEnableSignatureVerificationMiddleware())
-            WeChatSignatureVerificationMiddleware.setup(mpConfig,
-                                                        weChatMPService);
-        if (baseConfig.isEnableOAuthMiddleware() && mpConfig.isEnableOAuthMiddleware())
-            WeChatOAuthMiddleware.setup(mpConfig,
-                                        weChatMPService);
+                                   .equals(defaultMp());
 
         //注册
         if (_default)
             getBeanFactory().registerSingleton(
-                    getMPServiceBeanName(null),
-                    weChatMPService);
+                    getMpServiceBeanName(null),
+                    weChatMpService);
+
         getBeanFactory().registerSingleton(
-                getMPServiceBeanName(mpConfig.getName()),
-                weChatMPService);
+                getMpServiceBeanName(mpConfig.getName()),
+                weChatMpService);
+
+        if (baseConfig.isEnableMpEndpointServlet() && mpConfig.isEnableMpEndpointServlet()) {
+            WeChatMpEndpointServlet.setup(mpConfig,
+                                          weChatMpService);
+//            endpointServletRegistrationBean.addUrlMappings(mpConfig.getMpEndpointUrl());
+        }
+
+        if (baseConfig.isEnableOAuth2Servlet() && mpConfig.isEnableOAuth2Servlet()) {
+            WeChatOAuth2Servlet.setup(mpConfig,
+                                      weChatMpService);
+//            oAuth2ServletRegistrationBean.addUrlMappings(mpConfig.getOAuthBaseUrl(),
+//                                                         mpConfig.getOAuthUserInfoUrl());
+        }
     }
 
     /**
      * 加载并注册微信支付服务
      *
-     * @param pay 商户号名称
+     * @param pay                              商户号名称
+     * @param payNotifyServletRegistrationBean 微信收付通通知服务注册类
      */
-    private void loadAndRegisterPayService(String pay) {
+    private void loadAndRegisterPayService(String pay,
+                                           @Nullable
+                                                   ServletRegistrationBean<WeChatPayNotifyServlet> payNotifyServletRegistrationBean) {
         PayConfig payConfig = baseConfig.getPayConfig(pay);
         if (!payConfig.isEnable())
             return;
 
         IWeChatPayService weChatPayService;
         try {
-            weChatPayService = new WeChatPayService(baseConfig,
-                                                    payConfig);
+            weChatPayService = new WeChatPayService(payConfig);
         } catch (Exception ex) {
-            throw new ModuleException(Strings.getCreateWeChatMPServiceFailed(payConfig.getName()),
+            throw new ModuleException(Strings.getCreateWeChatMpServiceFailed(payConfig.getName()),
                                       ex);
         }
 
@@ -124,12 +142,7 @@ public class NaiveWeChatServiceProvider
 
         //是否为默认的商户号
         boolean _default = payConfig.getName()
-                                    .equals(defaultMP());
-
-        //设置中间件
-        if (baseConfig.isEnablePayNotifyMiddleware() && payConfig.isEnablePayNotifyMiddleware())
-            WeChatPayNotifyMiddleware.setup(payConfig,
-                                            weChatPayService);
+                                    .equals(defaultMp());
 
         //注册
         if (_default)
@@ -140,6 +153,16 @@ public class NaiveWeChatServiceProvider
         getBeanFactory().registerSingleton(
                 getPayServiceBeanName(payConfig.getName()),
                 weChatPayService);
+
+        if (baseConfig.isEnablePayNotifyServlet() && payConfig.isEnablePayNotifyServlet()) {
+            WeChatPayNotifyServlet.setup(payConfig,
+                                         weChatPayService);
+//            payNotifyServletRegistrationBean.addUrlMappings(payConfig.getPayNotifyUrl(),
+//                                                            payConfig.getPayNotifyV3Url(),
+//                                                            payConfig.getPayScoreNotifyV3Url(),
+//                                                            payConfig.getRefundNotifyUrl(),
+//                                                            payConfig.getRefundNotifyV3Url());
+        }
     }
 
     /**
@@ -147,7 +170,7 @@ public class NaiveWeChatServiceProvider
      *
      * @param mp 公众号名称
      */
-    public static String getMPServiceBeanName(
+    public static String getMpServiceBeanName(
             @Nullable
                     String mp) {
         return mp == null
@@ -173,76 +196,87 @@ public class NaiveWeChatServiceProvider
     }
 
     /**
-     * 获取中间件在Spring IOC容器中的名称
+     * 获取服务在Spring IOC容器中的名称
      *
-     * @param middlewareType 中间件类型
+     * @param servletType 服务类型
      */
-    public static String getMiddlewareBeanName(
-            Class<?> middlewareType) {
+    public static String getServletBeanName(
+            Class<?> servletType) {
         return String.format("%s%s",
-                             INaiveWeChatServiceProvider.MIDDLEWARE_IOC_PREFIX,
-                             middlewareType.getSimpleName());
+                             INaiveWeChatServiceProvider.SERVLET_IOC_PREFIX,
+                             servletType.getSimpleName());
     }
 
     @Override
-    public String defaultMP() {
-        return this.baseConfig.getMP();
+    public String defaultMp() {
+        return this.baseConfig.getMp();
     }
 
     @Override
-    public boolean isMPExists(String mp) {
-        return this.baseConfig.getMultiMP()
+    public boolean isMpExists(String mp) {
+        return this.baseConfig.getMultiMp()
                               .containsKey(mp);
     }
 
     @Override
-    public boolean isMPEnable(String mp) {
-        return this.baseConfig.getMultiMP()
+    public boolean isMpEnable(String mp) {
+        return this.baseConfig.getMultiMp()
                               .get(mp)
                               .isEnable();
     }
 
     @Override
-    public List<String> allMP(boolean enabledOnly) {
-        return this.baseConfig.getAllMP(enabledOnly);
+    public List<String> allMp(boolean enabledOnly) {
+        return this.baseConfig.getAllMp(enabledOnly);
     }
 
     @Override
-    public Map<String, IWeChatMPService> loadAllWeChatMPService() {
+    public Map<String, IWeChatMpService> loadAllWeChatMpService() {
         if (mpServiceMap.size() == 0) {
-            //注册中间件
-            if (baseConfig.isEnableSignatureVerificationMiddleware()) {
-                WeChatSignatureVerificationMiddleware signatureVerificationMiddleware = new WeChatSignatureVerificationMiddleware();
-                getBeanFactory().registerSingleton(getMiddlewareBeanName(WeChatSignatureVerificationMiddleware.class),
-                                                   signatureVerificationMiddleware);
+//            //创建服务
+//            ServletRegistrationBean<WeChatMpEndpointServlet> endpointServletRegistrationBean = null;
+//            if (baseConfig.isEnableMpEndpointServlet()) {
+//                endpointServletRegistrationBean = new ServletRegistrationBean<>();
+//                endpointServletRegistrationBean.setServlet(new WeChatMpEndpointServlet());
+//            }
+//            ServletRegistrationBean<WeChatOAuth2Servlet> oAuth2ServletRegistrationBean = null;
+//            if (baseConfig.isEnableOAuth2Servlet()) {
+//                oAuth2ServletRegistrationBean = new ServletRegistrationBean<>();
+//                oAuth2ServletRegistrationBean.setServlet(new WeChatOAuth2Servlet(baseConfig));
+//            }
+
+            for (String mp : allMp(true)) {
+                loadAndRegisterMpService(mp,
+                                         null,
+                                         null);
             }
-            if (baseConfig.isEnablePayNotifyMiddleware()) {
-                WeChatOAuthMiddleware oAuthMiddleware = new WeChatOAuthMiddleware(baseConfig);
-                getBeanFactory().registerSingleton(getMiddlewareBeanName(WeChatOAuthMiddleware.class),
-                                                   oAuthMiddleware);
-            }
-            for (String mp : allMP(true)) {
-                loadAndRegisterMPService(mp);
-            }
+
+//            //注册服务
+//            if (baseConfig.isEnableMpEndpointServlet())
+//                getBeanFactory().registerSingleton(getServletBeanName(WeChatMpEndpointServlet.class),
+//                                                   endpointServletRegistrationBean);
+//            if (baseConfig.isEnableOAuth2Servlet())
+//                getBeanFactory().registerSingleton(getServletBeanName(WeChatOAuth2Servlet.class),
+//                                                   oAuth2ServletRegistrationBean);
         }
 
         return mpServiceMap;
     }
 
     @Override
-    public IWeChatMPService getDefaultWeChatMPService() {
-        return getWeChatMPService(defaultMP());
+    public IWeChatMpService getDefaultWeChatMpService() {
+        return getWeChatMpService(defaultMp());
     }
 
     @Override
-    public IWeChatMPService getWeChatMPService(String mp) {
-        if (!isMPExists(mp))
-            throw new ModuleException(Strings.getConfigMPUndefined(mp));
+    public IWeChatMpService getWeChatMpService(String mp) {
+        if (!isMpExists(mp))
+            throw new ModuleException(Strings.getConfigMpUndefined(mp));
 
-        if (!isMPEnable(mp))
-            throw new ModuleException(Strings.getConfigMPNotActive(mp));
+        if (!isMpEnable(mp))
+            throw new ModuleException(Strings.getConfigMpNotActive(mp));
 
-        return loadAllWeChatMPService().get(mp);
+        return loadAllWeChatMpService().get(mp);
     }
 
 
@@ -272,16 +306,22 @@ public class NaiveWeChatServiceProvider
     @Override
     public Map<String, IWeChatPayService> loadAllWeChatPayService() {
         if (payServiceMap.size() == 0) {
-            //注册中间件
-            if (baseConfig.isEnablePayNotifyMiddleware()) {
-                WeChatPayNotifyMiddleware payNotifyMiddleware = new WeChatPayNotifyMiddleware(baseConfig);
-                getBeanFactory().registerSingleton(getMiddlewareBeanName(WeChatPayNotifyMiddleware.class),
-                                                   payNotifyMiddleware);
-            }
+//            //创建服务
+//            ServletRegistrationBean<WeChatPayNotifyServlet> payNotifyServletRegistrationBean = null;
+//            if (baseConfig.isEnablePayNotifyServlet()) {
+//                payNotifyServletRegistrationBean = new ServletRegistrationBean<>();
+//                payNotifyServletRegistrationBean.setServlet(new WeChatPayNotifyServlet(baseConfig));
+//            }
 
             for (String pay : allPay(true)) {
-                loadAndRegisterPayService(pay);
+                loadAndRegisterPayService(pay,
+                                          null);
             }
+
+//            //注册服务
+//            if (baseConfig.isEnablePayNotifyServlet())
+//                getBeanFactory().registerSingleton(getServletBeanName(WeChatPayNotifyServlet.class),
+//                                                   payNotifyServletRegistrationBean);
         }
 
         return payServiceMap;

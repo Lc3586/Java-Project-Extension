@@ -3,8 +3,10 @@ package project.extension.wechat.common;
 import org.junit.jupiter.api.Assertions;
 import project.extension.ioc.IOCExtension;
 import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.MpConfig;
+import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.INaiveWeChatServiceProvider;
-import project.extension.wechat.core.mp.standard.IWeChatMPService;
+import project.extension.wechat.core.mp.standard.IWeChatMpService;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
 
 /**
@@ -17,7 +19,7 @@ import project.extension.wechat.core.pay.standard.IWeChatPayService;
 public class ServiceObjectResolve {
     public static BaseConfig baseConfig;
 
-    public static IWeChatMPService masterWeChatMPService;
+    public static IWeChatMpService masterWeChatMPService;
 
     public static IWeChatPayService masterWeChatPayService;
 
@@ -36,22 +38,32 @@ public class ServiceObjectResolve {
                           BaseConfig.class.getName());
 
 
-        masterWeChatMPService = IOCExtension.applicationContext.getBean(IWeChatMPService.class);
+//        naiveWeChatServiceProvider = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.class);
+//
+//        Assertions.assertNotNull(naiveWeChatServiceProvider,
+//                                 "未获取到INaiveWeChatServiceProvider");
+//
+//        System.out.printf("\r\n%s已注入\r\n",
+//                          INaiveWeChatServiceProvider.class.getName());
+
+        masterWeChatMPService = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.DEFAULT_MP_SERVICE_IOC_NAME,
+                                                                        IWeChatMpService.class);
 
         Assertions.assertNotNull(masterWeChatMPService,
-                                 "未获取到默认的IWeChatMPService");
+                                 "未获取到默认的IWeChatMpService");
 
         System.out.printf("\r\n默认的%s已注入\r\n",
-                          IWeChatMPService.class.getName());
+                          IWeChatMpService.class.getName());
 
 
-        masterWeChatPayService = IOCExtension.applicationContext.getBean(IWeChatPayService.class);
-
-        Assertions.assertNotNull(masterWeChatPayService,
-                                 "未获取到默认的IWeChatPayService");
-
-        System.out.printf("\r\n默认的%s已注入\r\n",
-                          IWeChatPayService.class.getName());
+//        masterWeChatPayService = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.DEFAULT_PAY_SERVICE_IOC_NAME,
+//                                                                         IWeChatPayService.class);
+//
+//        Assertions.assertNotNull(masterWeChatPayService,
+//                                 "未获取到默认的IWeChatPayService");
+//
+//        System.out.printf("\r\n默认的%s已注入\r\n",
+//                          IWeChatPayService.class.getName());
 
 
         naiveWeChatServiceProvider = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.class);
@@ -64,23 +76,40 @@ public class ServiceObjectResolve {
     }
 
     /**
+     * 获取公众号配置
+     *
+     * @param mp 公众号名称
+     */
+    public static MpConfig getMpConfig(String mp) {
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMpExists(mp),
+                              String.format("%s公众号不存在",
+                                            mp));
+
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMpEnable(mp),
+                              String.format("%s公众号未启用",
+                                            mp));
+
+        return baseConfig.getMpConfig(mp);
+    }
+
+    /**
      * 获取微信公众号服务对象对象
      *
      * @param mp 公众号名称
      */
-    public static IWeChatMPService getMPService(String mp) {
-        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMPExists(mp),
+    public static IWeChatMpService getMPService(String mp) {
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMpExists(mp),
                               String.format("%s公众号不存在",
                                             mp));
 
-        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMPEnable(mp),
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isMpEnable(mp),
                               String.format("%s公众号未启用",
                                             mp));
 
-        if (mp.equals(baseConfig.getMP()))
+        if (mp.equals(baseConfig.getMp()))
             return masterWeChatMPService;
         else {
-            IWeChatMPService weChatMPService = ServiceObjectResolve.naiveWeChatServiceProvider.getWeChatMPService(mp);
+            IWeChatMpService weChatMPService = ServiceObjectResolve.naiveWeChatServiceProvider.getWeChatMpService(mp);
 
             Assertions.assertNotNull(weChatMPService,
                                      String.format("未获取到%s公众号的IWeChatMPService",
@@ -91,6 +120,23 @@ public class ServiceObjectResolve {
 
             return weChatMPService;
         }
+    }
+
+    /**
+     * 获取商户号配置
+     *
+     * @param pay 商户号名称
+     */
+    public static PayConfig getPayConfig(String pay) {
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isPayExists(pay),
+                              String.format("%s商户号不存在",
+                                            pay));
+
+        Assertions.assertTrue(ServiceObjectResolve.naiveWeChatServiceProvider.isPayEnable(pay),
+                              String.format("%s商户号未启用",
+                                            pay));
+
+        return baseConfig.getPayConfig(pay);
     }
 
     /**
@@ -107,7 +153,7 @@ public class ServiceObjectResolve {
                               String.format("%s商户号未启用",
                                             pay));
 
-        if (pay.equals(baseConfig.getMP()))
+        if (pay.equals(baseConfig.getMp()))
             return masterWeChatPayService;
         else {
             IWeChatPayService weChatPayService = ServiceObjectResolve.naiveWeChatServiceProvider.getWeChatPayService(pay);

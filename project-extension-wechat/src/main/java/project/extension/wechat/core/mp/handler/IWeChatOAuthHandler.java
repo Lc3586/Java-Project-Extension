@@ -3,7 +3,7 @@ package project.extension.wechat.core.mp.handler;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import org.springframework.lang.Nullable;
-import project.extension.wechat.config.MPConfig;
+import project.extension.wechat.config.MpConfig;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,7 +24,7 @@ public interface IWeChatOAuthHandler {
      * @return 重定向地址
      */
     String Handler(HttpServletRequest request,
-                   MPConfig config,
+                   MpConfig config,
                    WxOAuth2AccessToken accessToken,
                    @Nullable
                            String state);
@@ -39,7 +39,7 @@ public interface IWeChatOAuthHandler {
      * @return 重定向地址
      */
     String Handler(HttpServletRequest request,
-                   MPConfig config,
+                   MpConfig config,
                    WxOAuth2UserInfo userinfo,
                    @Nullable
                            String state);

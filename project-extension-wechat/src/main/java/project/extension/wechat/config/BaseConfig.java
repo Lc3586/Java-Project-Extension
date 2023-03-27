@@ -6,9 +6,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.standard.exception.ModuleException;
+import project.extension.string.StringExtension;
+import project.extension.tuple.Tuple2;
 import project.extension.wechat.core.INaiveWeChatServiceProvider;
-import project.extension.wechat.core.mp.handler.WeChatOAuthMiddleware;
-import project.extension.wechat.core.pay.handler.WeChatPayNotifyMiddleware;
+import project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet;
+import project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet;
+import project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet;
 import project.extension.wechat.globalization.Strings;
 
 import java.nio.charset.StandardCharsets;
@@ -31,9 +34,19 @@ public class BaseConfig {
     private String rootUrl;
 
     /**
+     * 当前服务器的根地址架构
+     */
+    private String rootUrlScheme;
+
+    /**
+     * 当前服务器的根地址主机
+     */
+    private String rootUrlHost;
+
+    /**
      * 默认的公众号名称
      */
-    private String mP;
+    private String mp;
 
     /**
      * 默认的商户号名称
@@ -64,33 +77,33 @@ public class BaseConfig {
     private String privateKeyPath;
 
     /**
-     * 默认启用微信验证签名验证中间件
-     * <p>此选项设为false时，multiMP中的enableSignatureVerificationMiddleware选项将无效</p>
+     * 默认启用微信终端服务
+     * <p>此选项设为false时，multiMP中的enableMpEndpointServlet选项将无效</p>
      *
      * @默认值 true
      */
-    private Boolean enableSignatureVerificationMiddleware = true;
+    private Boolean enableMpEndpointServlet = true;
 
     /**
-     * 默认启用微信网页授权中间件
-     * <p>此选项设为false时，multiMP中的enableOAuthMiddleware选项将无效</p>
+     * 默认启用微信网页授权服务
+     * <p>此选项设为false时，multiMP中的enableOAuth2Servlet选项将无效</p>
      *
      * @默认值 true
      */
-    private Boolean enableOAuthMiddleware = true;
+    private Boolean enableOAuth2Servlet = true;
 
     /**
-     * 默认启用微信收付通通知中间件
-     * <p>此选项设为false时，multiPay中的enablePayNotifyMiddleware选项将无效</p>
+     * 默认启用微信收付通通知服务
+     * <p>此选项设为false时，multiPay中的enablePayNotifyServlet选项将无效</p>
      *
      * @默认值 true
      */
-    private Boolean enablePayNotifyMiddleware = true;
+    private Boolean enablePayNotifyServlet = true;
 
     /**
      * 多公众号配置
      */
-    private Map<String, MPConfig> multiMP;
+    private Map<String, MpConfig> multiMp;
 
     /**
      * 多商户号配置
@@ -105,18 +118,41 @@ public class BaseConfig {
     }
 
     public void setRootUrl(String rootUrl) {
+        Tuple2<String, String> result = StringExtension.getSchemeAndHost(rootUrl);
+        if (result != null) {
+            this.rootUrlScheme = result.a;
+            this.rootUrlHost = result.b;
+        } else
+            throw new ModuleException(Strings.getDataFormatNonStandard("project.extension.wechat.rootUrl",
+                                                                       rootUrl,
+                                                                       "http://www.a.com, https://www.a.com"));
+
         this.rootUrl = rootUrl;
+    }
+
+    /**
+     * 当前服务器的根地址架构
+     */
+    public String getRootUrlScheme() {
+        return rootUrlScheme;
+    }
+
+    /**
+     * 当前服务器的根地址主机
+     */
+    public String getRootUrlHost() {
+        return rootUrlHost;
     }
 
     /**
      * 默认的公众号名称
      */
-    public String getMP() {
-        return mP;
+    public String getMp() {
+        return mp;
     }
 
-    public void setMP(String mP) {
-        this.mP = mP;
+    public void setMp(String mp) {
+        this.mp = mp;
     }
 
     /**
@@ -178,56 +214,56 @@ public class BaseConfig {
     }
 
     /**
-     * 默认启用微信令牌验证中间件
-     * <p>此选项设为false时，multiMP中的enableSignatureVerificationMiddleware选项将无效</p>
+     * 默认启用微信终端服务
+     * <p>此选项设为false时，multiMP中的enableMpEndpointServlet选项将无效</p>
      *
      * @默认值 true
      */
-    public Boolean isEnableSignatureVerificationMiddleware() {
-        return enableSignatureVerificationMiddleware;
+    public Boolean isEnableMpEndpointServlet() {
+        return enableMpEndpointServlet;
     }
 
-    public void setEnableSignatureVerificationMiddleware(Boolean enableSignatureVerificationMiddleware) {
-        this.enableSignatureVerificationMiddleware = enableSignatureVerificationMiddleware;
+    public void setEnableMpEndpointServlet(Boolean enableMpEndpointServlet) {
+        this.enableMpEndpointServlet = enableMpEndpointServlet;
     }
 
     /**
-     * 默认启用微信网页授权中间件
-     * <p>此选项设为false时，multiMP中的enableOAuthMiddleware选项将无效</p>
+     * 启用微信网页授权服务
+     * <p>此选项设为false时，multiMP中的enableOAuth2Servlet选项将无效</p>
      *
      * @默认值 true
      */
-    public Boolean isEnableOAuthMiddleware() {
-        return enableOAuthMiddleware;
+    public Boolean isEnableOAuth2Servlet() {
+        return enableOAuth2Servlet;
     }
 
-    public void setEnableOAuthMiddleware(Boolean enableOAuthMiddleware) {
-        this.enableOAuthMiddleware = enableOAuthMiddleware;
+    public void setEnableOAuth2Servlet(Boolean enableOAuth2Servlet) {
+        this.enableOAuth2Servlet = enableOAuth2Servlet;
     }
 
     /**
-     * 默认启用微信收付通通知中间件
-     * <p>此选项设为false时，multiPay中的enablePayNotifyMiddleware选项将无效</p>
+     * 默认启用微信收付通通知服务
+     * <p>此选项设为false时，multiPay中的enablePayNotifyServlet选项将无效</p>
      *
      * @默认值 true
      */
-    public Boolean isEnablePayNotifyMiddleware() {
-        return enablePayNotifyMiddleware;
+    public Boolean isEnablePayNotifyServlet() {
+        return enablePayNotifyServlet;
     }
 
-    public void setEnablePayNotifyMiddleware(Boolean enablePayNotifyMiddleware) {
-        this.enablePayNotifyMiddleware = enablePayNotifyMiddleware;
+    public void setEnablePayNotifyServlet(Boolean enablePayNotifyServlet) {
+        this.enablePayNotifyServlet = enablePayNotifyServlet;
     }
 
     /**
      * 多公众号配置
      */
-    public Map<String, MPConfig> getMultiMP() {
-        return multiMP;
+    public Map<String, MpConfig> getMultiMp() {
+        return multiMp;
     }
 
-    public void setMultiMP(Map<String, MPConfig> multiMP) {
-        this.multiMP = multiMP;
+    public void setMultiMp(Map<String, MpConfig> multiMp) {
+        this.multiMp = multiMp;
     }
 
     /**
@@ -244,19 +280,19 @@ public class BaseConfig {
     /**
      * 是否为多公众号
      */
-    public boolean isMultiMP() {
-        return getMultiMP() != null && getMultiMP().size() > 1;
+    public boolean isMultiMp() {
+        return getMultiMp() != null && getMultiMp().size() > 1;
     }
 
     /**
      * 获取所有公众号名称
      */
-    public List<String> getAllMP(boolean enabledOnly) {
+    public List<String> getAllMp(boolean enabledOnly) {
         List<String> allMP = new ArrayList<>();
-        for (String mp : this.getMultiMP()
+        for (String mp : this.getMultiMp()
                              .keySet()) {
             if (!enabledOnly
-                    || this.getMultiMP()
+                    || this.getMultiMp()
                            .get(mp)
                            .isEnable())
                 allMP.add(mp);
@@ -267,31 +303,31 @@ public class BaseConfig {
     /**
      * 获取默认的公众号配置
      */
-    public MPConfig getMPConfig() {
-        if (!StringUtils.hasText(this.getMP())) {
-            if (this.getMultiMP() == null || this.getMultiMP()
+    public MpConfig getMpConfig() {
+        if (!StringUtils.hasText(this.getMp())) {
+            if (this.getMultiMp() == null || this.getMultiMp()
                                                  .size() == 0) {
                 //设置默认公众号为master
-                this.setMP(INaiveWeChatServiceProvider.DEFAULT_MP);
+                this.setMp(INaiveWeChatServiceProvider.DEFAULT_MP);
             } else {
                 //设置默认公众号为多个中的第一个
-                MPConfig firstMP = CollectionsExtension.firstValue(this.getMultiMP());
+                MpConfig firstMP = CollectionsExtension.firstValue(this.getMultiMp());
                 assert firstMP != null;
-                this.setMP(firstMP.getName());
+                this.setMp(firstMP.getName());
 
-                if (!StringUtils.hasText(this.getMP())) {
-                    if (this.getMultiMP()
+                if (!StringUtils.hasText(this.getMp())) {
+                    if (this.getMultiMp()
                             .size() > 1)
-                        throw new ModuleException(Strings.getConfigMPNameUndefined());
+                        throw new ModuleException(Strings.getConfigMpNameUndefined());
 
                     //设置默认公众号为master
-                    this.setMP(INaiveWeChatServiceProvider.DEFAULT_MP);
-                    firstMP.setName(this.getMP());
+                    this.setMp(INaiveWeChatServiceProvider.DEFAULT_MP);
+                    firstMP.setName(this.getMp());
                 }
             }
         }
 
-        return getMPConfig(this.getMP());
+        return getMpConfig(this.getMp());
     }
 
     /**
@@ -299,14 +335,14 @@ public class BaseConfig {
      *
      * @param mp 公众号名称
      */
-    public MPConfig getMPConfig(String mp)
+    public MpConfig getMpConfig(String mp)
             throws
             ModuleException {
-        if (multiMP == null || multiMP.size() == 0)
-            throw new ModuleException(Strings.getConfigMPUndefined(mp));
+        if (multiMp == null || multiMp.size() == 0)
+            throw new ModuleException(Strings.getConfigMpUndefined(mp));
 
         AtomicInteger count = new AtomicInteger();
-        Optional<String> matchConfig = multiMP.keySet()
+        Optional<String> matchConfig = multiMp.keySet()
                                               .stream()
                                               .filter(x -> {
                                                   if (mp.equals(x)) {
@@ -317,44 +353,46 @@ public class BaseConfig {
                                               })
                                               .findAny();
         if (!matchConfig.isPresent())
-            throw new ModuleException(Strings.getConfigMPUndefined(mp));
+            throw new ModuleException(Strings.getConfigMpUndefined(mp));
 
         if (count.get() > 1)
-            throw new ModuleException(Strings.getConfigMPRepeat(mp));
+            throw new ModuleException(Strings.getConfigMpRepeat(mp));
 
-        MPConfig config = multiMP.get(matchConfig.get());
+        MpConfig config = multiMp.get(matchConfig.get());
 
         config.setName(matchConfig.get());
 
         if (config.isEnable() && !StringUtils.hasText(config.getAppId()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(mp,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(mp,
                                                                          "appId"));
 
         if (config.isEnable() && !StringUtils.hasText(config.getAppSecret()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(mp,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(mp,
                                                                          "appSecret"));
 
         if (config.isEnable() && !StringUtils.hasText(config.getToken()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(mp,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(mp,
                                                                          "token"));
 
         if (config.isEnable() && !StringUtils.hasText(config.getAesKey()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(mp,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(mp,
                                                                          "aesKey"));
 
-        if (config.isEnable() && !StringUtils.hasText(config.getTokenVerificationUrl()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(mp,
-                                                                         "tokenVerificationUrl"));
+        if (config.isEnable() && this.isEnableMpEndpointServlet() && config.isEnableMpEndpointServlet()) {
+            if (!StringUtils.hasText(config.getMpEndpointUrl()))
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatMpEndpointServlet.class.getName(),
+                                                                                       "mpEndpointUrl"));
+        }
 
-        if (config.isEnable() && (!this.isEnableOAuthMiddleware() || (this.isEnableOAuthMiddleware()
-                && !config.isEnableOAuthMiddleware()))) {
+        if (config.isEnable() && (!this.isEnableOAuth2Servlet() || (this.isEnableOAuth2Servlet()
+                && !config.isEnableOAuth2Servlet()))) {
             if (!StringUtils.hasText(config.getOAuthBaseUrl()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatOAuthMiddleware.class.getName(),
-                                                                                          "oAuthBaseUrl"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatOAuth2Servlet.class.getName(),
+                                                                                       "oAuthBaseUrl"));
 
             if (!StringUtils.hasText(config.getOAuthUserInfoUrl()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatOAuthMiddleware.class.getName(),
-                                                                                          "oAuthUserInfoUrl"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatOAuth2Servlet.class.getName(),
+                                                                                       "oAuthUserInfoUrl"));
         }
 
         return config;
@@ -454,22 +492,22 @@ public class BaseConfig {
                                                                           "key"));
 
         if (config.isEnable() && !StringUtils.hasText(config.getCertFilePath()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(pay,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(pay,
                                                                          "certFilePath"));
 
         if (config.isEnable() && !StringUtils.hasText(config.getCertPassword()))
-            throw new ModuleException(Strings.getConfigMPOptionUndefined(pay,
+            throw new ModuleException(Strings.getConfigMpOptionUndefined(pay,
                                                                          "certPassword"));
 
-        if (config.isEnable() && (!this.isEnablePayNotifyMiddleware() || (this.isEnablePayNotifyMiddleware()
-                && !config.isEnablePayNotifyMiddleware()))) {
+        if (config.isEnable() && (!this.isEnablePayNotifyServlet() || (this.isEnablePayNotifyServlet()
+                && !config.isEnablePayNotifyServlet()))) {
             if (!StringUtils.hasText(config.getPayNotifyUrl()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatPayNotifyMiddleware.class.getName(),
-                                                                                          "payNotifyUrl"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
+                                                                                       "payNotifyUrl"));
 
             if (!StringUtils.hasText(config.getPayNotifyV3Url()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatPayNotifyMiddleware.class.getName(),
-                                                                                          "payNotifyV3Url"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
+                                                                                       "payNotifyV3Url"));
 
             if (config.getPayNotifyUrl()
                       .equals(config.getPayNotifyV3Url()))
@@ -477,16 +515,16 @@ public class BaseConfig {
                                                                      "payNotifyV3Url"));
 
             if (!StringUtils.hasText(config.getPayScoreNotifyV3Url()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatPayNotifyMiddleware.class.getName(),
-                                                                                          "payScoreNotifyV3Url"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
+                                                                                       "payScoreNotifyV3Url"));
 
             if (!StringUtils.hasText(config.getRefundNotifyUrl()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatPayNotifyMiddleware.class.getName(),
-                                                                                          "refundNotifyUrl"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
+                                                                                       "refundNotifyUrl"));
 
             if (!StringUtils.hasText(config.getRefundNotifyV3Url()))
-                throw new ModuleException(Strings.getConfigRequiredWhenDisabledMiddleware(WeChatPayNotifyMiddleware.class.getName(),
-                                                                                          "refundNotifyV3Url"));
+                throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
+                                                                                       "refundNotifyV3Url"));
 
             if (config.getRefundNotifyUrl()
                       .equals(config.getRefundNotifyV3Url()))

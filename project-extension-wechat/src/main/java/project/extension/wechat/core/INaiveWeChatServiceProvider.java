@@ -1,6 +1,6 @@
 package project.extension.wechat.core;
 
-import project.extension.wechat.core.mp.standard.IWeChatMPService;
+import project.extension.wechat.core.mp.standard.IWeChatMpService;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public interface INaiveWeChatServiceProvider {
     /**
      * 默认微信公众号服务在IOC容器中的名称
      */
-    String DEFAULT_MP_SERVICE_IOC_NAME = "weChatMPService";
+    String DEFAULT_MP_SERVICE_IOC_NAME = "weChatMpService";
 
     /**
      * 默认微信支付服务在IOC容器中的名称
@@ -36,7 +36,7 @@ public interface INaiveWeChatServiceProvider {
     /**
      * 微信公众号服务在IOC容器中的名称前缀
      */
-    String MP_SERVICE_IOC_PREFIX = "weChatMPService#";
+    String MP_SERVICE_IOC_PREFIX = "weChatMpService#";
 
     /**
      * 微信支付服务在IOC容器中的名称前缀
@@ -44,52 +44,52 @@ public interface INaiveWeChatServiceProvider {
     String PAY_SERVICE_IOC_PREFIX = "weChatPayService#";
 
     /**
-     * 中间件在IOC容器中的名称前缀
+     * 服务在IOC容器中的名称前缀
      */
-    String MIDDLEWARE_IOC_PREFIX = "middleware#";
+    String SERVLET_IOC_PREFIX = "servlet#";
 
     /**
      * 获取默认的公众号
      */
-    String defaultMP();
+    String defaultMp();
 
     /**
      * 公众号是否存在
      *
      * @param mp 公众号
      */
-    boolean isMPExists(String mp);
+    boolean isMpExists(String mp);
 
     /**
      * 公众号是否启用
      *
      * @param mp 公众号
      */
-    boolean isMPEnable(String mp);
+    boolean isMpEnable(String mp);
 
     /**
      * 获取所有的公众号
      *
      * @param enabledOnly 仅获取启用的公众号
      */
-    List<String> allMP(boolean enabledOnly);
+    List<String> allMp(boolean enabledOnly);
 
     /**
      * 加载所有的微信公众号服务
      */
-    Map<String, IWeChatMPService> loadAllWeChatMPService();
+    Map<String, IWeChatMpService> loadAllWeChatMpService();
 
     /**
      * 获取默认微信公众号服务
      */
-    IWeChatMPService getDefaultWeChatMPService();
+    IWeChatMpService getDefaultWeChatMpService();
 
     /**
      * 获取微信公众号服务
      *
      * @param mp 公众号
      */
-    IWeChatMPService getWeChatMPService(String mp);
+    IWeChatMpService getWeChatMpService(String mp);
 
     /**
      * 获取默认的商户号

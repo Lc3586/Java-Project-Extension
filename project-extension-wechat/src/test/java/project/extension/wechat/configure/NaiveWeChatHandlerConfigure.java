@@ -5,9 +5,11 @@ import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import project.extension.wechat.config.MPConfig;
+import project.extension.string.StringExtension;
+import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.mp.handler.IWeChatOAuthHandler;
+import project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet;
 import project.extension.wechat.core.pay.handler.IWeChatPayNotifyHandler;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,18 +30,28 @@ public class NaiveWeChatHandlerConfigure {
         return new IWeChatOAuthHandler() {
             @Override
             public String Handler(HttpServletRequest request,
-                                  MPConfig config,
+                                  MpConfig config,
                                   WxOAuth2AccessToken accessToken,
                                   String state) {
-                return state;
+                return String.format("http://%s:%s%s?%s=%s",
+                                     request.getServerName(),
+                                     request.getServerPort(),
+                                     request.getRequestURI(),
+                                     WeChatOAuth2Servlet.STATE_PARAMETER,
+                                     state);
             }
 
             @Override
             public String Handler(HttpServletRequest request,
-                                  MPConfig config,
+                                  MpConfig config,
                                   WxOAuth2UserInfo userinfo,
                                   String state) {
-                return state;
+                return String.format("http://%s:%s%s?%s=%s",
+                                     request.getServerName(),
+                                     request.getServerPort(),
+                                     request.getRequestURI(),
+                                     WeChatOAuth2Servlet.STATE_PARAMETER,
+                                     state);
             }
         };
     }

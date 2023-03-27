@@ -11,6 +11,8 @@ import com.github.binarywang.wxpay.service.WxPayService;
 /**
  * 微信支付服务
  *
+ * <p>使用此方法获取默认的支付服务org.springframework.beans.factory.BeanFactory#getBean(INaiveWeChatServiceProvider.DEFAULT_PAY_SERVICE_IOC_NAME, IWeChatPayService.class)</p>
+ *
  * @author LCTR
  * @date 2023-03-14
  */
