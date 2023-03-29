@@ -80,6 +80,7 @@
         <module>project-extension-standard</module>
         <module>project-extension-document</module>
         <module>project-extension-wechat</module>
+        <module>project-extension-redis</module>
     </modules>
     <packaging>pom</packaging>
 

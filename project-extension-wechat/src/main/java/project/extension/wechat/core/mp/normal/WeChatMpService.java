@@ -10,8 +10,8 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.util.UriComponentsBuilder;
 import project.extension.standard.exception.ModuleException;
+import project.extension.string.StringExtension;
 import project.extension.wechat.config.BaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.core.mp.standard.IWeChatMpService;
@@ -101,22 +101,16 @@ public class WeChatMpService
 
     @Override
     public String getBaseOAuth2Url() {
-        return UriComponentsBuilder.newInstance()
-                                   .scheme(baseConfig.getRootUrlScheme())
-                                   .host(baseConfig.getRootUrlHost())
-                                   .path(mpConfig.getOAuthBaseUrl())
-                                   .build()
-                                   .toString();
+        return StringExtension.getUrl(baseConfig.getRootUrlScheme(),
+                                      baseConfig.getRootUrlHost(),
+                                      mpConfig.getOAuthBaseUrl());
     }
 
     @Override
     public String getUserInfoOAuth2Url() {
-        return UriComponentsBuilder.newInstance()
-                                   .scheme(baseConfig.getRootUrlScheme())
-                                   .host(baseConfig.getRootUrlHost())
-                                   .path(mpConfig.getOAuthUserInfoUrl())
-                                   .build()
-                                   .toString();
+        return StringExtension.getUrl(baseConfig.getRootUrlScheme(),
+                                      baseConfig.getRootUrlHost(),
+                                      mpConfig.getOAuthUserInfoUrl());
     }
 
     @Override

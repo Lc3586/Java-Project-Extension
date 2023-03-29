@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>project-extension-wechat</artifactId>
+    <artifactId>project-extension-redis</artifactId>
     <version>1.0.3-SNAPSHOT</version>
 
-    <name>top.lctr:project-extension-standard</name>
+    <name>top.lctr:project-extension-redis</name>
     <description>
-        项目拓展 微信
+        项目拓展 redis拓展工具
     </description>
 
     <licenses>
@@ -40,10 +40,6 @@
         <!--        <tag>project-extension-0.0.1</tag>-->
     </scm>
 
-    <properties>
-
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>top.lctr</groupId>
@@ -51,42 +47,17 @@
             <version>1.0.3-SNAPSHOT</version>
         </dependency>
 
-        <!-- 微信公众号 -->
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>weixin-java-mp</artifactId>
-            <version>4.4.9.B</version>
-        </dependency>
-
-        <!-- 微信支付 -->
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>weixin-java-pay</artifactId>
-            <version>4.4.9.B</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>cn.felord</groupId>-->
-        <!--            <artifactId>payment-spring-boot-starter</artifactId>-->
-        <!--            <version>1.0.17.RELEASE</version>-->
-        <!--        </dependency>-->
-
-        <!-- spring依赖 -->
+        <!-- redis 缓存操作 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot</artifactId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>${spring.boot.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.framework.version}</version>
-        </dependency>
 
-        <!-- servlet包 -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>1.9.7</version>
         </dependency>
 
         <!-- 测试工具 -->
