@@ -5,10 +5,9 @@ import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.common.bean.oauth2.WxOAuth2AccessToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import project.extension.string.StringExtension;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
-import project.extension.wechat.core.mp.handler.IWeChatOAuthHandler;
+import project.extension.wechat.core.mp.handler.IWeChatOAuth2Handler;
 import project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet;
 import project.extension.wechat.core.pay.handler.IWeChatPayNotifyHandler;
 
@@ -26,8 +25,8 @@ public class NaiveWeChatHandlerConfigure {
      * 注册微信网页授权处理类
      */
     @Bean
-    public IWeChatOAuthHandler registerWeChatOAuthHandler() {
-        return new IWeChatOAuthHandler() {
+    public IWeChatOAuth2Handler registerWeChatOAuthHandler() {
+        return new IWeChatOAuth2Handler() {
             @Override
             public String Handler(HttpServletRequest request,
                                   MpConfig config,

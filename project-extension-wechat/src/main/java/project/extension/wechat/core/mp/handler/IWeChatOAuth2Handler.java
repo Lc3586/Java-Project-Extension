@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author LCTR
  * @date 2023-03-16
  */
-public interface IWeChatOAuthHandler {
+public interface IWeChatOAuth2Handler {
     /**
      * 处理用户公众号唯一标识
      *

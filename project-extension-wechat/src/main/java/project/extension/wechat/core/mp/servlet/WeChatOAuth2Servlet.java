@@ -12,7 +12,7 @@ import project.extension.string.StringExtension;
 import project.extension.tuple.Tuple3;
 import project.extension.wechat.config.BaseConfig;
 import project.extension.wechat.config.MpConfig;
-import project.extension.wechat.core.mp.handler.IWeChatOAuthHandler;
+import project.extension.wechat.core.mp.handler.IWeChatOAuth2Handler;
 import project.extension.wechat.core.mp.standard.IWeChatMpService;
 import project.extension.wechat.globalization.Strings;
 import project.extension.wechat.model.WeChatRedirectType;
@@ -40,7 +40,7 @@ public class WeChatOAuth2Servlet
 
     private final BaseConfig baseConfig;
 
-    private IWeChatOAuthHandler oAuthHandler;
+    private IWeChatOAuth2Handler oAuthHandler;
 
     private final static ConcurrentMap<String, Tuple3<WeChatRedirectType, MpConfig, IWeChatMpService>> keyMap = new ConcurrentHashMap<>();
     private final static ConcurrentMap<String, String> urlPatternMap = new ConcurrentHashMap<>();
@@ -62,11 +62,11 @@ public class WeChatOAuth2Servlet
     /**
      * 获取处理类
      */
-    private IWeChatOAuthHandler getOAuthHandler() {
+    private IWeChatOAuth2Handler getOAuthHandler() {
         if (oAuthHandler == null)
-            oAuthHandler = IOCExtension.tryGetBean(IWeChatOAuthHandler.class);
+            oAuthHandler = IOCExtension.tryGetBean(IWeChatOAuth2Handler.class);
         if (oAuthHandler == null)
-            throw new ModuleException(Strings.getHandlerUndefined(IWeChatOAuthHandler.class.getName()));
+            throw new ModuleException(Strings.getHandlerUndefined(IWeChatOAuth2Handler.class.getName()));
         return oAuthHandler;
     }
 
