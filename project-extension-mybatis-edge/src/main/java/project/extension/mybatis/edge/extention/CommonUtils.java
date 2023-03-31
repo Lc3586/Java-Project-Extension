@@ -3,7 +3,7 @@ package project.extension.mybatis.edge.extention;
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
 import oracle.jdbc.OracleDriver;
 import project.extension.ioc.IOCExtension;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.DbType;
 import project.extension.standard.exception.ModuleException;
@@ -17,14 +17,14 @@ import java.sql.Driver;
  * @date 2022-12-15
  */
 public class CommonUtils {
-    private static BaseConfig config;
+    private static MyBatisEdgeBaseConfig config;
 
     /**
      * 配置
      */
-    public static BaseConfig getConfig() {
+    public static MyBatisEdgeBaseConfig getConfig() {
         if (config == null)
-            config = IOCExtension.applicationContext.getBean(BaseConfig.class);
+            config = IOCExtension.applicationContext.getBean(MyBatisEdgeBaseConfig.class);
         return config;
     }
 

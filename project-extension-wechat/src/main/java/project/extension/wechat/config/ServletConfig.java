@@ -21,15 +21,15 @@ import javax.servlet.ServletRegistration;
 @DependsOn("naiveWeChatServiceProvider")
 public class ServletConfig
         implements ServletContextInitializer {
-    public ServletConfig(BaseConfig baseConfig) {
-        this.baseConfig = baseConfig;
+    public ServletConfig(WeChatBaseConfig weChatBaseConfig) {
+        this.weChatBaseConfig = weChatBaseConfig;
     }
 
-    private final BaseConfig baseConfig;
+    private final WeChatBaseConfig weChatBaseConfig;
 
     @Override
     public void onStartup(ServletContext servletContext) {
-        if (baseConfig.isEnableMpEndpointServlet()) {
+        if (weChatBaseConfig.isEnableMpEndpointServlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatMpEndpointServlet.class),
                                                                                 WeChatMpEndpointServlet.class);
             for (String urlPattern : WeChatMpEndpointServlet.getAllUrlPattern()) {
@@ -37,7 +37,7 @@ public class ServletConfig
             }
         }
 
-        if (baseConfig.isEnableOAuth2Servlet()) {
+        if (weChatBaseConfig.isEnableOAuth2Servlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatOAuth2Servlet.class),
                                                                                 WeChatOAuth2Servlet.class);
             for (String urlPattern : WeChatOAuth2Servlet.getAllUrlPattern()) {
@@ -45,7 +45,7 @@ public class ServletConfig
             }
         }
 
-        if (baseConfig.isEnablePayNotifyServlet()) {
+        if (weChatBaseConfig.isEnablePayNotifyServlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatPayNotifyServlet.class),
                                                                                 WeChatPayNotifyServlet.class);
             for (String urlPattern : WeChatPayNotifyServlet.getAllUrlPattern()) {

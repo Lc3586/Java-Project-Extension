@@ -10,7 +10,7 @@ import project.extension.ioc.IOCExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.string.StringExtension;
 import project.extension.tuple.Tuple3;
-import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.core.mp.handler.IWeChatOAuth2Handler;
 import project.extension.wechat.core.mp.standard.IWeChatMpService;
@@ -35,10 +35,10 @@ import java.util.concurrent.ConcurrentMap;
 public class WeChatOAuth2Servlet
         extends HttpServlet {
     public WeChatOAuth2Servlet() {
-        this.baseConfig = IOCExtension.applicationContext.getBean(BaseConfig.class);
+        this.weChatBaseConfig = IOCExtension.applicationContext.getBean(WeChatBaseConfig.class);
     }
 
-    private final BaseConfig baseConfig;
+    private final WeChatBaseConfig weChatBaseConfig;
 
     private IWeChatOAuth2Handler oAuthHandler;
 
@@ -128,8 +128,8 @@ public class WeChatOAuth2Servlet
      * @param redirectUrl 回调地址
      */
     private String getFullRedirectUrl(String redirectUrl) {
-        return StringExtension.getUrl(baseConfig.getRootUrlScheme(),
-                                      baseConfig.getRootUrlHost(),
+        return StringExtension.getUrl(weChatBaseConfig.getRootUrlScheme(),
+                                      weChatBaseConfig.getRootUrlHost(),
                                       redirectUrl);
     }
 

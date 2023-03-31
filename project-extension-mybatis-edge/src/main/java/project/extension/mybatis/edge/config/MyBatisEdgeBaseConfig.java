@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Primary
 @Component
 @ConfigurationProperties("project.extension.mybatis")
-public class BaseConfig {
+public class MyBatisEdgeBaseConfig {
     /**
      * 默认的数据源
      */

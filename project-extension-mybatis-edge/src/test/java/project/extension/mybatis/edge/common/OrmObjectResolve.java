@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.provider.standard.IMultiNaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 import project.extension.mybatis.edge.core.ado.NaiveDataSource;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 2023-01-10
  */
 public class OrmObjectResolve {
-    public static BaseConfig baseConfig;
+    public static MyBatisEdgeBaseConfig myBatisEdgeBaseConfig;
 
     public static INaiveSql masterNaiveSql;
 
@@ -35,13 +35,13 @@ public class OrmObjectResolve {
      * 注入
      */
     public static void injection() {
-        baseConfig = IOCExtension.applicationContext.getBean(BaseConfig.class);
+        myBatisEdgeBaseConfig = IOCExtension.applicationContext.getBean(MyBatisEdgeBaseConfig.class);
 
-        Assertions.assertNotNull(baseConfig,
+        Assertions.assertNotNull(myBatisEdgeBaseConfig,
                                  "未获取到BaseConfig");
 
         System.out.printf("\r\n%s已注入\r\n",
-                          BaseConfig.class.getName());
+                          MyBatisEdgeBaseConfig.class.getName());
 
 
         masterNaiveSql = IOCExtension.applicationContext.getBean(INaiveSql.class);
@@ -101,7 +101,7 @@ public class OrmObjectResolve {
         System.out.printf("\r\n已获取%s数据源\r\n",
                           dataSource);
 
-        if (dataSource.equals(baseConfig.getDataSource()))
+        if (dataSource.equals(myBatisEdgeBaseConfig.getDataSource()))
             return masterNaiveSql;
         else
             return multiNaiveSql.getSlaveOrm(dataSource);

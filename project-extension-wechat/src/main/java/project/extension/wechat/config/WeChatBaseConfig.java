@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Primary
 @Component
 @ConfigurationProperties("project.extension.wechat")
-public class BaseConfig {
+public class WeChatBaseConfig {
     /**
      * 当前服务器的根地址
      */

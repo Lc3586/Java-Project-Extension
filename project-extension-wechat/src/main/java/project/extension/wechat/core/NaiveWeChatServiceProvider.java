@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import project.extension.ioc.IOCExtension;
 import project.extension.standard.exception.ModuleException;
-import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet;
@@ -33,17 +33,17 @@ import java.util.Map;
  */
 @SuppressWarnings("SpringDependsOnUnresolvedBeanInspection")
 @Configuration
-@EnableConfigurationProperties({BaseConfig.class})
+@EnableConfigurationProperties({WeChatBaseConfig.class})
 @DependsOn("iocExtension")
 public class NaiveWeChatServiceProvider
         implements INaiveWeChatServiceProvider {
-    public NaiveWeChatServiceProvider(BaseConfig baseConfig) {
-        this.baseConfig = baseConfig;
+    public NaiveWeChatServiceProvider(WeChatBaseConfig weChatBaseConfig) {
+        this.weChatBaseConfig = weChatBaseConfig;
         this.loadAllWeChatMpService();
         this.loadAllWeChatPayService();
     }
 
-    private final BaseConfig baseConfig;
+    private final WeChatBaseConfig weChatBaseConfig;
 
     private final Map<String, IWeChatMpService> mpServiceMap = new HashMap<>();
 
@@ -72,13 +72,13 @@ public class NaiveWeChatServiceProvider
                                                   ServletRegistrationBean<WeChatMpEndpointServlet> endpointServletRegistrationBean,
                                           @Nullable
                                                   ServletRegistrationBean<WeChatOAuth2Servlet> oAuth2ServletRegistrationBean) {
-        MpConfig mpConfig = baseConfig.getMpConfig(mp);
+        MpConfig mpConfig = weChatBaseConfig.getMpConfig(mp);
         if (!mpConfig.isEnable())
             return;
 
         IWeChatMpService weChatMpService;
         try {
-            weChatMpService = new WeChatMpService(baseConfig,
+            weChatMpService = new WeChatMpService(weChatBaseConfig,
                                                   mpConfig);
         } catch (Exception ex) {
             throw new ModuleException(Strings.getCreateWeChatMpServiceFailed(mpConfig.getName()),
@@ -102,13 +102,13 @@ public class NaiveWeChatServiceProvider
                 getMpServiceBeanName(mpConfig.getName()),
                 weChatMpService);
 
-        if (baseConfig.isEnableMpEndpointServlet() && mpConfig.isEnableMpEndpointServlet()) {
+        if (weChatBaseConfig.isEnableMpEndpointServlet() && mpConfig.isEnableMpEndpointServlet()) {
             WeChatMpEndpointServlet.setup(mpConfig,
                                           weChatMpService);
 //            endpointServletRegistrationBean.addUrlMappings(mpConfig.getMpEndpointUrl());
         }
 
-        if (baseConfig.isEnableOAuth2Servlet() && mpConfig.isEnableOAuth2Servlet()) {
+        if (weChatBaseConfig.isEnableOAuth2Servlet() && mpConfig.isEnableOAuth2Servlet()) {
             WeChatOAuth2Servlet.setup(mpConfig,
                                       weChatMpService);
 //            oAuth2ServletRegistrationBean.addUrlMappings(mpConfig.getOAuthBaseUrl(),
@@ -125,7 +125,7 @@ public class NaiveWeChatServiceProvider
     private void loadAndRegisterPayService(String pay,
                                            @Nullable
                                                    ServletRegistrationBean<WeChatPayNotifyServlet> payNotifyServletRegistrationBean) {
-        PayConfig payConfig = baseConfig.getPayConfig(pay);
+        PayConfig payConfig = weChatBaseConfig.getPayConfig(pay);
         if (!payConfig.isEnable())
             return;
 
@@ -154,7 +154,7 @@ public class NaiveWeChatServiceProvider
                 getPayServiceBeanName(payConfig.getName()),
                 weChatPayService);
 
-        if (baseConfig.isEnablePayNotifyServlet() && payConfig.isEnablePayNotifyServlet()) {
+        if (weChatBaseConfig.isEnablePayNotifyServlet() && payConfig.isEnablePayNotifyServlet()) {
             WeChatPayNotifyServlet.setup(payConfig,
                                          weChatPayService);
 //            payNotifyServletRegistrationBean.addUrlMappings(payConfig.getPayNotifyUrl(),
@@ -209,25 +209,25 @@ public class NaiveWeChatServiceProvider
 
     @Override
     public String defaultMp() {
-        return this.baseConfig.getMp();
+        return this.weChatBaseConfig.getMp();
     }
 
     @Override
     public boolean isMpExists(String mp) {
-        return this.baseConfig.getMultiMp()
-                              .containsKey(mp);
+        return this.weChatBaseConfig.getMultiMp()
+                                    .containsKey(mp);
     }
 
     @Override
     public boolean isMpEnable(String mp) {
-        return this.baseConfig.getMultiMp()
-                              .get(mp)
-                              .isEnable();
+        return this.weChatBaseConfig.getMultiMp()
+                                    .get(mp)
+                                    .isEnable();
     }
 
     @Override
     public List<String> allMp(boolean enabledOnly) {
-        return this.baseConfig.getAllMp(enabledOnly);
+        return this.weChatBaseConfig.getAllMp(enabledOnly);
     }
 
     @Override
@@ -282,25 +282,25 @@ public class NaiveWeChatServiceProvider
 
     @Override
     public String defaultPay() {
-        return this.baseConfig.getPay();
+        return this.weChatBaseConfig.getPay();
     }
 
     @Override
     public boolean isPayExists(String pay) {
-        return this.baseConfig.getMultiPay()
-                              .containsKey(pay);
+        return this.weChatBaseConfig.getMultiPay()
+                                    .containsKey(pay);
     }
 
     @Override
     public boolean isPayEnable(String pay) {
-        return this.baseConfig.getMultiPay()
-                              .get(pay)
-                              .isEnable();
+        return this.weChatBaseConfig.getMultiPay()
+                                    .get(pay)
+                                    .isEnable();
     }
 
     @Override
     public List<String> allPay(boolean enabledOnly) {
-        return this.baseConfig.getAllPay(enabledOnly);
+        return this.weChatBaseConfig.getAllPay(enabledOnly);
     }
 
     @Override

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.*;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.extention.SqlExtension;
 import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.mybatis.edge.model.DbType;
@@ -34,11 +34,11 @@ import java.util.stream.Collectors;
  */
 @Component
 public class EntityTypeHandler {
-    public EntityTypeHandler(BaseConfig config) {
+    public EntityTypeHandler(MyBatisEdgeBaseConfig config) {
         this.config = config;
     }
 
-    private final BaseConfig config;
+    private final MyBatisEdgeBaseConfig config;
 
     /**
      * 获取主键字段集合

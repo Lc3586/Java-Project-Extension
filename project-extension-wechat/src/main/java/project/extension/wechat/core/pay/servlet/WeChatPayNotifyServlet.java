@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import project.extension.ioc.IOCExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple4;
-import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.pay.handler.IWeChatPayNotifyHandler;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
@@ -38,10 +38,10 @@ import java.util.concurrent.ConcurrentMap;
 public class WeChatPayNotifyServlet
         extends HttpServlet {
     public WeChatPayNotifyServlet() {
-        this.baseConfig = IOCExtension.applicationContext.getBean(BaseConfig.class);
+        this.weChatBaseConfig = IOCExtension.applicationContext.getBean(WeChatBaseConfig.class);
     }
 
-    private final BaseConfig baseConfig;
+    private final WeChatBaseConfig weChatBaseConfig;
 
     private IWeChatPayNotifyHandler payNotifyHandler;
 
@@ -193,7 +193,7 @@ public class WeChatPayNotifyServlet
                     Tuple4<WeChatPayNotifyType, WeChatPayApiVersion, PayConfig, IWeChatPayService> keyInfo = keyMap.get(key);
 
                     String bodyData = IOUtils.toString(request.getInputStream(),
-                                                       baseConfig.getEncoding());
+                                                       weChatBaseConfig.getEncoding());
 
                     switch (keyInfo.a) {
                         case Pay:

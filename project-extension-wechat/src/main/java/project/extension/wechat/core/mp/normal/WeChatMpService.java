@@ -12,7 +12,7 @@ import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
 import org.apache.commons.lang3.StringUtils;
 import project.extension.standard.exception.ModuleException;
 import project.extension.string.StringExtension;
-import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.core.mp.standard.IWeChatMpService;
 import project.extension.wechat.globalization.Strings;
@@ -26,14 +26,14 @@ import project.extension.wechat.model.SendTemplateMessageResult;
  */
 public class WeChatMpService
         implements IWeChatMpService {
-    public WeChatMpService(BaseConfig baseConfig,
+    public WeChatMpService(WeChatBaseConfig weChatBaseConfig,
                            MpConfig mpConfig) {
-        this.baseConfig = baseConfig;
+        this.weChatBaseConfig = weChatBaseConfig;
         this.mpConfig = mpConfig;
         this.mpService = createMPService();
     }
 
-    private final BaseConfig baseConfig;
+    private final WeChatBaseConfig weChatBaseConfig;
 
     private final MpConfig mpConfig;
 
@@ -101,15 +101,15 @@ public class WeChatMpService
 
     @Override
     public String getBaseOAuth2Url() {
-        return StringExtension.getUrl(baseConfig.getRootUrlScheme(),
-                                      baseConfig.getRootUrlHost(),
+        return StringExtension.getUrl(weChatBaseConfig.getRootUrlScheme(),
+                                      weChatBaseConfig.getRootUrlHost(),
                                       mpConfig.getOAuthBaseUrl());
     }
 
     @Override
     public String getUserInfoOAuth2Url() {
-        return StringExtension.getUrl(baseConfig.getRootUrlScheme(),
-                                      baseConfig.getRootUrlHost(),
+        return StringExtension.getUrl(weChatBaseConfig.getRootUrlScheme(),
+                                      weChatBaseConfig.getRootUrlHost(),
                                       mpConfig.getOAuthUserInfoUrl());
     }
 

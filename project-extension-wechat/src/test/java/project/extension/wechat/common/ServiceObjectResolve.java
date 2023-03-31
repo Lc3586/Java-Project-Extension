@@ -2,7 +2,7 @@ package project.extension.wechat.common;
 
 import org.junit.jupiter.api.Assertions;
 import project.extension.ioc.IOCExtension;
-import project.extension.wechat.config.BaseConfig;
+import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
 import project.extension.wechat.core.INaiveWeChatServiceProvider;
@@ -17,7 +17,7 @@ import project.extension.wechat.core.pay.standard.IWeChatPayService;
  * @date 2023-03-17
  */
 public class ServiceObjectResolve {
-    public static BaseConfig baseConfig;
+    public static WeChatBaseConfig weChatBaseConfig;
 
     public static IWeChatMpService masterWeChatMPService;
 
@@ -29,13 +29,13 @@ public class ServiceObjectResolve {
      * 注入
      */
     public static void injection() {
-        baseConfig = IOCExtension.applicationContext.getBean(BaseConfig.class);
+        weChatBaseConfig = IOCExtension.applicationContext.getBean(WeChatBaseConfig.class);
 
-        Assertions.assertNotNull(baseConfig,
+        Assertions.assertNotNull(weChatBaseConfig,
                                  "未获取到BaseConfig");
 
         System.out.printf("\r\n%s已注入\r\n",
-                          BaseConfig.class.getName());
+                          WeChatBaseConfig.class.getName());
 
 
 //        naiveWeChatServiceProvider = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.class);
@@ -89,7 +89,7 @@ public class ServiceObjectResolve {
                               String.format("%s公众号未启用",
                                             mp));
 
-        return baseConfig.getMpConfig(mp);
+        return weChatBaseConfig.getMpConfig(mp);
     }
 
     /**
@@ -106,7 +106,7 @@ public class ServiceObjectResolve {
                               String.format("%s公众号未启用",
                                             mp));
 
-        if (mp.equals(baseConfig.getMp()))
+        if (mp.equals(weChatBaseConfig.getMp()))
             return masterWeChatMPService;
         else {
             IWeChatMpService weChatMPService = ServiceObjectResolve.naiveWeChatServiceProvider.getWeChatMpService(mp);
@@ -136,7 +136,7 @@ public class ServiceObjectResolve {
                               String.format("%s商户号未启用",
                                             pay));
 
-        return baseConfig.getPayConfig(pay);
+        return weChatBaseConfig.getPayConfig(pay);
     }
 
     /**
@@ -153,7 +153,7 @@ public class ServiceObjectResolve {
                               String.format("%s商户号未启用",
                                             pay));
 
-        if (pay.equals(baseConfig.getMp()))
+        if (pay.equals(weChatBaseConfig.getMp()))
             return masterWeChatPayService;
         else {
             IWeChatPayService weChatPayService = ServiceObjectResolve.naiveWeChatServiceProvider.getWeChatPayService(pay);

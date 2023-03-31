@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import project.extension.collections.CollectionsExtension;
 import project.extension.ioc.IOCExtension;
-import project.extension.mybatis.edge.config.BaseConfig;
+import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.config.DruidConfig;
 import project.extension.mybatis.edge.core.mapper.NaiveMapperScanner;
@@ -37,14 +37,14 @@ import java.util.Map;
  */
 @SuppressWarnings("SpringDependsOnUnresolvedBeanInspection")
 @Configuration
-@EnableConfigurationProperties({BaseConfig.class,
+@EnableConfigurationProperties({MyBatisEdgeBaseConfig.class,
                                 DruidConfig.class})
 @DependsOn("iocExtension")
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
-    public NaiveDataSourceProvider(BaseConfig baseConfig,
+    public NaiveDataSourceProvider(MyBatisEdgeBaseConfig myBatisEdgeBaseConfig,
                                    DruidConfig druidConfig) {
-        this.baseConfig = baseConfig;
+        this.myBatisEdgeBaseConfig = myBatisEdgeBaseConfig;
         this.druidConfig = druidConfig;
         this.databaseIdProvider = IOCExtension.tryGetBean(DatabaseIdProvider.class);
     }
@@ -52,7 +52,7 @@ public class NaiveDataSourceProvider
     /**
      * 基础配置
      */
-    private final BaseConfig baseConfig;
+    private final MyBatisEdgeBaseConfig myBatisEdgeBaseConfig;
 
     /**
      * 连接池配置
@@ -84,7 +84,7 @@ public class NaiveDataSourceProvider
      * @param dataSource 数据源名称
      */
     private void loadAndRegisterDataSource(String dataSource) {
-        DataSourceConfig dataSourceConfig = baseConfig.getDataSourceConfig(dataSource);
+        DataSourceConfig dataSourceConfig = myBatisEdgeBaseConfig.getDataSourceConfig(dataSource);
         if (!dataSourceConfig.isEnable())
             return;
 
@@ -320,25 +320,25 @@ public class NaiveDataSourceProvider
 
     @Override
     public String defaultDataSource() {
-        return this.baseConfig.getDataSource();
+        return this.myBatisEdgeBaseConfig.getDataSource();
     }
 
     @Override
     public boolean isExists(String dataSource) {
-        return this.baseConfig.getMultiDataSource()
-                              .containsKey(dataSource);
+        return this.myBatisEdgeBaseConfig.getMultiDataSource()
+                                         .containsKey(dataSource);
     }
 
     @Override
     public boolean isEnable(String dataSource) {
-        return this.baseConfig.getMultiDataSource()
-                              .get(dataSource)
-                              .isEnable();
+        return this.myBatisEdgeBaseConfig.getMultiDataSource()
+                                         .get(dataSource)
+                                         .isEnable();
     }
 
     @Override
     public List<String> allDataSources(boolean enabledOnly) {
-        return this.baseConfig.getAllDataSource(enabledOnly);
+        return this.myBatisEdgeBaseConfig.getAllDataSource(enabledOnly);
     }
 
     @Override
