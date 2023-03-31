@@ -3,6 +3,7 @@ package project.extension.redis.common;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.data.redis.core.RedisTemplate;
 import project.extension.ioc.IOCExtension;
+import project.extension.redis.dto.TestDTO;
 import project.extension.redis.extension.requestRateLimit.RequestRateLimiterAspectHandler;
 
 /**
@@ -13,7 +14,7 @@ import project.extension.redis.extension.requestRateLimit.RequestRateLimiterAspe
  * @date 2023-03-17
  */
 public class ServiceObjectResolve {
-    public static RedisTemplate<String, String> redisTemplate;
+    public static RedisTemplate<String, TestDTO> redisTemplate;
 
     public static RequestRateLimiterAspectHandler requestRateLimiterAspectHandler;
 
@@ -21,7 +22,7 @@ public class ServiceObjectResolve {
      * 注入
      */
     public static void injection() {
-        redisTemplate = (RedisTemplate<String, String>) IOCExtension.applicationContext.getBean("redisTemplate");
+        redisTemplate = (RedisTemplate<String, TestDTO>) IOCExtension.applicationContext.getBean("redisTemplate");
 
         Assertions.assertNotNull(redisTemplate,
                                  "未获取到RedisTemplate");

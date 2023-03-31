@@ -2,7 +2,9 @@ package project.extension.redis.test;
 
 import org.junit.jupiter.api.*;
 import org.springframework.data.redis.core.ValueOperations;
+import project.extension.redis.common.AssertExtension;
 import project.extension.redis.common.ServiceObjectResolve;
+import project.extension.redis.dto.TestDTO;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -30,8 +32,10 @@ public class X100ConnectTest {
     @Test
     @DisplayName("100.测试连接是否正常")
     @Order(100)
-    public void _100() {
-        ValueOperations<String, String> operations = ServiceObjectResolve.redisTemplate.opsForValue();
+    public void _100()
+            throws
+            Throwable {
+        ValueOperations<String, TestDTO> operations = ServiceObjectResolve.redisTemplate.opsForValue();
 
         Assertions.assertNotNull(operations,
                                  "获取操作对象失败");
@@ -44,10 +48,10 @@ public class X100ConnectTest {
         System.out.printf("\r\n已生成key: %s\r\n",
                           key);
 
-        String value = "测试数据";
+        TestDTO testData = TestDTO.getInstance();
 
         operations.set(key,
-                       value,
+                       testData,
                        60,
                        TimeUnit.SECONDS);
 
@@ -56,14 +60,13 @@ public class X100ConnectTest {
 
         System.out.println("已新增数据");
 
-        String value4Get = operations.get(key);
+        TestDTO testData4Get = operations.get(key);
 
-        Assertions.assertNotNull(value4Get,
+        Assertions.assertNotNull(testData4Get,
                                  "未获取到新增的数据");
 
-        Assertions.assertEquals(value,
-                                value4Get,
-                                "获取到的数据和初始值不一致");
+        AssertExtension.assertEquals(testData,
+                                     testData4Get);
 
         System.out.println("已获取数据");
 

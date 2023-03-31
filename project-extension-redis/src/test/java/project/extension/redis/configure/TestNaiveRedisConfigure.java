@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import project.extension.redis.config.NaiveRedisConfigure;
+import project.extension.redis.dto.TestDTO;
 
 /**
  * Redis配置类
@@ -24,9 +25,9 @@ public class TestNaiveRedisConfigure
      * @param connectionFactory 连接工厂
      */
     @Bean
-    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory connectionFactory) {
+    public RedisTemplate<String, TestDTO> redisTemplate(RedisConnectionFactory connectionFactory) {
         return super.redisTemplate(connectionFactory,
-                                   String.class);
+                                   TestDTO.class);
     }
 
     /**

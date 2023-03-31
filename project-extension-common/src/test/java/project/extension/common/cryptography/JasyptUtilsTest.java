@@ -105,7 +105,7 @@ public class JasyptUtilsTest {
     @Test
     @DisplayName("加密")
     public void encryptEnv() {
-        String password = JasyptUtils.getPasswordFromEnv("JAVA_LOCAL_49_JASYPT_PASSWORD");
+        String password = JasyptUtils.getPasswordFromEnv("JAVA_JASYPT_PASSWORD");
         String text = "33e16f3df65243a2b7353e3bd261cb17";
         System.out.printf("明文：%s%n",
                           text);
