@@ -41,7 +41,7 @@ project:
           #启用微信终端服务
           enableMpEndpointServlet: true
           #微信客户端终端的接口
-          mpEndpointUrl: /wechat/*
+          mpEndpointUrl: /wechat/endpoint
           #          #语言
           #          language: zh_CN
       #          #启用微信网页授权服务
