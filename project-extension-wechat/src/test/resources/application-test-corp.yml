@@ -95,15 +95,6 @@ project:
       #          #接收微信支付退款结果通知的回调地址
       #          refundNotifyV3Url:
 
-      #开发配置
-      dev:
-        #调试模式
-        debug: true
-        #开发令牌验证接口（如未配置此属性，则中间件会自动生成）
-        tokenVerificationUrl:
-#        #编码格式
-#        encoding: UTF-8
-
 jasypt:
   encryptor:
     password: ${JAVA_LOCAL_49_JASYPT_PASSWORD}

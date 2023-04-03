@@ -5,12 +5,12 @@
     <parent>
         <artifactId>project-extension</artifactId>
         <groupId>top.lctr</groupId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>project-extension-redis</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <name>top.lctr:project-extension-redis</name>
     <description>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-standard</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4-SNAPSHOT</version>
         </dependency>
 
         <!-- redis 缓存操作 -->
