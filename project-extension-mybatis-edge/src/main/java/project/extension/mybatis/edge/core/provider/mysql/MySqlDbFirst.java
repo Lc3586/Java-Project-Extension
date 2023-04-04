@@ -788,8 +788,8 @@ public class MySqlDbFirst
             DbColumnInfo columnInfo = tableWithColumns_cache.get(table_id)
                                                             .get(column);
             //将列标识为主键
-            if (!columnInfo.getIsPrimary() && is_primary_key)
-                columnInfo.setIsPrimary(true);
+            if (!columnInfo.isPrimary() && is_primary_key)
+                columnInfo.setPrimary(true);
 
             //添加索引信息
             Map<String, DbIndexInfo> indexes = new CaseInsensitiveMap<>();
@@ -949,11 +949,11 @@ public class MySqlDbFirst
                 tableWithIds_cache.get(table_id)
                                   .getColumns()
                                   .add(column);
-                if (column.getIsIdentity())
+                if (column.isIdentity())
                     tableWithIds_cache.get(table_id)
                                       .getIdentities()
                                       .add(column);
-                if (column.getIsPrimary())
+                if (column.isPrimary())
                     tableWithIds_cache.get(table_id)
                                       .getPrimaries()
                                       .add(column);

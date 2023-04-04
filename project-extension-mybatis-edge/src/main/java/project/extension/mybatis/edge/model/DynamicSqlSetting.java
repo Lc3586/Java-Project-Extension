@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
 import project.extension.mybatis.edge.annotations.ExecutorSetting;
 
 /**
@@ -10,6 +11,7 @@ import project.extension.mybatis.edge.annotations.ExecutorSetting;
  * @date 2022-03-26
  */
 @ExecutorSetting
+@Data
 public class DynamicSqlSetting<T> {
     public DynamicSqlSetting() {
 
@@ -26,45 +28,21 @@ public class DynamicSqlSetting<T> {
         this.resultType = resultType;
     }
 
-    @ExecutorSetting(ExecutorParameter.实体类型)
-    private Class<T> entityType;
-
-    @ExecutorSetting(ExecutorParameter.数据类型)
-    private Class<?> dataType;
-
-    @ExecutorSetting(ExecutorParameter.返回值类型)
-    private Class<?> resultType;
-
     /**
      * 实体类型
      */
-    public Class<T> getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(Class<T> entityType) {
-        this.entityType = entityType;
-    }
+    @ExecutorSetting(ExecutorParameter.实体类型)
+    private Class<T> entityType;
 
     /**
      * 数据类型
      */
-    public Class<?> getDataType() {
-        return dataType;
-    }
-
-    public void setDataType(Class<?> dataType) {
-        this.dataType = dataType;
-    }
+    @ExecutorSetting(ExecutorParameter.数据类型)
+    private Class<?> dataType;
 
     /**
      * 返回值类型
      */
-    public Class<?> getResultType() {
-        return resultType;
-    }
-
-    public void setResultType(Class<?> resultType) {
-        this.resultType = resultType;
-    }
+    @ExecutorSetting(ExecutorParameter.返回值类型)
+    private Class<?> resultType;
 }

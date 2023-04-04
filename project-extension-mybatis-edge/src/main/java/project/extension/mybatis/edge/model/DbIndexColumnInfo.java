@@ -1,11 +1,14 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 /**
  * 数据库表索引相关的列信息
  *
  * @author LCTR
  * @date 2022-06-10
  */
+@Data
 public class DbIndexColumnInfo {
     public DbIndexColumnInfo() {
 
@@ -26,32 +29,4 @@ public class DbIndexColumnInfo {
      * 是否降序
      */
     private boolean isDesc;
-
-    /**
-     * 列信息
-     */
-    public DbColumnInfo getColumn() {
-        return column;
-    }
-
-    /**
-     * 列信息
-     */
-    public void setColumn(DbColumnInfo column) {
-        this.column = column;
-    }
-
-    /**
-     * 是否降序
-     */
-    public boolean getIsDesc() {
-        return isDesc;
-    }
-
-    /**
-     * 是否降序
-     */
-    public void setIsDesc(boolean desc) {
-        isDesc = desc;
-    }
 }

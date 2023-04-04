@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @author LCTR
  * @date 2022-06-10
  */
+@Data
 public class DbForeignInfo {
     public DbForeignInfo() {
 
@@ -39,46 +42,4 @@ public class DbForeignInfo {
      * 关联列集合
      */
     private final List<DbColumnInfo> referencedColumns = new ArrayList<>();
-
-    /**
-     * 所在表
-     */
-    public DbTableInfo getTable() {
-        return table;
-    }
-
-    /**
-     * 所在表
-     */
-    public void setTable(DbTableInfo table) {
-        this.table = table;
-    }
-
-    /**
-     * 相关列集合
-     */
-    public List<DbColumnInfo> getColumns() {
-        return columns;
-    }
-
-    /**
-     * 关联表
-     */
-    public DbTableInfo getReferencedTable() {
-        return referencedTable;
-    }
-
-    /**
-     * 关联表
-     */
-    public void setReferencedTable(DbTableInfo referencedTable) {
-        this.referencedTable = referencedTable;
-    }
-
-    /**
-     * 关联列集合
-     */
-    public List<DbColumnInfo> getReferencedColumns() {
-        return referencedColumns;
-    }
 }

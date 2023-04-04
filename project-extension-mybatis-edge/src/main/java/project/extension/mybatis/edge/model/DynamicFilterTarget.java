@@ -1,11 +1,14 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 /**
  * 动态过滤器操作目标对象
  *
  * @author LCTR
  * @date 2022-05-17
  */
+@Data
 public class DynamicFilterTarget {
     public DynamicFilterTarget() {
 
@@ -55,48 +58,4 @@ public class DynamicFilterTarget {
      * 子表达式
      */
     private DynamicFilterExpression expression;
-
-    /**
-     * 操作目标类型
-     */
-    public FilterTargetType getType() {
-        return type;
-    }
-
-    public void setType(FilterTargetType type) {
-        this.type = type;
-    }
-
-    /**
-     * 字段名
-     */
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    /**
-     * 值
-     */
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    /**
-     * 子表达式
-     */
-    public DynamicFilterExpression getExpression() {
-        return expression;
-    }
-
-    public void setExpression(DynamicFilterExpression expression) {
-        this.expression = expression;
-    }
 }

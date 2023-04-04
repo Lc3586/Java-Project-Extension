@@ -1228,8 +1228,8 @@ public class PostgreSQLDbFirst
             DbColumnInfo columnInfo = tableWithColumns_cache.get(table_id)
                                                             .get(column);
             //将列标识为主键
-            if (!columnInfo.getIsPrimary() && is_primary_key)
-                columnInfo.setIsPrimary(true);
+            if (!columnInfo.isPrimary() && is_primary_key)
+                columnInfo.setPrimary(true);
             //主键列不处理
             if (is_primary_key)
                 continue;
@@ -1396,11 +1396,11 @@ public class PostgreSQLDbFirst
                 tableWithIds_cache.get(table_id)
                                   .getColumns()
                                   .add(column);
-                if (column.getIsIdentity())
+                if (column.isIdentity())
                     tableWithIds_cache.get(table_id)
                                       .getIdentities()
                                       .add(column);
-                if (column.getIsPrimary())
+                if (column.isPrimary())
                     tableWithIds_cache.get(table_id)
                                       .getPrimaries()
                                       .add(column);

@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,146 +14,71 @@ import java.util.Map;
  * @author LCTR
  * @date 2022-04-02
  */
+@Data
 public class InserterDTO {
-    private String schema;
-
-    private String tableName;
-
-    private String alias;
-
-    private final List<String> exceptionFieldNames = new ArrayList<>();
-
-    private final List<String> ignoreFieldNames = new ArrayList<>();
-
-    private Class<?> entityType;
-
-    private Class<?> dtoType;
-
-    private Integer mainTagLevel = 0;
-
-    private final List<String> customTags = new ArrayList<>();
-
-    private final List<Object> dataList = new ArrayList<>();
-
-    private final Map<String, Object> parameter = new HashMap<>();
-
-    private final Map<String, Field> outParameter = new HashMap<>();
-
-    private final Map<String, Field> inOutParameter = new HashMap<>();
-
     /**
      * 模式名
      */
-    public String getSchema() {
-        return schema;
-    }
-
-    public void setSchema(String schema) {
-        this.schema = schema;
-    }
+    private String schema;
 
     /**
      * 数据表名
      */
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
-    }
+    private String tableName;
 
     /**
      * 数据表别名
      */
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+    private String alias;
 
     /**
      * 包括的字段
      */
-    public List<String> getExceptionFieldNames() {
-        return exceptionFieldNames;
-    }
+    private final List<String> exceptionFieldNames = new ArrayList<>();
 
     /**
      * 忽略的字段
      */
-    public List<String> getIgnoreFieldNames() {
-        return ignoreFieldNames;
-    }
+    private final List<String> ignoreFieldNames = new ArrayList<>();
 
     /**
      * 实体类型
      */
-    public Class<?> getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(Class<?> entityType) {
-        this.entityType = entityType;
-    }
+    private Class<?> entityType;
 
     /**
      * 业务模型类型
      */
-    public Class<?> getDtoType() {
-        return dtoType;
-    }
-
-    public void setDtoType(Class<?> dtoType) {
-        this.dtoType = dtoType;
-    }
+    private Class<?> dtoType;
 
     /**
      * 主标签等级
      */
-    public Integer getMainTagLevel() {
-        return mainTagLevel;
-    }
-
-    public void setMainTagLevel(Integer mainTagLevel) {
-        this.mainTagLevel = mainTagLevel;
-    }
+    private Integer mainTagLevel = 0;
 
     /**
      * 自定义标签
      */
-    public List<String> getCustomTags() {
-        return customTags;
-    }
+    private final List<String> customTags = new ArrayList<>();
 
     /**
      * 数据集合
      */
-    public List<Object> getDataList() {
-        return dataList;
-    }
+    private final List<Object> dataList = new ArrayList<>();
 
     /**
      * 全部参数
      * <p>不可手动设置null值</p>
      */
-    public Map<String, Object> getParameter() {
-        return parameter;
-    }
+    private final Map<String, Object> parameter = new HashMap<>();
 
     /**
      * 输出参数
      */
-    public Map<String, Field> getOutParameter() {
-        return outParameter;
-    }
+    private final Map<String, Field> outParameter = new HashMap<>();
 
     /**
      * 输入输出参数
      */
-    public Map<String, Field> getInOutParameter() {
-        return inOutParameter;
-    }
+    private final Map<String, Field> inOutParameter = new HashMap<>();
 }

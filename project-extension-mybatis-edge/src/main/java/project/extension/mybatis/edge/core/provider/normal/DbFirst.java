@@ -135,8 +135,8 @@ public abstract class DbFirst
         //所有列按是否为主键（升序）、是否为外键（降序）、名称（升序）排序
         tableInfo.getColumns()
                  .sort((c1, c2) -> {
-                     int compare = Boolean.compare(c2.getIsPrimary(),
-                                                   c1.getIsPrimary());
+                     int compare = Boolean.compare(c2.isPrimary(),
+                                                   c1.isPrimary());
                      if (compare == 0) {
                          boolean b1 = tableInfo.getForeignsDict()
                                                .values()
@@ -169,9 +169,9 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : column.getIsNullable()
-                 ? dbTypeToJavaType.javaPackageTypeConvert
-                 : dbTypeToJavaType.javaTypeConvert;
+               : column.isNullable()
+                 ? dbTypeToJavaType.getJavaPackageTypeConvert()
+                 : dbTypeToJavaType.getJavaTypeConvert();
     }
 
     @Override
@@ -180,7 +180,7 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaType;
+               : dbTypeToJavaType.getJavaType();
     }
 
     @Override
@@ -189,7 +189,7 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaPackageType;
+               : dbTypeToJavaType.getJavaPackageType();
     }
 
     @Override
@@ -198,7 +198,7 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaTypeInfo;
+               : dbTypeToJavaType.getJavaTypeInfo();
     }
 
     @Override
@@ -207,7 +207,7 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaPackageTypeInfo;
+               : dbTypeToJavaType.getJavaPackageTypeInfo();
     }
 
     @Override
@@ -216,7 +216,7 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaStringify;
+               : dbTypeToJavaType.getJavaStringify();
     }
 
     @Override
@@ -225,6 +225,6 @@ public abstract class DbFirst
                                                                      null);
         return dbTypeToJavaType == null
                ? null
-               : dbTypeToJavaType.javaParse;
+               : dbTypeToJavaType.getJavaParse();
     }
 }

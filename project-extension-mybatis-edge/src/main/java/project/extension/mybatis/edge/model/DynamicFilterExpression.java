@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @author LCTR
  * @date 2022-05-17
  */
+@Data
 public class DynamicFilterExpression {
     public DynamicFilterExpression() {
 
@@ -27,22 +30,4 @@ public class DynamicFilterExpression {
      * 操作集合
      */
     private final List<DynamicFilterOperation> operations = new ArrayList<>();
-
-    /**
-     * 起始目标
-     */
-    public DynamicFilterTarget getStart() {
-        return start;
-    }
-
-    public void setStart(DynamicFilterTarget start) {
-        this.start = start;
-    }
-
-    /**
-     * 操作集合
-     */
-    public List<DynamicFilterOperation> getOperations() {
-        return operations;
-    }
 }

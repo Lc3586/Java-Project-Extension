@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @author LCTR
  * @date 2022-03-25
  */
+@Data
 public class DynamicOrder {
     public DynamicOrder() {
 
@@ -55,53 +58,25 @@ public class DynamicOrder {
             this.advancedOrder.addAll(advancedOrder);
     }
 
-    private String alias;
-
-    private String fieldName;
-
-    private OrderMethod method;
-
-    private final List<AdvancedOrder> advancedOrder = new ArrayList<>();
-
     /**
      * 数据表别名
      */
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+    private String alias;
 
     /**
      * 排序字段
      * <p>默认值 createTime</p>
      */
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+    private String fieldName;
 
     /**
      * 排序方法
      * <p>默认值 DESC（降序）</p>
      */
-    public OrderMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(OrderMethod method) {
-        this.method = method;
-    }
+    private OrderMethod method;
 
     /**
      * 高级排序
      */
-    public List<AdvancedOrder> getAdvancedOrder() {
-        return advancedOrder;
-    }
+    private final List<AdvancedOrder> advancedOrder = new ArrayList<>();
 }

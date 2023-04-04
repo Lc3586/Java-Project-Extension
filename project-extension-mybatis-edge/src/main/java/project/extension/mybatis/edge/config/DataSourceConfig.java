@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.config;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import lombok.Data;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.mybatis.edge.model.DbType;
 
@@ -13,6 +14,7 @@ import java.util.Properties;
  * @author LCTR
  * @date 2022-10-20
  */
+@Data
 public class DataSourceConfig {
     /**
      * 数据库类型
@@ -69,92 +71,5 @@ public class DataSourceConfig {
         if (properties == null) properties = new Properties();
         properties.put(DruidDataSourceFactory.PROP_NAME,
                        name);
-    }
-
-    /**
-     * 数据库类型
-     */
-    public DbType getDbType() {
-        return dbType;
-    }
-
-    public void setDbType(DbType dbType) {
-        this.dbType = dbType;
-    }
-
-    /**
-     * mybatis配置文件路径
-     */
-    public String getConfigLocation() {
-        return configLocation;
-    }
-
-    public void setConfigLocation(String configLocation) {
-        this.configLocation = configLocation;
-    }
-
-    /**
-     * 需要扫描的存放实体类的包
-     */
-    public List<String> getScanEntitiesPackages() {
-        return scanEntitiesPackages;
-    }
-
-    public void setScanEntitiesPackages(List<String> scanEntitiesPackages) {
-        this.scanEntitiesPackages = scanEntitiesPackages;
-    }
-
-    /**
-     * 需要扫描的存放Mapper接口类的包（可选）
-     */
-    public List<String> getScanMapperPackages() {
-        return scanMapperPackages;
-    }
-
-    public void setScanMapperPackages(List<String> scanMapperPackages) {
-        this.scanMapperPackages = scanMapperPackages;
-    }
-
-    /**
-     * 需要扫描的存放Mapper配置文件的目录
-     */
-    public List<String> getScanMapperXmlLocations() {
-        return scanMapperXmlLocations;
-    }
-
-    public void setScanMapperXmlLocations(List<String> scanMapperXmlLocations) {
-        this.scanMapperXmlLocations = scanMapperXmlLocations;
-    }
-
-    /**
-     * 实体类表名/列名命名规则
-     */
-    public NameConvertType getNameConvertType() {
-        return nameConvertType;
-    }
-
-    public void setNameConvertType(NameConvertType nameConvertType) {
-        this.nameConvertType = nameConvertType;
-    }
-
-    /**
-     * 启用
-     *
-     * @默认值 true
-     */
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-    public Properties getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(Properties properties) {
-        this.properties = properties;
     }
 }

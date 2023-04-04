@@ -1,5 +1,6 @@
 package project.extension.wechat.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Primary
 @Component
 @ConfigurationProperties("project.extension.wechat")
+@Data
 public class WeChatBaseConfig {
     /**
      * 当前服务器的根地址
@@ -110,13 +112,6 @@ public class WeChatBaseConfig {
      */
     private Map<String, PayConfig> multiPay;
 
-    /**
-     * 当前服务器的根地址
-     */
-    public String getRootUrl() {
-        return rootUrl;
-    }
-
     public void setRootUrl(String rootUrl) {
         Tuple2<String, String> result = StringExtension.getSchemeAndHost(rootUrl);
         if (result != null) {
@@ -131,153 +126,6 @@ public class WeChatBaseConfig {
     }
 
     /**
-     * 当前服务器的根地址架构
-     */
-    public String getRootUrlScheme() {
-        return rootUrlScheme;
-    }
-
-    /**
-     * 当前服务器的根地址主机
-     */
-    public String getRootUrlHost() {
-        return rootUrlHost;
-    }
-
-    /**
-     * 默认的公众号名称
-     */
-    public String getMp() {
-        return mp;
-    }
-
-    public void setMp(String mp) {
-        this.mp = mp;
-    }
-
-    /**
-     * 默认的商户号名称
-     */
-    public String getPay() {
-        return pay;
-    }
-
-    public void setPay(String pay) {
-        this.pay = pay;
-    }
-
-    /**
-     * 编码格式
-     *
-     * @默认值 UTF-8
-     */
-    public String getEncoding() {
-        return encoding;
-    }
-
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-
-    /**
-     * 默认的p12证书地址
-     */
-    public String getCertFilePath() {
-        return certFilePath;
-    }
-
-    public void setCertFilePath(String certFilePath) {
-        this.certFilePath = certFilePath;
-    }
-
-    /**
-     * 默认的证书密码
-     * <p>一般默认为商户号</p>
-     */
-    public String getCertPassword() {
-        return certPassword;
-    }
-
-    public void setCertPassword(String certPassword) {
-        this.certPassword = certPassword;
-    }
-
-    /**
-     * 默认的pem公钥文件地址
-     */
-    public String getPrivateKeyPath() {
-        return privateKeyPath;
-    }
-
-    public void setPrivateKeyPath(String privateKeyPath) {
-        this.privateKeyPath = privateKeyPath;
-    }
-
-    /**
-     * 默认启用微信终端服务
-     * <p>此选项设为false时，multiMP中的enableMpEndpointServlet选项将无效</p>
-     *
-     * @默认值 true
-     */
-    public Boolean isEnableMpEndpointServlet() {
-        return enableMpEndpointServlet;
-    }
-
-    public void setEnableMpEndpointServlet(Boolean enableMpEndpointServlet) {
-        this.enableMpEndpointServlet = enableMpEndpointServlet;
-    }
-
-    /**
-     * 启用微信网页授权服务
-     * <p>此选项设为false时，multiMP中的enableOAuth2Servlet选项将无效</p>
-     *
-     * @默认值 true
-     */
-    public Boolean isEnableOAuth2Servlet() {
-        return enableOAuth2Servlet;
-    }
-
-    public void setEnableOAuth2Servlet(Boolean enableOAuth2Servlet) {
-        this.enableOAuth2Servlet = enableOAuth2Servlet;
-    }
-
-    /**
-     * 默认启用微信收付通通知服务
-     * <p>此选项设为false时，multiPay中的enablePayNotifyServlet选项将无效</p>
-     *
-     * @默认值 true
-     */
-    public Boolean isEnablePayNotifyServlet() {
-        return enablePayNotifyServlet;
-    }
-
-    public void setEnablePayNotifyServlet(Boolean enablePayNotifyServlet) {
-        this.enablePayNotifyServlet = enablePayNotifyServlet;
-    }
-
-    /**
-     * 多公众号配置
-     */
-    public Map<String, MpConfig> getMultiMp() {
-        return multiMp;
-    }
-
-    public void setMultiMp(Map<String, MpConfig> multiMp) {
-        this.multiMp = multiMp;
-    }
-
-    /**
-     * 多商户号配置
-     */
-    public Map<String, PayConfig> getMultiPay() {
-        return multiPay;
-    }
-
-    public void setMultiPay(Map<String, PayConfig> multiPay) {
-        this.multiPay = multiPay;
-    }
-
-    /**
      * 是否为多公众号
      */
     public boolean isMultiMp() {
@@ -289,14 +137,15 @@ public class WeChatBaseConfig {
      */
     public List<String> getAllMp(boolean enabledOnly) {
         List<String> allMP = new ArrayList<>();
-        for (String mp : this.getMultiMp()
-                             .keySet()) {
-            if (!enabledOnly
-                    || this.getMultiMp()
-                           .get(mp)
-                           .isEnable())
-                allMP.add(mp);
-        }
+        if (this.getMultiMp() != null)
+            for (String mp : this.getMultiMp()
+                                 .keySet()) {
+                if (!enabledOnly
+                        || this.getMultiMp()
+                               .get(mp)
+                               .isEnable())
+                    allMP.add(mp);
+            }
         return allMP;
     }
 
@@ -378,14 +227,14 @@ public class WeChatBaseConfig {
             throw new ModuleException(Strings.getConfigMpOptionUndefined(mp,
                                                                          "aesKey"));
 
-        if (config.isEnable() && this.isEnableMpEndpointServlet() && config.isEnableMpEndpointServlet()) {
+        if (config.isEnable() && this.getEnableMpEndpointServlet() && config.getEnableMpEndpointServlet()) {
             if (!StringUtils.hasText(config.getMpEndpointUrl()))
                 throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatMpEndpointServlet.class.getName(),
                                                                                        "mpEndpointUrl"));
         }
 
-        if (config.isEnable() && (!this.isEnableOAuth2Servlet() || (this.isEnableOAuth2Servlet()
-                && !config.isEnableOAuth2Servlet()))) {
+        if (config.isEnable() && (!this.getEnableOAuth2Servlet() || (this.getEnableOAuth2Servlet()
+                && !config.getEnableOAuth2Servlet()))) {
             if (!StringUtils.hasText(config.getOAuthBaseUrl()))
                 throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatOAuth2Servlet.class.getName(),
                                                                                        "oAuthBaseUrl"));
@@ -410,14 +259,15 @@ public class WeChatBaseConfig {
      */
     public List<String> getAllPay(boolean enabledOnly) {
         List<String> allPay = new ArrayList<>();
-        for (String mp : this.getMultiPay()
-                             .keySet()) {
-            if (!enabledOnly
-                    || this.getMultiPay()
-                           .get(mp)
-                           .isEnable())
-                allPay.add(mp);
-        }
+        if (this.getMultiPay() != null)
+            for (String mp : this.getMultiPay()
+                                 .keySet()) {
+                if (!enabledOnly
+                        || this.getMultiPay()
+                               .get(mp)
+                               .isEnable())
+                    allPay.add(mp);
+            }
         return allPay;
     }
 
@@ -499,8 +349,8 @@ public class WeChatBaseConfig {
             throw new ModuleException(Strings.getConfigMpOptionUndefined(pay,
                                                                          "certPassword"));
 
-        if (config.isEnable() && (!this.isEnablePayNotifyServlet() || (this.isEnablePayNotifyServlet()
-                && !config.isEnablePayNotifyServlet()))) {
+        if (config.isEnable() && (!this.getEnablePayNotifyServlet() || (this.getEnablePayNotifyServlet()
+                && !config.getEnablePayNotifyServlet()))) {
             if (!StringUtils.hasText(config.getPayNotifyUrl()))
                 throw new ModuleException(Strings.getConfigRequiredWhenDisabledServlet(WeChatPayNotifyServlet.class.getName(),
                                                                                        "payNotifyUrl"));

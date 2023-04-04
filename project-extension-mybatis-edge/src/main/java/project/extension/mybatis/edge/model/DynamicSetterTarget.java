@@ -1,11 +1,14 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 /**
  * 动态更新器操作目标对象
  *
  * @author LCTR
  * @date 2022-04-14
  */
+@Data
 public class DynamicSetterTarget {
     public DynamicSetterTarget() {
 
@@ -55,48 +58,4 @@ public class DynamicSetterTarget {
      * 子表达式
      */
     private DynamicSetterExpression expression;
-
-    /**
-     * 操作目标类型
-     */
-    public SetterTargetType getType() {
-        return type;
-    }
-
-    public void setType(SetterTargetType type) {
-        this.type = type;
-    }
-
-    /**
-     * 字段名
-     */
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
-
-    /**
-     * 值
-     */
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    /**
-     * 子表达式
-     */
-    public DynamicSetterExpression getExpression() {
-        return expression;
-    }
-
-    public void setExpression(DynamicSetterExpression expression) {
-        this.expression = expression;
-    }
 }

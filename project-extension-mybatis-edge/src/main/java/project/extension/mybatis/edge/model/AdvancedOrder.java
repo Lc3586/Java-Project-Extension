@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
 import project.extension.openapi.annotations.OpenApiMainTag;
 import project.extension.openapi.annotations.OpenApiSchema;
 import project.extension.openapi.annotations.OpenApiSchemaStrictMode;
@@ -13,6 +14,7 @@ import project.extension.openapi.model.OpenApiSchemaType;
  */
 @OpenApiSchemaStrictMode
 @OpenApiMainTag("AdvancedOrder")
+@Data
 public class AdvancedOrder {
     /**
      * @param fieldName 字段名
@@ -33,46 +35,22 @@ public class AdvancedOrder {
         this.method = method;
     }
 
-    @OpenApiSchema
-    private String alias;
-
-    @OpenApiSchema
-    private String fieldName;
-
-    @OpenApiSchema(value = "DESC", type = OpenApiSchemaType.enum_)
-    private OrderMethod method;
-
     /**
      * 数据表别名
      */
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+    @OpenApiSchema
+    private String alias;
 
     /**
      * 排序列
      */
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+    @OpenApiSchema
+    private String fieldName;
 
     /**
      * 排序方法
      * <p>默认值 DES（降序）</p>
      */
-    public OrderMethod getMethod() {
-        return method;
-    }
-
-    public void setMethod(OrderMethod method) {
-        this.method = method;
-    }
+    @OpenApiSchema(value = "DESC", type = OpenApiSchemaType.enum_)
+    private OrderMethod method;
 }

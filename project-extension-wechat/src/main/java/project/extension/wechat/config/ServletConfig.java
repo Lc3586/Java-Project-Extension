@@ -29,7 +29,7 @@ public class ServletConfig
 
     @Override
     public void onStartup(ServletContext servletContext) {
-        if (weChatBaseConfig.isEnableMpEndpointServlet()) {
+        if (weChatBaseConfig.getEnableMpEndpointServlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatMpEndpointServlet.class),
                                                                                 WeChatMpEndpointServlet.class);
             for (String urlPattern : WeChatMpEndpointServlet.getAllUrlPattern()) {
@@ -37,7 +37,7 @@ public class ServletConfig
             }
         }
 
-        if (weChatBaseConfig.isEnableOAuth2Servlet()) {
+        if (weChatBaseConfig.getEnableOAuth2Servlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatOAuth2Servlet.class),
                                                                                 WeChatOAuth2Servlet.class);
             for (String urlPattern : WeChatOAuth2Servlet.getAllUrlPattern()) {
@@ -45,7 +45,7 @@ public class ServletConfig
             }
         }
 
-        if (weChatBaseConfig.isEnablePayNotifyServlet()) {
+        if (weChatBaseConfig.getEnablePayNotifyServlet()) {
             ServletRegistration servletRegistration = servletContext.addServlet(NaiveWeChatServiceProvider.getServletBeanName(WeChatPayNotifyServlet.class),
                                                                                 WeChatPayNotifyServlet.class);
             for (String urlPattern : WeChatPayNotifyServlet.getAllUrlPattern()) {

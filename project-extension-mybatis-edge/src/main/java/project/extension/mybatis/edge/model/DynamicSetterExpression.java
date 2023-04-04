@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @author LCTR
  * @date 2022-04-14
  */
+@Data
 public class DynamicSetterExpression {
     public DynamicSetterExpression() {
 
@@ -27,22 +30,4 @@ public class DynamicSetterExpression {
      * 操作集合
      */
     private final List<DynamicSetterOperation> operations = new ArrayList<>();
-
-    /**
-     * 起始目标
-     */
-    public DynamicSetterTarget getStart() {
-        return start;
-    }
-
-    public void setStart(DynamicSetterTarget start) {
-        this.start = start;
-    }
-
-    /**
-     * 操作集合
-     */
-    public List<DynamicSetterOperation> getOperations() {
-        return operations;
-    }
 }

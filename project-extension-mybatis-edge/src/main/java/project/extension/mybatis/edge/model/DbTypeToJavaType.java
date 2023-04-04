@@ -1,11 +1,14 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 /**
  * 数据库类型转换至java类型相关信息
  *
  * @author LCTR
  * @date 2022-06-10
  */
+@Data
 public class DbTypeToJavaType {
     public DbTypeToJavaType(String javaTypeConvert,
                             String javaPackageTypeConvert,
@@ -28,40 +31,40 @@ public class DbTypeToJavaType {
     /**
      * 基本类型强制转换语句
      */
-    public String javaTypeConvert;
+    private String javaTypeConvert;
 
     /**
      * 包装类型强制转换语句
      */
-    public String javaPackageTypeConvert;
+    private String javaPackageTypeConvert;
 
     /**
      * 反序列化语句
      */
-    public String javaParse;
+    private String javaParse;
 
     /**
      * 序列化语句
      */
-    public String javaStringify;
+    private String javaStringify;
 
     /**
      * 基本类型
      */
-    public String javaType;
+    private String javaType;
 
     /**
      * 包装类型
      */
-    public String javaPackageType;
+    private String javaPackageType;
 
     /**
      * 基本类型对象
      */
-    public Class<?> javaTypeInfo;
+    private Class<?> javaTypeInfo;
 
     /**
      * 包装类型对象
      */
-    public Class<?> javaPackageTypeInfo;
+    private Class<?> javaPackageTypeInfo;
 }

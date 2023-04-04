@@ -1,5 +1,7 @@
 package project.extension.mybatis.edge.model;
 
+import lombok.Data;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  * @author LCTR
  * @date 2022-03-31
  */
+@Data
 public class DynamicFilter {
     public DynamicFilter() {
 
@@ -153,105 +156,45 @@ public class DynamicFilter {
         this.relation = relation;
     }
 
-    private String alias;
-
-    private String fieldName;
-
-    private Object value;
-
-    private Boolean valueIsFieldName = false;
-
-    private FilterCompare compare = FilterCompare.Eq;
-
-    private String customSql;
-
-    private FilterGroupRelation relation = FilterGroupRelation.AND;
-
-    private final List<DynamicFilter> dynamicFilter = new ArrayList<>();
-
     /**
      * 数据表别名
      */
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
+    private String alias;
 
     /**
      * 要比较的字段
      */
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
+    private String fieldName;
 
     /**
      * 用于比较的值
      */
-    public Object getValue() {
-        return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
+    private Object value;
 
     /**
      * Value值是另一个用来比较的字段
      */
-    public Boolean getValueIsFieldName() {
-        return valueIsFieldName;
-    }
-
-    public void setValueIsFieldName(Boolean valueIsFieldName) {
-        this.valueIsFieldName = valueIsFieldName;
-    }
+    private Boolean valueIsFieldName = false;
 
     /**
      * 比较类型
      * <p>默认值 Eq</p>
      */
-    public FilterCompare getCompare() {
-        return compare;
-    }
-
-    public void setCompare(FilterCompare compare) {
-        this.compare = compare;
-    }
+    private FilterCompare compare = FilterCompare.Eq;
 
     /**
      * 自定义sql语句
      */
-    public String getCustomSql() {
-        return customSql;
-    }
-
-    public void setCustomSql(String customSql) {
-        this.customSql = customSql;
-    }
+    private String customSql;
 
     /**
      * 组内关系
      * <p>默认值 AND</p>
      */
-    public FilterGroupRelation getRelation() {
-        return relation;
-    }
-
-    public void setRelation(FilterGroupRelation relation) {
-        this.relation = relation;
-    }
+    private FilterGroupRelation relation = FilterGroupRelation.AND;
 
     /**
      * 子条件
      */
-    public List<DynamicFilter> getDynamicFilter() {
-        return dynamicFilter;
-    }
+    private final List<DynamicFilter> dynamicFilter = new ArrayList<>();
 }

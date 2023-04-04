@@ -4,14 +4,11 @@ project:
     wechat:
       #当前服务器的根地址
       rootUrl: http://localhost:8080
+#      rootUrl: ENC(f/3LzDYtp1JHBvfWC5+oNu9xb22RBCSH/VvX+YCYavs=)
       #默认的公众号名称
       mp: master
       #默认的商户号名称
       pay: master
-      #默认的公众号令牌
-      token:
-      #默认的AES加密密钥
-      aesKey:
       #默认的p12证书地址
       certFilePath:
       #默认的证书密码
@@ -31,17 +28,17 @@ project:
           #启用
           enable: true
           #公众账号标识
-          appId: ENC(msaKT5SHEgfjzcPsKFrw97NMlnye/ZgW8XMEqYYdX1A=)
+          appId: ENC(XAOpIx+nd8M1KwCFPBQblFDkdh8XQ6xEjf2ZHY4Trys=)
           #公众账号密钥
-          appSecret: ENC(dN051J9in9rY/RMPpuiXT+zSvM5vk6KC0YYqCGQivlIS2gXHEUAJ2xmQRNuz/tCH)
+          appSecret: ENC(SUgnL0Yuk0wDz3AWPKyRC+CDoap4Omu0DG4BNnf/N/j16f2RN2yl5W1s6B34cplk)
           #令牌
-          token: ENC(Yf6Wd1NhDym9ZqoyWeVR15P5rc5a14PVY7IiEL4xPB50XwFWIEfqyvsajb5sdDCv)
+          token: ENC(EuptQrmInSt/IkMy3azTjWkOkiswNCcpemW/KUySWQMW7+8XMGZd+bxXwKkrs2tZ)
           #AES加密密钥
-          aesKey: ENC(H4ZNsKZmGrjDPH3W+exHg/KxxkxszRiQoL3mpXjw7Ra2zvQtHf0uDJuBVR1cW3ap5JyiKDpd9fI=)
+          aesKey: ENC(h0rixmhU2SrV4zQu68CrCnqdjcRARmWRX0OySwo+duyIR4siYZGiIOJ3bvwRp0LgKqZCksHfwvw=)
           #启用微信终端服务
           enableMpEndpointServlet: true
           #微信客户端终端的接口
-          mpEndpointUrl: /wechat/endpoint
+          mpEndpointUrl: ENC(0n/JBZRJQ5q9HSUQ6VWNsdj+DiLsuz8xaC1bquVyQ64=)
           #          #语言
           #          language: zh_CN
       #          #启用微信网页授权服务
@@ -51,49 +48,49 @@ project:
       #          oAuthBaseUrl:
       #          #用户信息授权接口
       #          oAuthUserInfoUrl:
-      #多商户号配置
-      multiPay:
-        #默认商户号
-        master:
-          #启用
-          enable: false
-          #公众账号标识
-          appId:
-          #商户号
-          mchId:
-          #商户API秘钥
-          mchKey:
-          #服务商模式下的子商户公众号标识
-          subAppId:
-          #服务商模式下的子商户号
-          subMchId:
-          #p12证书文件的绝对路径或者以classpath:开头的类路径
-          certFilePath:
-          #证书密码
-          certPassword:
-          #微信支付分serviceId
-          serviceId:
-          #V3接口秘钥
-          apiV3Key:
-          #V3证书序列号
-          certSerialNo:
-          #apiclient_key.pem证书文件的绝对路径或者以classpath:开头的类路径
-          privateKeyPath:
-          #apiclient_cert.pem证书文件的绝对路径或者以classpath:开头的类路径
-          privateCertPath:
-      #          #启用微信收付通通知服务
-      #          enablePayNotifyServlet: true
-          #启用服务时无需配置以下选项
-      #          #接收收付通通知的URL
-      #          payNotifyUrl:
-      #          #接收收付通通知的URL
-      #          payNotifyV3Url:
-      #          #接收微信支付分的URL
-      #          payScoreNotifyV3Url:
-      #          #接收微信支付退款结果通知的回调地址
-      #          refundNotifyUrl:
-      #          #接收微信支付退款结果通知的回调地址
-      #          refundNotifyV3Url:
+#      #多商户号配置
+#      multiPay:
+#        #默认商户号
+#        master:
+#          #启用
+#          enable: false
+#          #公众账号标识
+#          appId:
+#          #商户号
+#          mchId:
+#          #商户API秘钥
+#          mchKey:
+#          #服务商模式下的子商户公众号标识
+#          subAppId:
+#          #服务商模式下的子商户号
+#          subMchId:
+#          #p12证书文件的绝对路径或者以classpath:开头的类路径
+#          certFilePath:
+#          #证书密码
+#          certPassword:
+#          #微信支付分serviceId
+#          serviceId:
+#          #V3接口秘钥
+#          apiV3Key:
+#          #V3证书序列号
+#          certSerialNo:
+#          #apiclient_key.pem证书文件的绝对路径或者以classpath:开头的类路径
+#          privateKeyPath:
+#          #apiclient_cert.pem证书文件的绝对路径或者以classpath:开头的类路径
+#          privateCertPath:
+#      #          #启用微信收付通通知服务
+#      #          enablePayNotifyServlet: true
+#          #启用服务时无需配置以下选项
+#      #          #接收收付通通知的URL
+#      #          payNotifyUrl:
+#      #          #接收收付通通知的URL
+#      #          payNotifyV3Url:
+#      #          #接收微信支付分的URL
+#      #          payScoreNotifyV3Url:
+#      #          #接收微信支付退款结果通知的回调地址
+#      #          refundNotifyUrl:
+#      #          #接收微信支付退款结果通知的回调地址
+#      #          refundNotifyV3Url:
 
 jasypt:
   encryptor:

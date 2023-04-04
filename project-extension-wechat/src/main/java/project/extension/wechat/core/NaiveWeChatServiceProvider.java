@@ -102,13 +102,13 @@ public class NaiveWeChatServiceProvider
                 getMpServiceBeanName(mpConfig.getName()),
                 weChatMpService);
 
-        if (weChatBaseConfig.isEnableMpEndpointServlet() && mpConfig.isEnableMpEndpointServlet()) {
+        if (weChatBaseConfig.getEnableMpEndpointServlet() && mpConfig.getEnableMpEndpointServlet()) {
             WeChatMpEndpointServlet.setup(mpConfig,
                                           weChatMpService);
 //            endpointServletRegistrationBean.addUrlMappings(mpConfig.getMpEndpointUrl());
         }
 
-        if (weChatBaseConfig.isEnableOAuth2Servlet() && mpConfig.isEnableOAuth2Servlet()) {
+        if (weChatBaseConfig.getEnableOAuth2Servlet() && mpConfig.getEnableOAuth2Servlet()) {
             WeChatOAuth2Servlet.setup(mpConfig,
                                       weChatMpService);
 //            oAuth2ServletRegistrationBean.addUrlMappings(mpConfig.getOAuthBaseUrl(),
@@ -154,7 +154,7 @@ public class NaiveWeChatServiceProvider
                 getPayServiceBeanName(payConfig.getName()),
                 weChatPayService);
 
-        if (weChatBaseConfig.isEnablePayNotifyServlet() && payConfig.isEnablePayNotifyServlet()) {
+        if (weChatBaseConfig.getEnablePayNotifyServlet() && payConfig.getEnablePayNotifyServlet()) {
             WeChatPayNotifyServlet.setup(payConfig,
                                          weChatPayService);
 //            payNotifyServletRegistrationBean.addUrlMappings(payConfig.getPayNotifyUrl(),

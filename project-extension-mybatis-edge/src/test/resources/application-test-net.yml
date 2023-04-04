@@ -3,7 +3,7 @@ project:
   extension:
     mybatis:
       # 默认的数据源
-      dataSource: master
+      dataSource: mysql
       # mybatis配置文件路径
       configLocation: classpath:mybatis/mybatis-config.xml
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
@@ -44,7 +44,7 @@ project:
           enable: true
           dbType: JdbcSqlServer
           properties:
-            url: ENC(0PuXkecs2pAkwowQWCkohXz2oUvrDCFTLDuj9WwbZYApXgdwx8FFa75QF1M2oQ5zbRnY5jDSB3zH2dNJpj8UIOVNmNUjYr6S)
+            url: ENC(oilOf3N4zBFkDwmX41Kpgsovd2wLZYywl4BKg7QzSqHA1KgysggiNG6rmAJ41BwiS78WuA4JPdxPDvZEoeWqnXWJ4iM62kFu5ZWULGVIahLM9JkXF5yR6QAS7gu+/lFL)
             username: ENC(wRcisMssTFy7D6ATnFH9FQ==)
             password: ENC(EAMmuitoh95dSC4GUZp66sOIXZUAqVlm)
         #从库-SqlServer数据库2012及以上版本
@@ -52,7 +52,7 @@ project:
           enable: true
           dbType: JdbcSqlServer_2012_plus
           properties:
-            url: ENC(0PuXkecs2pAkwowQWCkohXz2oUvrDCFTLDuj9WwbZYApXgdwx8FFa75QF1M2oQ5zbRnY5jDSB3zH2dNJpj8UIOVNmNUjYr6S)
+            url: ENC(oilOf3N4zBFkDwmX41Kpgsovd2wLZYywl4BKg7QzSqHA1KgysggiNG6rmAJ41BwiS78WuA4JPdxPDvZEoeWqnXWJ4iM62kFu5ZWULGVIahLM9JkXF5yR6QAS7gu+/lFL)
             username: ENC(wRcisMssTFy7D6ATnFH9FQ==)
             password: ENC(EAMmuitoh95dSC4GUZp66sOIXZUAqVlm)
         #从库-达梦数据库

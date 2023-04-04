@@ -873,8 +873,8 @@ public class SqlServerDbFirst
                 DbColumnInfo columnInfo = tableWithColumns_cache.get(object_id)
                                                                 .get(column);
                 //将列标识为主键
-                if (!columnInfo.getIsPrimary() && is_primary_key)
-                    columnInfo.setIsPrimary(true);
+                if (!columnInfo.isPrimary() && is_primary_key)
+                    columnInfo.setPrimary(true);
 
                 //添加索引信息
                 Map<String, DbIndexInfo> indexes = new HashMap<>();
@@ -1042,11 +1042,11 @@ public class SqlServerDbFirst
                     tableWithIds_cache.get(object_id)
                                       .getColumns()
                                       .add(column);
-                    if (column.getIsIdentity())
+                    if (column.isIdentity())
                         tableWithIds_cache.get(object_id)
                                           .getIdentities()
                                           .add(column);
-                    if (column.getIsPrimary())
+                    if (column.isPrimary())
                         tableWithIds_cache.get(object_id)
                                           .getPrimaries()
                                           .add(column);

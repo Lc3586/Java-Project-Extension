@@ -1,6 +1,7 @@
 package project.extension.mybatis.edge.config;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Primary
 @Component
 @ConfigurationProperties("project.extension.mybatis")
+@Data
 public class MyBatisEdgeBaseConfig {
     /**
      * 默认的数据源
@@ -60,83 +62,6 @@ public class MyBatisEdgeBaseConfig {
     private Map<String, DataSourceConfig> multiDataSource;
 
     /**
-     * 默认的数据源名称
-     */
-    public String getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    /**
-     * mybatis配置文件路径
-     */
-    public String getConfigLocation() {
-        return configLocation;
-    }
-
-    public void setConfigLocation(String configLocation) {
-        this.configLocation = configLocation;
-    }
-
-    /**
-     * 需要扫描的存放实体类的包
-     */
-    public List<String> getScanEntitiesPackages() {
-        return scanEntitiesPackages;
-    }
-
-    public void setScanEntitiesPackages(List<String> scanEntitiesPackages) {
-        this.scanEntitiesPackages = scanEntitiesPackages;
-    }
-
-    /**
-     * 需要扫描的存放Mapper接口类的包（可选）
-     */
-    public List<String> getScanMapperPackages() {
-        return scanMapperPackages;
-    }
-
-    public void setScanMapperPackages(List<String> scanMapperPackages) {
-        this.scanMapperPackages = scanMapperPackages;
-    }
-
-    /**
-     * 需要扫描的存放Mapper配置文件的目录
-     */
-    public List<String> getScanMapperXmlLocations() {
-        return scanMapperXmlLocations;
-    }
-
-    public void setScanMapperXmlLocations(List<String> scanMapperXmlLocations) {
-        this.scanMapperXmlLocations = scanMapperXmlLocations;
-    }
-
-    /**
-     * 默认的实体类表名/列名命名规则
-     */
-    public NameConvertType getNameConvertType() {
-        return nameConvertType;
-    }
-
-    public void setNameConvertType(NameConvertType nameConvertType) {
-        this.nameConvertType = nameConvertType;
-    }
-
-    /**
-     * 多库配置
-     */
-    public Map<String, DataSourceConfig> getMultiDataSource() {
-        return multiDataSource;
-    }
-
-    public void setMultiDataSource(Map<String, DataSourceConfig> multi) {
-        this.multiDataSource = multi;
-    }
-
-    /**
      * 是否为多数据源
      */
     public boolean isMultiDataSource() {
@@ -148,14 +73,15 @@ public class MyBatisEdgeBaseConfig {
      */
     public List<String> getAllDataSource(boolean enabledOnly) {
         List<String> allDataSource = new ArrayList<>();
-        for (String dataSource : this.getMultiDataSource()
-                                     .keySet()) {
-            if (!enabledOnly
-                    || this.getMultiDataSource()
-                           .get(dataSource)
-                           .isEnable())
-                allDataSource.add(dataSource);
-        }
+        if (this.getMultiDataSource() != null)
+            for (String dataSource : this.getMultiDataSource()
+                                         .keySet()) {
+                if (!enabledOnly
+                        || this.getMultiDataSource()
+                               .get(dataSource)
+                               .isEnable())
+                    allDataSource.add(dataSource);
+            }
         return allDataSource;
     }
 
