@@ -3,6 +3,7 @@ package project.extension.mybatis.edge.extention;
 import org.springframework.core.annotation.AnnotationUtils;
 import project.extension.mybatis.edge.annotations.ExecutorSetting;
 import project.extension.openapi.extention.SchemaExtension;
+import project.extension.type.TypeExtension;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -106,7 +107,7 @@ public class ExecutorExtension {
                 }
             }
 
-            Class<?> superClassz = SchemaExtension.getSuperModelType(classz);
+            Class<?> superClassz = TypeExtension.getSuperType(classz);
             if (superClassz.equals(Object.class) || superClassz.equals(classz)) break;
 
             classz = superClassz;

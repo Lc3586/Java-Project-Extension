@@ -10,8 +10,10 @@ import org.springframework.lang.Nullable;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.MappingSetting;
+import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.extention.SchemaExtension;
+import project.extension.type.TypeExtension;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -53,8 +55,7 @@ public class MapBuilder {
 
         List<ParameterMapping> parameterMappings = new ArrayList<>();
 
-        if (!parameterType.getTypeName()
-                          .startsWith("java.lang.")) {
+        if (!TypeExtension.isLangType(parameterType)) {
             //获取标签
             List<String> tags = new ArrayList<>();
             String[] mainTags = SchemaExtension.getMainTag(parameterType,
@@ -218,8 +219,7 @@ public class MapBuilder {
 
         List<ResultMapping> resultMappings = new ArrayList<>();
 
-        if (!resultType.getTypeName()
-                       .startsWith("java.lang.")
+        if (!TypeExtension.isLangType(resultType)
                 && !resultType.getTypeName()
                               .startsWith("java.util.")) {
             List<Field> fields = EntityTypeHandler.getColumnFieldsByDtoType(resultType,

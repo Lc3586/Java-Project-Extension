@@ -5,9 +5,11 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.cryptography.MD5Utils;
+import project.extension.object.ObjectExtension;
 import project.extension.openapi.annotations.*;
 import project.extension.openapi.model.*;
 import project.extension.tuple.Tuple2;
+import project.extension.type.TypeExtension;
 
 import java.lang.reflect.*;
 import java.math.BigDecimal;
@@ -23,21 +25,6 @@ import java.util.regex.Pattern;
  * @date 2022-03-21
  */
 public class OpenApiExtension {
-    private static Method getGenericSignatureMethod;
-
-    /**
-     * 获取泛型签名信息的方法
-     */
-    private static Method getGenericSignatureMethod()
-            throws
-            NoSuchMethodException {
-        if (getGenericSignatureMethod == null) {
-            getGenericSignatureMethod = Field.class.getDeclaredMethod("getGenericSignature");
-            getGenericSignatureMethod.setAccessible(true);
-        }
-        return getGenericSignatureMethod;
-    }
-
     /**
      * 获取或创建接口说明类
      *
@@ -171,7 +158,8 @@ public class OpenApiExtension {
                                            int level)
             throws
             Exception {
-        String signature = (String) getGenericSignatureMethod().invoke(field);
+        String signature = (String) TypeExtension.getGenericSignatureMethod()
+                                                 .invoke(field);
         if (signature != null) {
             //字段为擦除类型，尝试获取对应的泛型类型
             Matcher matcher = Pattern.compile("^T(.*?);$",
@@ -214,8 +202,7 @@ public class OpenApiExtension {
                                          int level)
             throws
             Exception {
-        if (clazz.getTypeName()
-                 .startsWith("java.lang.")
+        if (TypeExtension.isLangType(clazz)
                 || clazz.equals(Date.class)
                 || clazz.equals(BigDecimal.class)) {
             //基础类型
@@ -347,7 +334,7 @@ public class OpenApiExtension {
         switch (schemaInfo.getType()) {
             case OpenApiSchemaType.boolean_:
                 if (schemaInfo.isSpecialValue()) {
-                    Tuple2<Boolean, Boolean> cast_boolean = SchemaExtension.tryCast(schemaInfo.getValue(),
+                    Tuple2<Boolean, Boolean> cast_boolean = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                     OpenApiSchemaValueExample.boolean_,
                                                                                     Boolean.class);
                     any = new OpenApiBoolean(cast_boolean.b);
@@ -357,7 +344,7 @@ public class OpenApiExtension {
                 switch (schemaInfo.getFormat()) {
                     case OpenApiSchemaFormat.integer_byte:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Byte> cast_byte = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Byte> cast_byte = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                       OpenApiSchemaValueExample.byte_,
                                                                                       Byte.class);
                             any = new OpenApiByte(cast_byte.b);
@@ -366,7 +353,7 @@ public class OpenApiExtension {
                     case OpenApiSchemaFormat.integer_int32:
                     default:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Integer> cast_int = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Integer> cast_int = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                         OpenApiSchemaValueExample.int_,
                                                                                         Integer.class);
                             any = new OpenApiInteger(cast_int.b);
@@ -374,7 +361,7 @@ public class OpenApiExtension {
                         break;
                     case OpenApiSchemaFormat.integer_int64:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Long> cast_long = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Long> cast_long = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                       OpenApiSchemaValueExample.long_,
                                                                                       Long.class);
                             any = new OpenApiLong(cast_long.b);
@@ -386,7 +373,7 @@ public class OpenApiExtension {
                 switch (schemaInfo.getFormat()) {
                     case OpenApiSchemaFormat.number_float:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Float> cast_float = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Float> cast_float = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                         OpenApiSchemaValueExample.float_,
                                                                                         Float.class);
                             any = new OpenApiFloat(cast_float.b);
@@ -394,7 +381,7 @@ public class OpenApiExtension {
                         break;
                     case OpenApiSchemaFormat.number_decimal:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, BigDecimal> cast_decimal = SchemaExtension.tryCast(
+                            Tuple2<Boolean, BigDecimal> cast_decimal = ObjectExtension.tryCast(
                                     schemaInfo.getValue(),
                                     OpenApiSchemaValueExample.decimal,
                                     BigDecimal.class);
@@ -404,7 +391,7 @@ public class OpenApiExtension {
                     case OpenApiSchemaFormat.number_double:
                     default:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Double> cast_double = SchemaExtension.tryCast(
+                            Tuple2<Boolean, Double> cast_double = ObjectExtension.tryCast(
                                     schemaInfo.getValue(),
                                     OpenApiSchemaValueExample.double_,
                                     Double.class);
@@ -424,7 +411,7 @@ public class OpenApiExtension {
                 switch (schemaInfo.getFormat()) {
                     case OpenApiSchemaFormat.string_date_original:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Date> cast_date_original = SchemaExtension.tryCast(
+                            Tuple2<Boolean, Date> cast_date_original = ObjectExtension.tryCast(
                                     schemaInfo.getValue(),
                                     OpenApiSchemaValueExample.date_original,
                                     Date.class);
@@ -433,7 +420,7 @@ public class OpenApiExtension {
                         break;
                     case OpenApiSchemaFormat.string_datetime:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Date> cast_datetime = SchemaExtension.tryCast(
+                            Tuple2<Boolean, Date> cast_datetime = ObjectExtension.tryCast(
                                     schemaInfo.getValue(),
                                     OpenApiSchemaValueExample.date_original,
                                     Date.class);
@@ -443,7 +430,7 @@ public class OpenApiExtension {
                         break;
                     case OpenApiSchemaFormat.string_date:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Date> cast_date = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Date> cast_date = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                       OpenApiSchemaValueExample.date_original,
                                                                                       Date.class);
                             any = new OpenApiString(new SimpleDateFormat("yyyy-MM-dd").format(cast_date.b));
@@ -451,7 +438,7 @@ public class OpenApiExtension {
                         break;
                     case OpenApiSchemaFormat.string_time:
                         if (schemaInfo.isSpecialValue()) {
-                            Tuple2<Boolean, Date> cast_time = SchemaExtension.tryCast(schemaInfo.getValue(),
+                            Tuple2<Boolean, Date> cast_time = ObjectExtension.tryCast(schemaInfo.getValue(),
                                                                                       OpenApiSchemaValueExample.date_original,
                                                                                       Date.class);
                             any = new OpenApiString(new SimpleDateFormat("HH:mm:ss").format(cast_time.b));

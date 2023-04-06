@@ -1,5 +1,8 @@
 package project.extension.object;
 
+import com.alibaba.fastjson.JSONObject;
+import project.extension.tuple.Tuple2;
+
 /**
  * Object拓展方法
  *
@@ -21,5 +24,27 @@ public class ObjectExtension {
         return target.isInstance(object)
                ? target.cast(object)
                : null;
+    }
+
+    /**
+     * 转换类型
+     *
+     * @param value        数据
+     * @param defaultValue 默认值
+     * @param type         目标数据类型
+     * @param <T>          目标数据类型
+     * @return 已转为目标类型的数据，失败时为默认值
+     */
+    public static <T> Tuple2<Boolean, T> tryCast(Object value,
+                                                 T defaultValue,
+                                                 Class<T> type) {
+        try {
+            return new Tuple2<>(true,
+                                JSONObject.parseObject(JSONObject.toJSONString(value),
+                                                       type));
+        } catch (Exception ex) {
+            return new Tuple2<>(false,
+                                defaultValue);
+        }
     }
 }

@@ -3,7 +3,6 @@ package project.extension.openapi.extention;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import com.alibaba.fastjson.JSONObject;
 import project.extension.openapi.model.FieldValueChanged;
 import project.extension.openapi.model.OpenApiSchemaFormat;
 import project.extension.openapi.model.OpenApiSchemaType;
@@ -11,10 +10,9 @@ import project.extension.openapi.model.SchemaInfo;
 import project.extension.tuple.Tuple2;
 import project.extension.openapi.annotations.*;
 import project.extension.tuple.Tuple3;
+import project.extension.type.TypeExtension;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Consumer;
@@ -29,100 +27,6 @@ import java.util.stream.Stream;
  * @date 2022-03-18
  */
 public class SchemaExtension {
-    /**
-     * 获取父类类型
-     *
-     * @param type 类型
-     * @return 类型的父类类型，如果没有则返回它自己
-     */
-    public static Class<?> getSuperModelType(Class<?> type) {
-//        //返回数组类型的元素类型
-//        if (type.isArray()) return getSuperModelType(type.getComponentType());
-//
-        //获取继承类
-        Class<?> superClazz = type.getSuperclass();
-//        if (superClazz == null || superClazz.equals(Object.class)) return type;
-
-        //是否标记为父类类型
-        if (superClazz != null && !superClazz.equals(Object.class)) return superClazz;
-//        if (superClazz != null && !superClazz.equals(Object.class)
-//                && superClazz.getAnnotation(OpenApiSuperModel.class) != null) return superClazz;
-
-        return type;
-    }
-
-    /**
-     * 获取泛型集合元素类型
-     *
-     * @param clazz 类型
-     * @param type  类型
-     * @return 元素类型
-     */
-    public static Class<?> getGenericType(Class<?> clazz,
-                                          Type type) {
-        //返回数组类型的元素类型
-        if (clazz.isArray()) return getGenericType(clazz.getComponentType());
-
-        //返回泛型类型
-        if (type instanceof ParameterizedType && Iterable.class.isAssignableFrom(clazz)) {
-            return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
-        }
-
-        return clazz;
-    }
-
-    /**
-     * 获取数组元素类型
-     *
-     * @param type 类型
-     * @return 元素类型
-     */
-    public static Class<?> getGenericType(Class<?> type) {
-        //返回数组类型的元素类型
-        if (type.isArray()) return getGenericType(type.getComponentType());
-
-        return null;
-    }
-
-    /**
-     * 获取数组和泛型集合元素类型
-     *
-     * @param clazz 类型
-     * @param type  泛型类型
-     * @return a: 是否为数组或泛型集合,b: 元素类型
-     */
-    public static Tuple2<Boolean, Class<?>> tryGetCollectionItemType(Class<?> clazz,
-                                                                     Type type) {
-        Boolean flag = clazz.isArray() || (type instanceof ParameterizedType && Iterable.class.isAssignableFrom(clazz));
-        return new Tuple2<>(flag,
-                            flag
-                            ? getGenericType(clazz,
-                                             type)
-                            : null);
-    }
-
-    /**
-     * 转换类型
-     *
-     * @param value        数据
-     * @param defaultValue 默认值
-     * @param type         目标数据类型
-     * @param <T>          目标数据类型
-     * @return 已转为目标类型的数据，失败时为默认值
-     */
-    public static <T> Tuple2<Boolean, T> tryCast(Object value,
-                                                 T defaultValue,
-                                                 Class<T> type) {
-        try {
-            return new Tuple2<>(true,
-                                JSONObject.parseObject(JSONObject.toJSONString(value),
-                                                       type));
-        } catch (Exception ex) {
-            return new Tuple2<>(false,
-                                defaultValue);
-        }
-    }
-
     /**
      * 过滤模型
      *
@@ -241,8 +145,8 @@ public class SchemaExtension {
             //递归处理字段的泛型类型
             if (innerModel && schemaAttribute != null && schemaAttribute.type()
                                                                         .equals(OpenApiSchemaType.model))
-                filterModel(getGenericType(field.getType(),
-                                           field.getGenericType()),
+                filterModel(TypeExtension.getGenericType(field.getType(),
+                                                         field.getGenericType()),
                             after,
                             before,
                             !schemaAttribute.format()
@@ -258,7 +162,7 @@ public class SchemaExtension {
         }
 
         //递归处理泛型类型
-        Class<?> genericClazz = getGenericType(clazz);
+        Class<?> genericClazz = TypeExtension.getGenericType(clazz);
         if (genericClazz != null && !genericClazz.equals(clazz))
             filterModel(genericClazz,
                         after,
@@ -269,7 +173,7 @@ public class SchemaExtension {
                         superModel);
 
         //递归处理父类类型
-        Class<?> superClazz = getSuperModelType(clazz);
+        Class<?> superClazz = TypeExtension.getSuperType(clazz);
         if (!superClazz.equals(clazz))
             filterModel(superClazz,
                         after == null
@@ -854,7 +758,7 @@ public class SchemaExtension {
                                 .collect(Collectors.toList()));
 
             //获取并处理父类类型
-            superClassz = getSuperModelType(classz);
+            superClassz = TypeExtension.getSuperType(classz);
             if (superClassz.equals(classz)) break;
             else classz = superClassz;
         }

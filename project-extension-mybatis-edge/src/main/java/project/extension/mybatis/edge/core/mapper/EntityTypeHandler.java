@@ -20,6 +20,7 @@ import project.extension.openapi.annotations.OpenApiSchema;
 import project.extension.openapi.extention.SchemaExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.tuple.Tuple2;
+import project.extension.type.TypeExtension;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -194,7 +195,7 @@ public class EntityTypeHandler {
             }
 
             //递归处理父类类型
-            Class<?> superClazz = SchemaExtension.getSuperModelType(entityType);
+            Class<?> superClazz = TypeExtension.getSuperType(entityType);
             if (!superClazz.equals(entityType)) {
                 entityType = superClazz;
                 continue;
@@ -302,7 +303,7 @@ public class EntityTypeHandler {
             }
 
             //递归处理父类类型
-            Class<?> superClazz = SchemaExtension.getSuperModelType(entityType);
+            Class<?> superClazz = TypeExtension.getSuperType(entityType);
             if (!superClazz.equals(entityType)) {
                 entityType = superClazz;
                 continue;
@@ -376,7 +377,7 @@ public class EntityTypeHandler {
             }
 
             //递归处理父类类型
-            Class<?> superClazz = SchemaExtension.getSuperModelType(entityType);
+            Class<?> superClazz = TypeExtension.getSuperType(entityType);
             if (!superClazz.equals(entityType)) {
                 entityType = superClazz;
                 continue;
@@ -611,7 +612,7 @@ public class EntityTypeHandler {
             return modelType.getDeclaredField(fieldName);
         } catch (NoSuchFieldException ex1) {
             //搜索模型类型基类的字段
-            Class<?> superClazz = SchemaExtension.getSuperModelType(modelType);
+            Class<?> superClazz = TypeExtension.getSuperType(modelType);
             if (!superClazz.equals(Object.class) && !superClazz.equals(modelType)) return getFieldByFieldName(fieldName,
                                                                                                               superClazz,
                                                                                                               entityMappingType);
