@@ -6,6 +6,8 @@ import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.config.WxMpConfigStorage;
+import project.extension.func.IFunc1;
+import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.model.*;
 
 /**
@@ -24,8 +26,10 @@ public interface IWeChatMpService {
 
     /**
      * 获取微信客户端配置存储对象
+     *
+     * @param resolveMpConfigStorage 参数：当前使用的配置，返回值：配置存储对象
      */
-    void setMpConfigStorage(WxMpConfigStorage mpConfigStorage);
+    void setMpConfigStorage(IFunc1<MpConfig, WxMpConfigStorage> resolveMpConfigStorage);
 
     /**
      * 获取微信客户端配置存储对象

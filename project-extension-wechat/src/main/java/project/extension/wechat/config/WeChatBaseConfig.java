@@ -9,7 +9,7 @@ import project.extension.collections.CollectionsExtension;
 import project.extension.standard.exception.ModuleException;
 import project.extension.string.StringExtension;
 import project.extension.tuple.Tuple2;
-import project.extension.wechat.core.INaiveWeChatServiceProvider;
+import project.extension.wechat.core.INaiveWeChatService;
 import project.extension.wechat.core.mp.servlet.WeChatMpEndpointServlet;
 import project.extension.wechat.core.mp.servlet.WeChatOAuth2Servlet;
 import project.extension.wechat.core.pay.servlet.WeChatPayNotifyServlet;
@@ -157,7 +157,7 @@ public class WeChatBaseConfig {
             if (this.getMultiMp() == null || this.getMultiMp()
                                                  .size() == 0) {
                 //设置默认公众号为master
-                this.setMp(INaiveWeChatServiceProvider.DEFAULT_MP);
+                this.setMp(INaiveWeChatService.DEFAULT_MP);
             } else {
                 //设置默认公众号为多个中的第一个
                 MpConfig firstMP = CollectionsExtension.firstValue(this.getMultiMp());
@@ -170,7 +170,7 @@ public class WeChatBaseConfig {
                         throw new ModuleException(Strings.getConfigMpNameUndefined());
 
                     //设置默认公众号为master
-                    this.setMp(INaiveWeChatServiceProvider.DEFAULT_MP);
+                    this.setMp(INaiveWeChatService.DEFAULT_MP);
                     firstMP.setName(this.getMp());
                 }
             }
@@ -279,7 +279,7 @@ public class WeChatBaseConfig {
             if (this.getMultiPay() == null || this.getMultiPay()
                                                   .size() == 0) {
                 //设置默认商户号为master
-                this.setPay(INaiveWeChatServiceProvider.DEFAULT_PAY);
+                this.setPay(INaiveWeChatService.DEFAULT_PAY);
             } else {
                 //设置默认商户号为多个中的第一个
                 PayConfig firstPay = CollectionsExtension.firstValue(this.getMultiPay());
@@ -292,7 +292,7 @@ public class WeChatBaseConfig {
                         throw new ModuleException(Strings.getConfigPayNameUndefined());
 
                     //设置默认商户号为master
-                    this.setPay(INaiveWeChatServiceProvider.DEFAULT_PAY);
+                    this.setPay(INaiveWeChatService.DEFAULT_PAY);
                     firstPay.setName(this.getPay());
                 }
             }

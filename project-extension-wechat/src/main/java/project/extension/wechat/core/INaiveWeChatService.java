@@ -12,7 +12,7 @@ import java.util.Map;
  * @author LCTR
  * @date 2023-03-15
  */
-public interface INaiveWeChatServiceProvider {
+public interface INaiveWeChatService {
     /**
      * 默认公众号
      */

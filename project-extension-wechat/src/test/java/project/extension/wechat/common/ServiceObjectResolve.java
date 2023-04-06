@@ -5,7 +5,7 @@ import project.extension.ioc.IOCExtension;
 import project.extension.wechat.config.WeChatBaseConfig;
 import project.extension.wechat.config.MpConfig;
 import project.extension.wechat.config.PayConfig;
-import project.extension.wechat.core.INaiveWeChatServiceProvider;
+import project.extension.wechat.core.INaiveWeChatService;
 import project.extension.wechat.core.mp.standard.IWeChatMpService;
 import project.extension.wechat.core.pay.standard.IWeChatPayService;
 
@@ -23,7 +23,7 @@ public class ServiceObjectResolve {
 
     public static IWeChatPayService masterWeChatPayService;
 
-    public static INaiveWeChatServiceProvider naiveWeChatServiceProvider;
+    public static INaiveWeChatService naiveWeChatServiceProvider;
 
     /**
      * 注入
@@ -46,7 +46,7 @@ public class ServiceObjectResolve {
 //        System.out.printf("\r\n%s已注入\r\n",
 //                          INaiveWeChatServiceProvider.class.getName());
 
-        masterWeChatMPService = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.DEFAULT_MP_SERVICE_IOC_NAME,
+        masterWeChatMPService = IOCExtension.applicationContext.getBean(INaiveWeChatService.DEFAULT_MP_SERVICE_IOC_NAME,
                                                                         IWeChatMpService.class);
 
         Assertions.assertNotNull(masterWeChatMPService,
@@ -66,13 +66,13 @@ public class ServiceObjectResolve {
 //                          IWeChatPayService.class.getName());
 
 
-        naiveWeChatServiceProvider = IOCExtension.applicationContext.getBean(INaiveWeChatServiceProvider.class);
+        naiveWeChatServiceProvider = IOCExtension.applicationContext.getBean(INaiveWeChatService.class);
 
         Assertions.assertNotNull(naiveWeChatServiceProvider,
                                  "未获取到INaiveWeChatServiceProvider");
 
         System.out.printf("\r\n%s已注入\r\n",
-                          INaiveWeChatServiceProvider.class.getName());
+                          INaiveWeChatService.class.getName());
     }
 
     /**

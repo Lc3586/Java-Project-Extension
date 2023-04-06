@@ -15,16 +15,23 @@ import java.lang.annotation.*;
 @Target({ElementType.TYPE})
 public @interface TableSetting {
     /**
-     * 表名
-     * <p>此值不受配置中的命名规则影响</p>
+     * 表的别名
+     * <p>如果同时设置了finalName，则最后使用的将会是finalName</p>
      */
-    @AliasFor("name") String value() default "";
+    @AliasFor("alias") String value() default "";
 
     /**
-     * 表名
-     * <p>此值不受配置中的命名规则影响</p>
+     * 表的别名
+     * <p>如果同时设置了finalName，则最后使用的将会是finalName</p>
      */
-    @AliasFor("value") String name() default "";
+    @AliasFor("value") String alias() default "";
+
+    /**
+     * 指定表名
+     * <p>此值不受配置中的命名规则影响</p>
+     * <p>优先级高于别名</p>
+     */
+    String finalName() default "";
 
     /**
      * 模式名

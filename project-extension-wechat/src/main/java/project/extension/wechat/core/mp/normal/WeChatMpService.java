@@ -10,6 +10,7 @@ import me.chanjar.weixin.mp.bean.template.WxMpTemplateMessage;
 import me.chanjar.weixin.mp.config.WxMpConfigStorage;
 import me.chanjar.weixin.mp.config.impl.WxMpDefaultConfigImpl;
 import org.apache.commons.lang3.StringUtils;
+import project.extension.func.IFunc1;
 import project.extension.standard.exception.ModuleException;
 import project.extension.string.StringExtension;
 import project.extension.wechat.config.WeChatBaseConfig;
@@ -58,8 +59,8 @@ public class WeChatMpService
     }
 
     @Override
-    public void setMpConfigStorage(WxMpConfigStorage mpConfigStorage) {
-        getMpService().setWxMpConfigStorage(mpConfigStorage);
+    public void setMpConfigStorage(IFunc1<MpConfig, WxMpConfigStorage> resolveMpConfigStorage) {
+        getMpService().setWxMpConfigStorage(resolveMpConfigStorage.invoke(mpConfig));
     }
 
     @Override

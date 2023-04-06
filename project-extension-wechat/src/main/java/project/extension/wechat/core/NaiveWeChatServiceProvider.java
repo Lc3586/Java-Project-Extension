@@ -36,7 +36,7 @@ import java.util.Map;
 @EnableConfigurationProperties({WeChatBaseConfig.class})
 @DependsOn("iocExtension")
 public class NaiveWeChatServiceProvider
-        implements INaiveWeChatServiceProvider {
+        implements INaiveWeChatService {
     public NaiveWeChatServiceProvider(WeChatBaseConfig weChatBaseConfig) {
         this.weChatBaseConfig = weChatBaseConfig;
         this.loadAllWeChatMpService();
@@ -174,9 +174,9 @@ public class NaiveWeChatServiceProvider
             @Nullable
                     String mp) {
         return mp == null
-               ? INaiveWeChatServiceProvider.DEFAULT_MP_SERVICE_IOC_NAME
+               ? INaiveWeChatService.DEFAULT_MP_SERVICE_IOC_NAME
                : String.format("%s%s",
-                               INaiveWeChatServiceProvider.MP_SERVICE_IOC_PREFIX,
+                               INaiveWeChatService.MP_SERVICE_IOC_PREFIX,
                                mp);
     }
 
@@ -189,9 +189,9 @@ public class NaiveWeChatServiceProvider
             @Nullable
                     String mp) {
         return mp == null
-               ? INaiveWeChatServiceProvider.DEFAULT_PAY_SERVICE_IOC_NAME
+               ? INaiveWeChatService.DEFAULT_PAY_SERVICE_IOC_NAME
                : String.format("%s%s",
-                               INaiveWeChatServiceProvider.PAY_SERVICE_IOC_PREFIX,
+                               INaiveWeChatService.PAY_SERVICE_IOC_PREFIX,
                                mp);
     }
 
@@ -203,7 +203,7 @@ public class NaiveWeChatServiceProvider
     public static String getServletBeanName(
             Class<?> servletType) {
         return String.format("%s%s",
-                             INaiveWeChatServiceProvider.SERVLET_IOC_PREFIX,
+                             INaiveWeChatService.SERVLET_IOC_PREFIX,
                              servletType.getSimpleName());
     }
 

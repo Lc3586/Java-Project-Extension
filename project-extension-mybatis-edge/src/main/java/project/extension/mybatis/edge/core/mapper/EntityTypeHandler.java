@@ -234,7 +234,11 @@ public class EntityTypeHandler {
                                                                             TableSetting.class);
         if (tableSettingAttribute != null) {
             result.a = tableSettingAttribute.schema();
-            result.b = tableSettingAttribute.name();
+            if (StringUtils.hasText(tableSettingAttribute.finalName()))
+                result.b = tableSettingAttribute.finalName();
+            else if (StringUtils.hasText(tableSettingAttribute.alias()))
+                result.b = SqlExtension.convertName(tableSettingAttribute.alias(),
+                                                    nameConvertType);
         }
 
         if (!StringUtils.hasText(result.b)) result.b = SqlExtension.convertName(entityType.getSimpleName(),
@@ -864,9 +868,9 @@ public class EntityTypeHandler {
     public static Class<?> getEntityType(Class<?> type) {
         if (type.getDeclaredAnnotation(TableSetting.class) != null) return type;
 
-        Class<?> superClassz = type.getSuperclass();
-        if (superClassz.equals(Object.class) || superClassz.equals(type))
+        Class<?> superClass = type.getSuperclass();
+        if (superClass.equals(Object.class) || superClass.equals(type))
             throw new ModuleException(Strings.getEntityUndefined(type.getTypeName()));
-        return getEntityType(superClassz);
+        return getEntityType(superClass);
     }
 }
