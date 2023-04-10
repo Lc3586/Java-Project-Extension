@@ -456,7 +456,9 @@ public class EntityTypeHandler {
         }
 
         //如果指定了标签则获取继承类的信息
-        if (dtoType.isAnnotationPresent(OpenApiMainTag.class) || dtoType.isAnnotationPresent(OpenApiMainTags.class)) {
+        if (dtoType.isAnnotationPresent(OpenApiMainTag.class)
+                || dtoType.isAnnotationPresent(OpenApiMainTags.class)
+                || CollectionsExtension.anyPlus(customTags)) {
             //继承到实体的业务模型
             List<String> tags = new ArrayList<>();
             String[] mainTags = SchemaExtension.getMainTag(dtoType,

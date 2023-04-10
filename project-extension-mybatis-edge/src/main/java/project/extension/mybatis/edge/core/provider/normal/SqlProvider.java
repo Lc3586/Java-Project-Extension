@@ -1088,33 +1088,38 @@ public abstract class SqlProvider {
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:WOPK-%s:WOIK:%s",
+        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:MTL-%s:CT-%s:WOPK-%s:WOIK:%s",
                                         this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
                                         ? ""
                                         : dtoType.getTypeName(),
+                                        mainTagLevel,
+                                        customTags == null
+                                        ? ""
+                                        : String.join(",",
+                                                      customTags),
                                         withOutPrimaryKey,
                                         withOutIdentityKey);
         Map<String, String> fieldWithColumns = CacheExtension.getFieldWithColumns(cacheKey);
-        if (CollectionsExtension.anyPlus(fieldWithColumns)) return fieldWithColumns;
+        if (!CollectionsExtension.anyPlus(fieldWithColumns)) {
+            fieldWithColumns = new HashMap<>();
 
-        fieldWithColumns = new HashMap<>();
+            for (Field field : EntityTypeHandler.getColumnFieldsByDtoType(dtoType,
+                                                                          mainTagLevel,
+                                                                          customTags,
+                                                                          withOutPrimaryKey,
+                                                                          withOutIdentityKey,
+                                                                          inherit)) {
+                fieldWithColumns.put(field.getName(),
+                                     EntityTypeHandler.getColumn(field,
+                                                                 config.getNameConvertType()));
+            }
 
-        for (Field field : EntityTypeHandler.getColumnFieldsByDtoType(dtoType,
-                                                                      mainTagLevel,
-                                                                      customTags,
-                                                                      withOutPrimaryKey,
-                                                                      withOutIdentityKey,
-                                                                      inherit)) {
-            fieldWithColumns.put(field.getName(),
-                                 EntityTypeHandler.getColumn(field,
-                                                             config.getNameConvertType()));
+            //添加至缓存
+            CacheExtension.setFieldWithColumns(cacheKey,
+                                               fieldWithColumns);
         }
-
-        //添加至缓存
-        CacheExtension.setFieldWithColumns(cacheKey,
-                                           fieldWithColumns);
 
         if (CollectionsExtension.anyPlus(exceptionFieldNames))
             CollectionsExtension.tryRemoveIfKeyNotIn(fieldWithColumns,
