@@ -41,7 +41,7 @@ project:
             password: ENC(Q88XTJSttazzBLg5bVN32Oyn0e5CagP/+MXtmSUYGxc=)
         #从库-SqlServer数据库
         sqlserver:
-          enable: true
+          enable: false
           dbType: JdbcSqlServer
           properties:
             url: ENC(oilOf3N4zBFkDwmX41Kpgsovd2wLZYywl4BKg7QzSqHA1KgysggiNG6rmAJ41BwiS78WuA4JPdxPDvZEoeWqnXWJ4iM62kFu5ZWULGVIahLM9JkXF5yR6QAS7gu+/lFL)
@@ -49,7 +49,7 @@ project:
             password: ENC(EAMmuitoh95dSC4GUZp66sOIXZUAqVlm)
         #从库-SqlServer数据库2012及以上版本
         sqlserver2012:
-          enable: true
+          enable: false
           dbType: JdbcSqlServer_2012_plus
           properties:
             url: ENC(oilOf3N4zBFkDwmX41Kpgsovd2wLZYywl4BKg7QzSqHA1KgysggiNG6rmAJ41BwiS78WuA4JPdxPDvZEoeWqnXWJ4iM62kFu5ZWULGVIahLM9JkXF5yR6QAS7gu+/lFL)
