@@ -39,7 +39,7 @@ public interface IWeChatMpService {
     /**
      * 设置消息路由
      */
-    void setWxMpMessageRouter(WxMpMessageRouter router);
+    void setWxMpMessageRouter(IFunc1<MpConfig, WxMpMessageRouter> resolveMpMessageRouter);
 
     /**
      * 获取消息路由

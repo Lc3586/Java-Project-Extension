@@ -69,8 +69,8 @@ public class WeChatMpService
     }
 
     @Override
-    public void setWxMpMessageRouter(WxMpMessageRouter router) {
-        this.wxMpMessageRouter = router;
+    public void setWxMpMessageRouter(IFunc1<MpConfig, WxMpMessageRouter> resolveMpMessageRouter) {
+        this.wxMpMessageRouter = resolveMpMessageRouter.invoke(mpConfig);
     }
 
     @Override
