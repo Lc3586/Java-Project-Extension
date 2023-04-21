@@ -197,16 +197,20 @@ public class StringExtension {
      * 转为十六进制字符串
      *
      * @param bytes 数据
+     * @param upper 转大写
      * @return 十六进制字符串
      */
-    public static String toHexString(byte[] bytes) {
+    public static String toHexString(byte[] bytes,
+                                     boolean upper) {
         StringBuilder result = new StringBuilder(bytes.length);
 
         for (byte aByte : bytes) {
-            String item = Integer.toHexString(0xFF & aByte);
-            if (item.length() < 2)
-                result.append(0);
-            result.append(item.toUpperCase());
+            String hexString = Integer.toHexString((aByte & 0xFF) | 0x100);
+            result.append(upper
+                          ? hexString.toUpperCase(Locale.ROOT)
+                          : hexString,
+                          1,
+                          3);
         }
 
         return result.toString();

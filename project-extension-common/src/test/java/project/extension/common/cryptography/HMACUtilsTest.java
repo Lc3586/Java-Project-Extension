@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import project.extension.cryptography.HMACUtils;
 import project.extension.cryptography.JasyptUtils;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * HMAC工具类测试
  *
@@ -39,7 +41,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_MD5(text,
-                                          password);
+                                          password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 
@@ -70,7 +72,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_SHA1(text,
-                                           password);
+                                           password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 
@@ -101,7 +103,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_SHA224(text,
-                                             password);
+                                             password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 
@@ -132,7 +134,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_SHA256(text,
-                                             password);
+                                             password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 
@@ -163,7 +165,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_SHA384(text,
-                                             password);
+                                             password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 
@@ -194,7 +196,7 @@ public class HMACUtilsTest {
 
         //实际值
         String data1 = HMACUtils.HMAC_SHA512(text,
-                                             password);
+                                             password.getBytes(StandardCharsets.UTF_8));
         System.out.printf("摘要：%s%n",
                           data1);
 

@@ -19,7 +19,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_MD5(String text,
-                                  String secret)
+                                  byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -38,7 +38,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_MD5(String text,
-                                  String secret,
+                                  byte[] secret,
                                   boolean upper)
             throws
             Exception {
@@ -57,7 +57,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA1(String text,
-                                   String secret)
+                                   byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -76,7 +76,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA1(String text,
-                                   String secret,
+                                   byte[] secret,
                                    boolean upper)
             throws
             Exception {
@@ -95,7 +95,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA224(String text,
-                                     String secret)
+                                     byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -114,7 +114,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA224(String text,
-                                     String secret,
+                                     byte[] secret,
                                      boolean upper)
             throws
             Exception {
@@ -133,7 +133,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA256(String text,
-                                     String secret)
+                                     byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -152,7 +152,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA256(String text,
-                                     String secret,
+                                     byte[] secret,
                                      boolean upper)
             throws
             Exception {
@@ -171,7 +171,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA384(String text,
-                                     String secret)
+                                     byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -190,7 +190,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA384(String text,
-                                     String secret,
+                                     byte[] secret,
                                      boolean upper)
             throws
             Exception {
@@ -209,7 +209,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA512(String text,
-                                     String secret)
+                                     byte[] secret)
             throws
             Exception {
         return HMAC(text,
@@ -228,7 +228,7 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC_SHA512(String text,
-                                     String secret,
+                                     byte[] secret,
                                      boolean upper)
             throws
             Exception {
@@ -250,14 +250,14 @@ public class HMACUtils {
      * @return 密文
      */
     public static String HMAC(String text,
-                              String secret,
+                              byte[] secret,
                               String algorithm,
                               boolean upper,
                               String charsetName)
             throws
             Exception {
         Mac sha256_HMAC = Mac.getInstance(algorithm);
-        SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(charsetName),
+        SecretKeySpec secret_key = new SecretKeySpec(secret,
                                                      algorithm);
         sha256_HMAC.init(secret_key);
         byte[] array = sha256_HMAC.doFinal(text.getBytes(charsetName));
