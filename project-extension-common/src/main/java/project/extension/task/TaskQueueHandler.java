@@ -44,7 +44,7 @@ public abstract class TaskQueueHandler {
                             int threadPoolSize,
                             Logger logger) {
         this.name = name;
-        this.state = TaskQueueHandlerState.STOPPED;
+        this.state = TaskQueueHandlerState.已停止;
         this.taskQueue = new ConcurrentLinkedDeque<>();
         this.ConcurrentTaskMap = new ConcurrentHashMap<>();
         this.ScheduleTaskList = new ConcurrentLinkedQueue<>();
@@ -163,7 +163,7 @@ public abstract class TaskQueueHandler {
      * @param autoHandler 自动开始处理任务
      */
     public void start(boolean autoHandler) {
-        this.state = TaskQueueHandlerState.STARTING;
+        this.state = TaskQueueHandlerState.启动中;
 
         timer = new Timer();
 
@@ -171,7 +171,7 @@ public abstract class TaskQueueHandler {
 
         startTime = new Date();
 
-        this.state = TaskQueueHandlerState.RUNNING;
+        this.state = TaskQueueHandlerState.运行中;
 
         //异步执行
         CompletableFuture.runAsync(this::run,
@@ -189,9 +189,9 @@ public abstract class TaskQueueHandler {
      */
     public void start(boolean autoHandler,
                       IFunc0<Boolean> before) {
-        this.state = TaskQueueHandlerState.STARTING;
+        this.state = TaskQueueHandlerState.启动中;
         if (!before.invoke()) {
-            this.state = TaskQueueHandlerState.STOPPED;
+            this.state = TaskQueueHandlerState.已停止;
             return;
         }
         this.start(autoHandler);
@@ -210,12 +210,12 @@ public abstract class TaskQueueHandler {
      * @param before 停止前要执行的方法
      */
     public void shutDown(IAction0 before) {
-        this.state = TaskQueueHandlerState.STOPPING;
+        this.state = TaskQueueHandlerState.停止中;
 
         if (before != null)
             before.invoke();
 
-        this.state = TaskQueueHandlerState.STOPPING;
+        this.state = TaskQueueHandlerState.停止中;
 
         if (cf == null) cf = new CompletableFuture<>();
 
@@ -242,7 +242,7 @@ public abstract class TaskQueueHandler {
                              }
                          });
 
-        this.state = TaskQueueHandlerState.STOPPED;
+        this.state = TaskQueueHandlerState.已停止;
     }
 
     /**
@@ -263,8 +263,8 @@ public abstract class TaskQueueHandler {
      */
     public void addTask(Object taskKey,
                         boolean handler) {
-        if (this.state.equals(TaskQueueHandlerState.STOPPING)
-                || this.state.equals(TaskQueueHandlerState.STOPPED))
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
             throw new CommonException(String.format("%s已关闭",
                                                     getName()));
 
@@ -292,8 +292,8 @@ public abstract class TaskQueueHandler {
      */
     public void addTasks(Collection<Object> taskKeys,
                          boolean handler) {
-        if (this.state.equals(TaskQueueHandlerState.STOPPING)
-                || this.state.equals(TaskQueueHandlerState.STOPPED))
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
             throw new CommonException(String.format("%s已关闭",
                                                     getName()));
 
@@ -324,7 +324,7 @@ public abstract class TaskQueueHandler {
      */
     public void wait2Start(int timeout) {
         if (!this.getState()
-                 .equals(TaskQueueHandlerState.STARTING))
+                 .equals(TaskQueueHandlerState.启动中))
             return;
 
         if (timeout != -1
@@ -374,7 +374,7 @@ public abstract class TaskQueueHandler {
                           int offsetScheduleTaskCount,
                           int timeout) {
         if (!this.getState()
-                 .equals(TaskQueueHandlerState.RUNNING)
+                 .equals(TaskQueueHandlerState.运行中)
                 && getConcurrentTaskCount() - offsetConcurrentTaskCount <= 0
                 && getScheduleTaskCount() - offsetScheduleTaskCount <= 0)
             return;
@@ -399,13 +399,13 @@ public abstract class TaskQueueHandler {
             while (true) {
                 if (cf != null) {
                     if (!cf.get()) return;
-                    this.state = TaskQueueHandlerState.RUNNING;
+                    this.state = TaskQueueHandlerState.运行中;
                     cf = null;
                 }
 
                 if (taskQueue.isEmpty()) {
                     cf = new CompletableFuture<>();
-                    this.state = TaskQueueHandlerState.IDLING;
+                    this.state = TaskQueueHandlerState.空闲;
                     continue;
                 }
 
@@ -459,8 +459,8 @@ public abstract class TaskQueueHandler {
                                      Runnable runnable,
                                      @Nullable
                                              Consumer<Void> thenAccept) {
-        if (this.state.equals(TaskQueueHandlerState.STOPPING)
-                || this.state.equals(TaskQueueHandlerState.STOPPED))
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
             throw new CommonException(String.format("%s已关闭",
                                                     getName()));
 
@@ -501,8 +501,8 @@ public abstract class TaskQueueHandler {
     protected <T> void addScheduleTask(IAction1<T> action,
                                        T parameter,
                                        long delay) {
-        if (this.state.equals(TaskQueueHandlerState.STOPPING)
-                || this.state.equals(TaskQueueHandlerState.STOPPED))
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
             throw new CommonException(String.format("%s已关闭",
                                                     getName()));
 

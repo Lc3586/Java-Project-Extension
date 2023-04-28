@@ -1,50 +1,57 @@
-package project.extension.task;
+package project.extension.console.dto;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 数据库类型
+ * 控制台输出时的字体样式
  *
  * @author LCTR
- * @date 2022-03-24
+ * @date 2023-04-28
  */
-public enum TaskQueueHandlerState {
+public enum ConsoleFontStyle {
     /**
-     * 启动中
+     * 重置
      */
-    启动中(0,
-        "启动中"),
+    重置(0,
+       "重置"),
     /**
-     * 空闲
-     * <p>队列为空</p>
-     * <p>但是可能存在要处理的异步子任务和延时子任务</p>
+     * 加粗
      */
-    空闲(1,
-       "空闲"),
+    加粗(1,
+       "加粗"),
     /**
-     * 运行中
-     * <p>正在处理队列</p>
+     * 减弱
      */
-    运行中(2,
-        "运行中"),
+    减弱(2,
+       "减弱"),
     /**
-     * 停止中
+     * 斜体
      */
-    停止中(3,
-        "停止中"),
+    斜体(3,
+       "斜体"),
     /**
-     * 已停止
+     * 下划线
      */
-    已停止(4,
-        "已停止");
+    下划线(4,
+        "下划线"),
+    /**
+     * 慢速闪烁
+     */
+    慢速闪烁(5,
+         "慢速闪烁"),
+    /**
+     * 快速闪烁
+     */
+    快速闪烁(6,
+         "快速闪烁");
 
     /**
      * @param index 索引
      * @param value 值
      */
-    TaskQueueHandlerState(int index,
-                          String value) {
+    ConsoleFontStyle(int index,
+                     String value) {
         this.index = index;
         this.value = value;
     }
@@ -84,14 +91,14 @@ public enum TaskQueueHandlerState {
      * @param value 值
      * @return 枚举
      */
-    public static TaskQueueHandlerState toEnum(String value)
+    public static ConsoleFontStyle toEnum(String value)
             throws
             IllegalArgumentException {
-        Optional<TaskQueueHandlerState> find = Arrays.stream(TaskQueueHandlerState.values())
-                                                     .filter(x -> x.value.equals(value))
-                                                     .findFirst();
+        Optional<ConsoleFontStyle> find = Arrays.stream(ConsoleFontStyle.values())
+                                                .filter(x -> x.value.equals(value))
+                                                .findFirst();
         if (!find.isPresent())
-            throw new IllegalArgumentException(String.format("未找到符合%s此值的TaskQueueHandlerState枚举",
+            throw new IllegalArgumentException(String.format("未找到符合%s此值的ConsoleFontStyle枚举",
                                                              value));
         return find.get();
     }
@@ -102,10 +109,10 @@ public enum TaskQueueHandlerState {
      * @param index 索引
      * @return 枚举
      */
-    public static TaskQueueHandlerState toEnum(int index)
+    public static ConsoleFontStyle toEnum(int index)
             throws
             IllegalArgumentException {
-        for (TaskQueueHandlerState value : TaskQueueHandlerState.values()) {
+        for (ConsoleFontStyle value : ConsoleFontStyle.values()) {
             if (value.getIndex() == index)
                 return value;
         }

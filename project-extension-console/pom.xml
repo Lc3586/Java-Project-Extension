@@ -10,10 +10,62 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>project-extension-console</artifactId>
+    <version>1.0.4-SNAPSHOT</version>
+
+    <name>top.lctr:project-extension-document</name>
+    <description>
+        项目拓展 控制台工具
+    </description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>lctr</name>
+            <email>lc3586@foxmail.com</email>
+            <organization>https://lctr.top/</organization>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git@github.com:Lc3586/Java-Project-Extension.git</connection>
+        <developerConnection>scm:git@github.com:Lc3586/Java-Project-Extension.git</developerConnection>
+        <url>git@github.com:Lc3586/Java-Project-Extension.git</url>
+        <!--        <tag>project-extension-0.0.1</tag>-->
+    </scm>
 
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>top.lctr</groupId>
+            <artifactId>project-extension-common</artifactId>
+            <version>1.0.4-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>public</id>
+            <name>aliyun nexus</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+
+        <repository>
+            <id>com.e-iceblue</id>
+            <name>e-iceblue</name>
+            <url>https://repo.e-iceblue.cn/repository/maven-public</url>
+        </repository>
+    </repositories>
 </project>

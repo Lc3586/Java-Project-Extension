@@ -14,11 +14,13 @@ public class TaskExtension {
      *
      * @param millis 毫秒数
      */
-    public static void delay(long millis)
-            throws
-            Exception {
-        delayTask(millis)
-                .get();
+    public static void delay(long millis) {
+        try {
+            delayTask(millis)
+                    .get();
+        } catch (Exception ignore) {
+
+        }
     }
 
     /**
