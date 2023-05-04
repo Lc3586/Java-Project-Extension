@@ -8,6 +8,7 @@ import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
 import project.extension.mybatis.edge.extention.EntityExtension;
 import project.extension.standard.exception.BusinessException;
+import project.extension.test.TestDataHelper;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -34,154 +35,6 @@ public class TempDataExtension {
      * 当前开启事务的线程
      */
     private static final Map<Long, String> threadTransactionMap = new HashMap<>();
-
-    /**
-     * 用于测试的字符值
-     */
-    private static final char[] charsValue = new char[]
-            {
-                    'a',
-                    'b',
-                    'c',
-                    'd',
-                    'e',
-                    'f',
-                    'g',
-                    'h',
-                    'i',
-                    'j',
-                    'k',
-                    'l',
-                    'm',
-                    'n',
-                    'o',
-                    'p',
-                    'q',
-                    'r',
-                    's',
-                    't',
-                    'u',
-                    'v',
-                    'w',
-                    'x',
-                    'y',
-                    'z',
-                    '1',
-                    '2',
-                    '3',
-                    '4',
-                    '5',
-                    '6',
-                    '7',
-                    '8',
-                    '9',
-                    '0',
-                    '!',
-                    '@',
-                    '$',
-                    '%',
-                    '^',
-                    '&',
-                    '*',
-                    '(',
-                    ')',
-                    '~',
-                    '`',
-                    '·',
-                    '！',
-                    '￥',
-                    '…',
-                    '（',
-                    '）',
-                    '_',
-                    '+',
-                    '-',
-                    '=',
-                    '。',
-                    '.',
-                    '?',
-                    '？',
-                    '¿',
-                    '；',
-                    '’',
-                    '\'',
-                    '[',
-                    ']',
-                    '【',
-                    '】',
-                    '\\',
-                    '|',
-                    '/',
-                    ',',
-                    '，',
-                    ':',
-                    '：',
-                    '{',
-                    '}',
-                    '▁',
-                    '▂',
-                    '▃',
-                    '▄',
-                    '▅',
-                    '▆',
-                    '▇',
-                    '█',
-                    '№',
-                    '↑',
-                    '→',
-                    '↘',
-                    '↓',
-                    '↙',
-                    '←',
-                    '㊣',
-                    '∮',
-                    '♂',
-                    '♀',
-                    '∞',
-                    'ㄨ',
-                    '╬',
-                    '╭',
-                    '╮',
-                    '╰',
-                    '╱',
-                    '╲',
-                    '＠',
-                    'ξ',
-                    'ζ',
-                    'ω',
-                    '々',
-                    '√',
-                    '①',
-                    '¤',
-                    '★',
-                    '☆',
-                    '■',
-                    '▓',
-                    '☉',
-                    '⊙',
-                    '●',
-                    '〇',
-                    '◎',
-                    '๑',
-                    '♬',
-                    '✿',
-                    '☂',
-                    '☃',
-                    '☄',
-                    '☒',
-                    '☢',
-                    '☺',
-                    '☻',
-                    '♣',
-                    '♠',
-                    '♦',
-                    'ஐ',
-                    'ﻬ',
-                    '☎',
-                    '☏',
-                    '♨',
-                    '㊝',
-                    '♈'};
 
     /**
      * 获取数据
@@ -248,138 +101,94 @@ public class TempDataExtension {
 
                 if (Character.class.equals(field.getType())
                         || char.class.equals(field.getType())) {
-                    if (columnSetting == null)
-                        field.set(data,
-                                  '6');
-                    else
-                        field.set(data,
-                                  charsValue[new Random().nextInt(charsValue.length - 1)]);
+                    field.set(data,
+                              TestDataHelper.generateCharacter());
                 } else if (String.class.equals(field.getType())) {
                     if (columnSetting == null)
                         field.set(data,
-                                  "6");
+                                  TestDataHelper.generateString(null));
                     else {
                         int length = columnSetting.length();
                         if (length == 36) {
                             field.set(data,
-                                      UUID.randomUUID()
-                                          .toString());
+                                      TestDataHelper.generateUUID()
+                                                    .toString());
                             continue;
                         }
 
-                        if (length <= 0)
-                            length = 100000;
-
-                        char[] chars = new char[length];
-                        Random random = new Random();
-                        for (int i = 0; i < length; i++) {
-                            chars[i] = charsValue[random.nextInt(charsValue.length - 1)];
-                        }
                         field.set(data,
-                                  new String(chars));
+                                  TestDataHelper.generateString(length));
                     }
                 } else if (UUID.class.equals(field.getType())) {
                     field.set(data,
-                              UUID.randomUUID());
+                              TestDataHelper.generateUUID());
                 } else if (Boolean.class.equals(field.getType())
                         || boolean.class.equals(field.getType())) {
                     field.set(data,
-                              new Random().nextBoolean());
+                              TestDataHelper.generateBoolean());
                 } else if (Byte.class.equals(field.getType())
                         || byte.class.equals(field.getType())) {
                     field.set(data,
-                              new Random().nextBoolean()
-                              ? Byte.MAX_VALUE
-                              : Byte.MIN_VALUE);
+                              TestDataHelper.generateByte());
                 } else if (Short.class.equals(field.getType())
                         || short.class.equals(field.getType())) {
                     field.set(data,
-                              new Random().nextBoolean()
-                              ? Short.MAX_VALUE
-                              : Short.MIN_VALUE);
+                              TestDataHelper.generateBoolean());
                 } else if (Integer.class.equals(field.getType())
                         || int.class.equals(field.getType())) {
                     field.set(data,
-                              new Random().nextBoolean()
-                              ? Integer.MAX_VALUE
-                              : Integer.MIN_VALUE);
+                              TestDataHelper.generateInteger());
                 } else if (Long.class.equals(field.getType())
                         || long.class.equals(field.getType())) {
                     field.set(data,
-                              new Random().nextBoolean()
-                              ? Long.MAX_VALUE
-                              : Long.MIN_VALUE);
+                              TestDataHelper.generateLong());
                 } else if (Float.class.equals(field.getType())
                         || float.class.equals(field.getType())) {
                     if (columnSetting == null || columnSetting.precision() == 0)
                         field.set(data,
-                                  new Random().nextBoolean()
-                                  ? Float.MAX_VALUE
-                                  : Float.MIN_VALUE);
+                                  TestDataHelper.generateFloat(null,
+                                                               null));
                     else {
                         int precision = columnSetting.precision();
                         int scale = columnSetting.scale();
-                        char[] integer = new char[precision - scale];
-                        Arrays.fill(integer,
-                                    '9');
-                        char[] decimal = new char[scale];
-                        Arrays.fill(decimal,
-                                    '9');
                         field.set(data,
-                                  new Float(String.format("%s.%s",
-                                                          new String(integer),
-                                                          new String(decimal))));
+                                  TestDataHelper.generateFloat(precision,
+                                                               scale));
                     }
                 } else if (Double.class.equals(field.getType())
                         || double.class.equals(field.getType())) {
                     if (columnSetting == null || columnSetting.precision() == 0)
                         field.set(data,
-                                  new Random().nextBoolean()
-                                  ? Double.MAX_VALUE
-                                  : Double.MIN_VALUE);
+                                  TestDataHelper.generateDouble(null,
+                                                                null));
                     else {
                         int precision = columnSetting.precision();
                         int scale = columnSetting.scale();
-                        char[] integer = new char[precision - scale];
-                        Arrays.fill(integer,
-                                    '9');
-                        char[] decimal = new char[scale];
-                        Arrays.fill(decimal,
-                                    '9');
                         field.set(data,
-                                  new Double(String.format("%s.%s",
-                                                           new String(integer),
-                                                           new String(decimal))));
+                                  TestDataHelper.generateDouble(precision,
+                                                                scale));
                     }
                 } else if (BigDecimal.class.equals(field.getType())) {
                     if (columnSetting == null || columnSetting.precision() == 0)
                         field.set(data,
-                                  new BigDecimal(new Random().nextBoolean()
-                                                 ? Long.MAX_VALUE
-                                                 : Long.MIN_VALUE));
+                                  TestDataHelper.generateBigDecimal(null,
+                                                                    null));
                     else {
                         int precision = columnSetting.precision();
                         int scale = columnSetting.scale();
-                        char[] integer = new char[precision - scale];
-                        Arrays.fill(integer,
-                                    '9');
-                        char[] decimal = new char[scale];
-                        Arrays.fill(decimal,
-                                    '9');
                         field.set(data,
-                                  new BigDecimal(String.format("%s.%s",
-                                                               new String(integer),
-                                                               new String(decimal))));
+                                  TestDataHelper.generateDouble(precision,
+                                                                scale));
                     }
                 } else if (java.sql.Date.class.equals(field.getType())) {
                     field.set(data,
-                              new java.sql.Date(new java.sql.Timestamp(System.currentTimeMillis()).getTime()));
+                              TestDataHelper.generateSqlDate());
                 } else if (Time.class.equals(field.getType())) {
                     field.set(data,
-                              new Time(new java.sql.Timestamp(System.currentTimeMillis()).getTime()));
+                              TestDataHelper.generateTime());
                 } else if (Date.class.equals(field.getType())) {
                     field.set(data,
-                              new Date(System.currentTimeMillis()));
+                              TestDataHelper.generateDate());
                 } else if (byte[].class.equals(field.getType())) {
                     //data:image/gif;base64,
                     String base64 = readBase64FromFile("file/gif_base64");

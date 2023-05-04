@@ -11,10 +11,10 @@ import java.util.Optional;
  */
 public enum ConsoleFontStyle {
     /**
-     * 重置
+     * 默认
      */
-    重置(0,
-       "重置"),
+    默认(0,
+       "默认"),
     /**
      * 加粗
      */
@@ -91,16 +91,11 @@ public enum ConsoleFontStyle {
      * @param value 值
      * @return 枚举
      */
-    public static ConsoleFontStyle toEnum(String value)
-            throws
-            IllegalArgumentException {
+    public static ConsoleFontStyle toEnum(String value) {
         Optional<ConsoleFontStyle> find = Arrays.stream(ConsoleFontStyle.values())
                                                 .filter(x -> x.value.equals(value))
                                                 .findFirst();
-        if (!find.isPresent())
-            throw new IllegalArgumentException(String.format("未找到符合%s此值的ConsoleFontStyle枚举",
-                                                             value));
-        return find.get();
+        return find.orElse(ConsoleFontStyle.默认);
     }
 
     /**
@@ -109,15 +104,11 @@ public enum ConsoleFontStyle {
      * @param index 索引
      * @return 枚举
      */
-    public static ConsoleFontStyle toEnum(int index)
-            throws
-            IllegalArgumentException {
+    public static ConsoleFontStyle toEnum(int index) {
         for (ConsoleFontStyle value : ConsoleFontStyle.values()) {
             if (value.getIndex() == index)
                 return value;
         }
-
-        throw new IllegalArgumentException(String.format("指定索引%s无效",
-                                                         index));
+        return ConsoleFontStyle.默认;
     }
 }

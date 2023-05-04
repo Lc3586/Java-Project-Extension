@@ -333,4 +333,34 @@ public class StringExtension {
 
         return null;
     }
+
+    /**
+     * 截取字符串
+     *
+     * @param input      输入内容
+     * @param startIndex 起始索引
+     * @param length     长度
+     */
+    public static String substringZero(String input,
+                                       int startIndex,
+                                       int length) {
+        return length == 0 || startIndex >= input.length()
+               ? ""
+               : input.substring(startIndex,
+                                 length);
+    }
+
+    /**
+     * 创建字符串
+     *
+     * @param character 字符
+     * @param length    长度
+     */
+    public static String newString(char character,
+                                   int length) {
+        char[] chars = new char[length];
+        Arrays.fill(chars,
+                    character);
+        return new String(chars);
+    }
 }

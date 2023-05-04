@@ -11,6 +11,11 @@ import java.util.Optional;
  */
 public enum ConsoleBackgroundColor {
     /**
+     * 默认
+     */
+    默认(0,
+       "默认"),
+    /**
      * 红色
      */
     红色(41,
@@ -96,16 +101,11 @@ public enum ConsoleBackgroundColor {
      * @param value 值
      * @return 枚举
      */
-    public static ConsoleBackgroundColor toEnum(String value)
-            throws
-            IllegalArgumentException {
+    public static ConsoleBackgroundColor toEnum(String value) {
         Optional<ConsoleBackgroundColor> find = Arrays.stream(ConsoleBackgroundColor.values())
                                                       .filter(x -> x.value.equals(value))
                                                       .findFirst();
-        if (!find.isPresent())
-            throw new IllegalArgumentException(String.format("未找到符合%s此值的ConsoleBackgroundColor枚举",
-                                                             value));
-        return find.get();
+        return find.orElse(ConsoleBackgroundColor.默认);
     }
 
     /**
@@ -114,15 +114,12 @@ public enum ConsoleBackgroundColor {
      * @param index 索引
      * @return 枚举
      */
-    public static ConsoleBackgroundColor toEnum(int index)
-            throws
-            IllegalArgumentException {
+    public static ConsoleBackgroundColor toEnum(int index) {
         for (ConsoleBackgroundColor value : ConsoleBackgroundColor.values()) {
             if (value.getIndex() == index)
                 return value;
         }
 
-        throw new IllegalArgumentException(String.format("指定索引%s无效",
-                                                         index));
+        return ConsoleBackgroundColor.默认;
     }
 }
