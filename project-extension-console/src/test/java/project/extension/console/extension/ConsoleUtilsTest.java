@@ -9,7 +9,6 @@ import project.extension.task.TaskExtension;
 import project.extension.test.TestDataHelper;
 
 import java.io.*;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 /**
