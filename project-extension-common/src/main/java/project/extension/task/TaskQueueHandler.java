@@ -200,8 +200,8 @@ public abstract class TaskQueueHandler {
     /**
      * 关停
      */
-    public void shutDown() {
-        shutDown(null);
+    public void shutdown() {
+        shutdown(null);
     }
 
     /**
@@ -209,7 +209,7 @@ public abstract class TaskQueueHandler {
      *
      * @param before 停止前要执行的方法
      */
-    public void shutDown(IAction0 before) {
+    public void shutdown(IAction0 before) {
         this.state = TaskQueueHandlerState.停止中;
 
         if (before != null)
@@ -224,23 +224,27 @@ public abstract class TaskQueueHandler {
         if (!cf.isDone()) cf.complete(false);
 
         //取消定时任务
-        timer.cancel();
+        if (timer != null)
+            timer.cancel();
 
         //清理延时任务
-        ScheduleTaskList.clear();
+        if (ScheduleTaskList != null)
+            ScheduleTaskList.clear();
 
         //清理主任务
-        taskQueue.clear();
+        if (taskQueue != null)
+            taskQueue.clear();
 
         //清理并发子任务
-        ConcurrentTaskMap.values()
-                         .forEach(x -> {
-                             try {
-                                 x.cancel(true);
-                             } catch (Exception ignore) {
+        if (ConcurrentTaskMap != null)
+            ConcurrentTaskMap.values()
+                             .forEach(x -> {
+                                 try {
+                                     x.cancel(true);
+                                 } catch (Exception ignore) {
 
-                             }
-                         });
+                                 }
+                             });
 
         this.state = TaskQueueHandlerState.已停止;
     }
@@ -323,18 +327,49 @@ public abstract class TaskQueueHandler {
      * @param timeout 超时时间(ms)(值为-1时会一直等待下去)
      */
     public void wait2Start(int timeout) {
-        if (!this.getState()
-                 .equals(TaskQueueHandlerState.启动中))
-            return;
+        while (true) {
+            if (!this.getState()
+                     .equals(TaskQueueHandlerState.启动中))
+                return;
 
-        if (timeout != -1
-                && timeout <= 0)
-            throw new CommonException(String.format("等待%s启动超时",
-                                                    getName()));
+            if (timeout != -1
+                    && timeout <= 0)
+                throw new CommonException(String.format("等待%s启动超时",
+                                                        getName()));
 
-        this.timer.schedule(new ActionTimerTask<>(this::wait2Start,
-                                                  --timeout),
-                            50);
+            TaskExtension.delay(50);
+            if (timeout != -1)
+                timeout -= 50;
+        }
+    }
+
+    /**
+     * 等待关闭
+     */
+    public void wait2Shutdown() {
+        wait2Shutdown(-1);
+    }
+
+    /**
+     * 等待关闭
+     *
+     * @param timeout 超时时间(ms)(值为-1时会一直等待下去)
+     */
+    public void wait2Shutdown(int timeout) {
+        while (true) {
+            if (this.getState()
+                    .equals(TaskQueueHandlerState.已停止))
+                return;
+
+            if (timeout != -1
+                    && timeout <= 0)
+                throw new CommonException(String.format("等待%s关闭超时",
+                                                        getName()));
+
+            TaskExtension.delay(50);
+            if (timeout != -1)
+                timeout -= 50;
+        }
     }
 
     /**
@@ -373,22 +408,22 @@ public abstract class TaskQueueHandler {
     public void wait2Idle(int offsetConcurrentTaskCount,
                           int offsetScheduleTaskCount,
                           int timeout) {
-        if (!this.getState()
-                 .equals(TaskQueueHandlerState.运行中)
-                && getConcurrentTaskCount() - offsetConcurrentTaskCount <= 0
-                && getScheduleTaskCount() - offsetScheduleTaskCount <= 0)
-            return;
+        while (true) {
+            if (!this.getState()
+                     .equals(TaskQueueHandlerState.运行中)
+                    && getConcurrentTaskCount() - offsetConcurrentTaskCount <= 0
+                    && getScheduleTaskCount() - offsetScheduleTaskCount <= 0)
+                return;
 
-        if (timeout != -1
-                && timeout <= 0)
-            throw new CommonException(String.format("等待%s任务执行结束超时",
-                                                    getName()));
+            if (timeout != -1
+                    && timeout <= 0)
+                throw new CommonException(String.format("等待%s任务执行结束超时",
+                                                        getName()));
 
-        this.timer.schedule(new ActionTimerTask3<>(this::wait2Idle,
-                                                   offsetConcurrentTaskCount,
-                                                   offsetScheduleTaskCount,
-                                                   --timeout),
-                            50);
+            TaskExtension.delay(50);
+            if (timeout != -1)
+                timeout -= 50;
+        }
     }
 
     /**

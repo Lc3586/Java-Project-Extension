@@ -4,6 +4,7 @@ import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import project.extension.exception.CommonException;
 import project.extension.number.DecimalExtension;
+import project.extension.resource.ScanExtension;
 import project.extension.string.StringExtension;
 
 import javax.xml.bind.DatatypeConverter;
@@ -655,5 +656,15 @@ public class FileExtension {
                                                     targetFileInJar),
                                       ex);
         }
+    }
+
+    /**
+     * 程序是否在jar中运行
+     */
+    public static boolean isRunInJar()
+            throws IOException {
+        return "jar".equals(ScanExtension.getResource("")
+                                         .getURL()
+                                         .getProtocol());
     }
 }

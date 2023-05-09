@@ -27,7 +27,7 @@ public class ExecutableHelper {
         switch (SystemInfoUtils.currentOS()) {
             case Windows_32:
             case Windows_64:
-                return "cmd.exe";
+                return "cmd /c";
             case Linux_32:
             case Linux_64:
             case OSX_32:
@@ -214,7 +214,6 @@ public class ExecutableHelper {
 
     /**
      * @param cmd              命令
-     * @param arguments        程序启动参数
      * @param environments     环境变量
      * @param workingDirectory 工作目录
      * @param inputCharset     输入内容字符集
@@ -223,7 +222,6 @@ public class ExecutableHelper {
      * @return a: 信息输出,b: 错误输出,c: 程序退出码
      */
     public static Tuple3<String, String, Integer> execShell(String cmd,
-                                                            String[] arguments,
                                                             String[] environments,
                                                             File workingDirectory,
                                                             Charset inputCharset,
@@ -232,14 +230,8 @@ public class ExecutableHelper {
             throws
             CommonException {
         return simpleExec(getShell(),
-                          arguments,
-                          String.format("%s&exit",
-                                        cmd.substring(cmd.length() - 1,
-                                                      1)
-                                           .equals("&")
-                                        ? cmd.substring(0,
-                                                        cmd.length() - 1)
-                                        : cmd),
+                          cmd.split(" "),
+                          null,
                           environments,
                           workingDirectory,
                           inputCharset,

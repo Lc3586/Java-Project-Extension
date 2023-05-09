@@ -363,4 +363,19 @@ public class StringExtension {
                     character);
         return new String(chars);
     }
+
+    /**
+     * 创建字符串
+     *
+     * @param value  字符串
+     * @param length 长度
+     */
+    public static String newString(String value,
+                                   int length) {
+        String[] values = new String[length];
+        Arrays.fill(values,
+                    value);
+        return String.join("",
+                           values);
+    }
 }
