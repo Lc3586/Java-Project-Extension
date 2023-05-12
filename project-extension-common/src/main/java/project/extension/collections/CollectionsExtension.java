@@ -1,6 +1,5 @@
 package project.extension.collections;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import project.extension.tuple.Tuple2;
 
 import java.util.*;
@@ -265,7 +264,6 @@ public class CollectionsExtension {
      * @param <K>                键的类型
      * @param <V>                值的类型
      */
-    @CanIgnoreReturnValue
     public static <K, V> Map<K, V> addOrUpdate(Map<K, V> map,
                                                K key,
                                                V value,
@@ -291,7 +289,6 @@ public class CollectionsExtension {
      * @param <K>                键的类型
      * @param <V>                值的类型
      */
-    @CanIgnoreReturnValue
     public static <K, V> Hashtable<K, V> addOrUpdate(Hashtable<K, V> dic,
                                                      K key,
                                                      V value,
@@ -506,7 +503,6 @@ public class CollectionsExtension {
      * @param <V>  值类型
      * @return 哈希表
      */
-    @CanIgnoreReturnValue
     public static <K, V> Map<K, V> tryRemove(Map<K, V> map,
                                              Collection<K> keys) {
         keys.forEach(map::remove);
@@ -522,7 +518,6 @@ public class CollectionsExtension {
      * @param <V>    值类型
      * @return 哈希表
      */
-    @CanIgnoreReturnValue
     public static <K, V> Map<K, V> tryRemoveIfValueIn(Map<K, V> map,
                                                       Collection<V> values) {
         List<K> removeKeys = new ArrayList<>();
@@ -543,7 +538,6 @@ public class CollectionsExtension {
      * @param <V>  值类型
      * @return 哈希表
      */
-    @CanIgnoreReturnValue
     public static <K, V> Map<K, V> tryRemoveIfKeyNotIn(Map<K, V> map,
                                                        Collection<K> keys) {
         List<K> removeKeys = new ArrayList<>();
@@ -564,7 +558,6 @@ public class CollectionsExtension {
      * @param <V>    值类型
      * @return 哈希表
      */
-    @CanIgnoreReturnValue
     public static <K, V> Map<K, V> tryRemoveIfValueNotIn(Map<K, V> map,
                                                          Collection<V> values) {
         List<K> removeKeys = new ArrayList<>();
@@ -584,7 +577,6 @@ public class CollectionsExtension {
      * @param <T>   数据类型
      * @return 填充后的集合
      */
-    @CanIgnoreReturnValue
     public static <T> List<T> fill(List<T> list,
                                    T value) {
         Collections.fill(list,
@@ -601,7 +593,6 @@ public class CollectionsExtension {
      * @param <T>   数据类型
      * @return 填充后的数组
      */
-    @CanIgnoreReturnValue
     public static <T> T[] fill(T[] array,
                                T value) {
         Arrays.fill(array,

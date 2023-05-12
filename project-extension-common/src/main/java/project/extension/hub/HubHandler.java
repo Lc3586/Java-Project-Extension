@@ -351,7 +351,7 @@ public abstract class HubHandler {
      * 消息处理类
      */
     private class MessageHandler
-            extends TaskQueueHandler {
+            extends TaskQueueHandler<String> {
         public MessageHandler(String name,
                               int threadPoolSize,
                               Logger logger) {
@@ -390,13 +390,11 @@ public abstract class HubHandler {
          * @param uuid 客户端标识
          */
         @Override
-        protected void processingTask(Object uuid) {
-            String uuid_resolve = String.valueOf(uuid);
-
+        protected void processingTask(String uuid) {
             //异步执行
-            super.putConcurrentTask(uuid_resolve,
-                                    () -> this.handlerTask(uuid_resolve),
-                                    x -> super.removeConcurrentTask(uuid_resolve));
+            super.putConcurrentTask(uuid,
+                                    () -> this.handlerTask(uuid),
+                                    x -> super.removeConcurrentTask(uuid));
         }
 
         /**
@@ -421,7 +419,7 @@ public abstract class HubHandler {
      * 消息发送类
      */
     private class MessageSender
-            extends TaskQueueHandler {
+            extends TaskQueueHandler<String> {
         public MessageSender(String name,
                              int threadPoolSize,
                              Logger logger) {
@@ -509,14 +507,13 @@ public abstract class HubHandler {
          * @param key 任务标识
          */
         @Override
-        protected void processingTask(Object key) {
-            String key_resolve = String.valueOf(key);
-            Tuple4<SendType, MessageType, String, Object> message = messageMap.get(key_resolve);
+        protected void processingTask(String key) {
+            Tuple4<SendType, MessageType, String, Object> message = messageMap.get(key);
 
             //异步执行
-            super.putConcurrentTask(message.b,
-                                    () -> this.handlerTask(key_resolve),
-                                    x -> super.removeConcurrentTask(message.b));
+            super.putConcurrentTask(key,
+                                    () -> this.handlerTask(key),
+                                    x -> super.removeConcurrentTask(key));
         }
 
         /**

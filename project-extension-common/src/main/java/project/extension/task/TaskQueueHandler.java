@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  * @author LCTR
  * @date 2022-09-09
  */
-public abstract class TaskQueueHandler {
+public abstract class TaskQueueHandler<Key> {
     /**
      * <p>threadPoolSize 默认值为 -1，将会使用所有可用的处理器</p>
      *
@@ -46,8 +46,8 @@ public abstract class TaskQueueHandler {
         this.name = name;
         this.state = TaskQueueHandlerState.已停止;
         this.taskQueue = new ConcurrentLinkedDeque<>();
-        this.ConcurrentTaskMap = new ConcurrentHashMap<>();
-        this.ScheduleTaskList = new ConcurrentLinkedQueue<>();
+        this.concurrentTaskMap = new ConcurrentHashMap<>();
+        this.scheduleTaskList = new ConcurrentLinkedQueue<>();
         if (threadPoolSize == -1)
             this.concurrentTaskExecutor = Executors.newWorkStealingPool();
         else if (threadPoolSize == 0)
@@ -62,24 +62,29 @@ public abstract class TaskQueueHandler {
     /**
      * 主任务队列
      */
-    private final Queue<Object> taskQueue;
+    private final Queue<Key> taskQueue;
 
     /**
      * 并发子任务集合
      * <p>key：任意Key，value：异步任务</p>
      */
-    private final ConcurrentMap<Object, CompletableFuture<Void>> ConcurrentTaskMap;
+    private final ConcurrentMap<Key, CompletableFuture<Void>> concurrentTaskMap;
 
     /**
      * 延时子任务集合
      * <p>item：任意Key</p>
      */
-    private final ConcurrentLinkedQueue<UUID> ScheduleTaskList;
+    private final ConcurrentLinkedQueue<UUID> scheduleTaskList;
 
     /**
      * 并发子任务线程管理服务
      */
     private final ExecutorService concurrentTaskExecutor;
+
+    /**
+     * 等待空闲
+     */
+    private CompletableFuture<Void> waitIdle;
 
     /**
      * 定时器
@@ -138,14 +143,14 @@ public abstract class TaskQueueHandler {
      * 并发子任务数量
      */
     public int getConcurrentTaskCount() {
-        return ConcurrentTaskMap.size();
+        return concurrentTaskMap.size();
     }
 
     /**
      * 延时子任务数量
      */
     public int getScheduleTaskCount() {
-        return ScheduleTaskList.size();
+        return scheduleTaskList.size();
     }
 
     /**
@@ -171,7 +176,7 @@ public abstract class TaskQueueHandler {
 
         startTime = new Date();
 
-        this.state = TaskQueueHandlerState.运行中;
+        this.state = TaskQueueHandlerState.空闲;
 
         //异步执行
         CompletableFuture.runAsync(this::run,
@@ -228,16 +233,16 @@ public abstract class TaskQueueHandler {
             timer.cancel();
 
         //清理延时任务
-        if (ScheduleTaskList != null)
-            ScheduleTaskList.clear();
+        if (scheduleTaskList != null)
+            scheduleTaskList.clear();
 
         //清理主任务
         if (taskQueue != null)
             taskQueue.clear();
 
         //清理并发子任务
-        if (ConcurrentTaskMap != null)
-            ConcurrentTaskMap.values()
+        if (concurrentTaskMap != null)
+            concurrentTaskMap.values()
                              .forEach(x -> {
                                  try {
                                      x.cancel(true);
@@ -254,7 +259,7 @@ public abstract class TaskQueueHandler {
      *
      * @param taskKey 任务标识
      */
-    public void addTask(Object taskKey) {
+    public void addTask(Key taskKey) {
         this.addTask(taskKey,
                      true);
     }
@@ -265,7 +270,7 @@ public abstract class TaskQueueHandler {
      * @param taskKey 任务标识
      * @param handler 是否立即开始处理
      */
-    public void addTask(Object taskKey,
+    public void addTask(Key taskKey,
                         boolean handler) {
         if (this.state.equals(TaskQueueHandlerState.停止中)
                 || this.state.equals(TaskQueueHandlerState.已停止))
@@ -283,7 +288,7 @@ public abstract class TaskQueueHandler {
      *
      * @param taskKeys 任务标识集合
      */
-    public void addTasks(Collection<Object> taskKeys) {
+    public void addTasks(Collection<Key> taskKeys) {
         this.addTasks(taskKeys,
                       true);
     }
@@ -294,7 +299,7 @@ public abstract class TaskQueueHandler {
      * @param taskKeys 任务标识集合
      * @param handler  是否立即开始处理
      */
-    public void addTasks(Collection<Object> taskKeys,
+    public void addTasks(Collection<Key> taskKeys,
                          boolean handler) {
         if (this.state.equals(TaskQueueHandlerState.停止中)
                 || this.state.equals(TaskQueueHandlerState.已停止))
@@ -384,6 +389,17 @@ public abstract class TaskQueueHandler {
     /**
      * 等待任务执行结束
      *
+     * @param timeout 超时时间(ms)(值为-1时会一直等待下去)
+     */
+    public void wait2Idle(int timeout) {
+        wait2Idle(0,
+                  0,
+                  timeout);
+    }
+
+    /**
+     * 等待任务执行结束
+     *
      * @param offsetConcurrentTaskCount 并发子任务差值
      *                                  <p>如果当总的并发子任务个数减去此差值小于等于0，则判断任务已执行结束</p>
      * @param offsetScheduleTaskCount   延时子任务差值
@@ -434,13 +450,24 @@ public abstract class TaskQueueHandler {
             while (true) {
                 if (cf != null) {
                     if (!cf.get()) return;
+                    if (waitIdle != null)
+                        waitIdle.cancel(true);
                     this.state = TaskQueueHandlerState.运行中;
                     cf = null;
                 }
 
                 if (taskQueue.isEmpty()) {
                     cf = new CompletableFuture<>();
-                    this.state = TaskQueueHandlerState.空闲;
+                    waitIdle = CompletableFuture.runAsync(() -> {
+                        for (CompletableFuture<Void> task : concurrentTaskMap.values()) {
+                            try {
+                                task.wait();
+                            } catch (Exception ignore) {
+
+                            }
+                        }
+                        this.state = TaskQueueHandlerState.空闲;
+                    });
                     continue;
                 }
 
@@ -466,7 +493,7 @@ public abstract class TaskQueueHandler {
         int count = taskQueue.size();
 
         for (int i = 0; i < count; i++) {
-            Object taskKey = taskQueue.poll();
+            Key taskKey = taskQueue.poll();
 
             try {
                 processingTask(taskKey);
@@ -481,7 +508,7 @@ public abstract class TaskQueueHandler {
     /**
      * 处理主任务
      */
-    protected abstract void processingTask(Object taskKey);
+    protected abstract void processingTask(Key taskKey);
 
     /**
      * 新增并发子任务
@@ -490,7 +517,7 @@ public abstract class TaskQueueHandler {
      * @param runnable   执行操作
      * @param thenAccept 操作结束后执行（可选）
      */
-    protected void putConcurrentTask(Object key,
+    protected void putConcurrentTask(Key key,
                                      Runnable runnable,
                                      @Nullable
                                              Consumer<Void> thenAccept) {
@@ -499,7 +526,7 @@ public abstract class TaskQueueHandler {
             throw new CommonException(String.format("%s已关闭",
                                                     getName()));
 
-        ConcurrentTaskMap.put(key,
+        concurrentTaskMap.put(key,
                               thenAccept == null
                               ? CompletableFuture.runAsync(runnable,
                                                            concurrentTaskExecutor)
@@ -513,8 +540,8 @@ public abstract class TaskQueueHandler {
      *
      * @param key 任务标识
      */
-    protected boolean containsConcurrentTask(Object key) {
-        return ConcurrentTaskMap.containsKey(key);
+    protected boolean containsConcurrentTask(Key key) {
+        return concurrentTaskMap.containsKey(key);
     }
 
     /**
@@ -522,8 +549,8 @@ public abstract class TaskQueueHandler {
      *
      * @param key 任务标识
      */
-    protected void removeConcurrentTask(Object key) {
-        ConcurrentTaskMap.remove(key);
+    protected void removeConcurrentTask(Key key) {
+        concurrentTaskMap.remove(key);
     }
 
     /**
@@ -542,10 +569,10 @@ public abstract class TaskQueueHandler {
                                                     getName()));
 
         UUID key = UUID.randomUUID();
-        ScheduleTaskList.add(key);
+        scheduleTaskList.add(key);
         timer.schedule(new ActionTimerTask<>(state -> {
                            action.invoke(parameter);
-                           ScheduleTaskList.remove(key);
+                           scheduleTaskList.remove(key);
                        },
                                              parameter),
                        delay);
