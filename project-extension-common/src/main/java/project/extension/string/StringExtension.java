@@ -73,6 +73,20 @@ public class StringExtension {
     }
 
     /**
+     * 移除字符串头部以及尾部和指定内容相同的数据
+     *
+     * @param input 输入
+     * @param var   指定内容
+     * @return 输出
+     */
+    public static String trimBoth(String input,
+                                  String var) {
+        return trimEnd(trimStart(input,
+                                 var),
+                       var);
+    }
+
+    /**
      * 移除字符串尾部和指定内容相同的数据
      *
      * @param input 输入

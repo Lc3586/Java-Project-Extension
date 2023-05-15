@@ -68,7 +68,7 @@ public abstract class TaskQueueHandler<Key> {
      * 并发子任务集合
      * <p>key：任意Key，value：异步任务</p>
      */
-    private final ConcurrentMap<Key, CompletableFuture<Void>> concurrentTaskMap;
+    private final ConcurrentMap<Object, CompletableFuture<Void>> concurrentTaskMap;
 
     /**
      * 延时子任务集合
@@ -517,10 +517,10 @@ public abstract class TaskQueueHandler<Key> {
      * @param runnable   执行操作
      * @param thenAccept 操作结束后执行（可选）
      */
-    protected void putConcurrentTask(Key key,
-                                     Runnable runnable,
-                                     @Nullable
-                                             Consumer<Void> thenAccept) {
+    protected <T> void putConcurrentTask(T key,
+                                         Runnable runnable,
+                                         @Nullable
+                                                 Consumer<Void> thenAccept) {
         if (this.state.equals(TaskQueueHandlerState.停止中)
                 || this.state.equals(TaskQueueHandlerState.已停止))
             throw new CommonException(String.format("%s已关闭",
@@ -540,7 +540,7 @@ public abstract class TaskQueueHandler<Key> {
      *
      * @param key 任务标识
      */
-    protected boolean containsConcurrentTask(Key key) {
+    protected <T> boolean containsConcurrentTask(T key) {
         return concurrentTaskMap.containsKey(key);
     }
 
@@ -549,7 +549,7 @@ public abstract class TaskQueueHandler<Key> {
      *
      * @param key 任务标识
      */
-    protected void removeConcurrentTask(Key key) {
+    protected <T> void removeConcurrentTask(T key) {
         concurrentTaskMap.remove(key);
     }
 
