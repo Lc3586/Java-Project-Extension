@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * 数据库类型
+ * 处理类状态
  *
  * @author LCTR
  * @date 2022-03-24

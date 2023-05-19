@@ -397,6 +397,14 @@ public abstract class HubHandler {
                                     x -> super.removeConcurrentTask(uuid));
         }
 
+        @Override
+        protected void processingPriorityTask(String uuid) {
+            //异步执行
+            super.putPriorityConcurrentTask(uuid,
+                                            () -> this.handlerTask(uuid),
+                                            x -> super.removeConcurrentTask(uuid));
+        }
+
         /**
          * 异步处理子任务
          *
@@ -508,6 +516,16 @@ public abstract class HubHandler {
          */
         @Override
         protected void processingTask(String key) {
+            Tuple4<SendType, MessageType, String, Object> message = messageMap.get(key);
+
+            //异步执行
+            super.putConcurrentTask(key,
+                                    () -> this.handlerTask(key),
+                                    x -> super.removeConcurrentTask(key));
+        }
+
+        @Override
+        protected void processingPriorityTask(String key) {
             Tuple4<SendType, MessageType, String, Object> message = messageMap.get(key);
 
             //异步执行

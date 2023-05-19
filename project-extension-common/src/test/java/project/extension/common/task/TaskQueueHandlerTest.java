@@ -32,15 +32,32 @@ public class TaskQueueHandlerTest {
         protected void processingTask(UUID taskKey) {
             //异步执行
             super.putConcurrentTask(taskKey,
-                                    () -> this.handlerTask(taskKey),
+                                    () -> this.handlerTask(taskKey,
+                                                           false),
                                     x -> super.removeConcurrentTask(taskKey));
         }
 
-        private void handlerTask(UUID taskKey) {
-            logger.info(String.format("开始执行任务：%s",
+        @Override
+        protected void processingPriorityTask(UUID taskKey) {
+            //异步执行
+            super.putPriorityConcurrentTask(taskKey,
+                                            () -> this.handlerTask(taskKey,
+                                                                   true),
+                                            x -> super.removePriorityConcurrentTask(taskKey));
+        }
+
+        private void handlerTask(UUID taskKey,
+                                 boolean priority) {
+            logger.info(String.format("开始执行%s任务：%s",
+                                      priority
+                                      ? "主"
+                                      : "优先级",
                                       taskKey));
             TaskExtension.delay(new Random().nextInt(5) * 1000);
-            logger.info(String.format("任务执行完毕：%s",
+            logger.info(String.format("%s任务执行完毕：%s",
+                                      priority
+                                      ? "主"
+                                      : "优先级",
                                       taskKey));
         }
     }
@@ -80,6 +97,10 @@ public class TaskQueueHandlerTest {
             taskQueueHandler.addTask(UUID.randomUUID());
         }
 
+        for (int i = 0; i < 10; i++) {
+            taskQueueHandler.addPriorityTask(UUID.randomUUID());
+        }
+
         Assertions.assertEquals(TaskQueueHandlerState.运行中,
                                 taskQueueHandler.getState(),
                                 "程序在处理任务时应该为运行中状态");
@@ -89,6 +110,44 @@ public class TaskQueueHandlerTest {
         Assertions.assertEquals(TaskQueueHandlerState.空闲,
                                 taskQueueHandler.getState(),
                                 "程序处理完全部任务后应该为空闲状态");
+
+        taskQueueHandler.shutdown();
+
+        System.out.println("测试已通过");
+    }
+
+
+    /**
+     * 测试优先级任务是否能优先执行
+     */
+    @Test
+    @DisplayName("测试优先级任务是否能优先执行")
+    public void priorityTask() {
+        TestTaskQueueHandler taskQueueHandler = new TestTaskQueueHandler();
+
+        taskQueueHandler.start(true);
+
+        for (int i = 0; i < 1000; i++) {
+            taskQueueHandler.addTask(UUID.randomUUID());
+        }
+
+        for (int i = 0; i < 10; i++) {
+            taskQueueHandler.addPriorityTask(UUID.randomUUID());
+        }
+
+        TaskExtension.delay(10000);
+
+        Assertions.assertTrue(taskQueueHandler.getTaskCount() > 0,
+                              "主任务执行异常");
+
+        Assertions.assertEquals(0,
+                                taskQueueHandler.getPriorityTaskCount(),
+                                "优先级任务没有优先执行");
+
+        System.out.printf("还剩%s个主任务未执行",
+                          taskQueueHandler.getTaskCount());
+
+        taskQueueHandler.shutdown();
 
         System.out.println("测试已通过");
     }

@@ -605,9 +605,11 @@ public class FileExtension {
      *
      * @param targetFileInJar       文件在jar中的路径
      * @param destinationFileInDisk 在磁盘中存储提取的文件的路径
+     * @param override              复写已存在的文件
      */
     public static void extractFileFromJar(String targetFileInJar,
-                                          String destinationFileInDisk)
+                                          String destinationFileInDisk,
+                                          boolean override)
             throws
             CommonException {
         targetFileInJar = targetFileInJar.replaceAll("\\\\",
@@ -642,6 +644,10 @@ public class FileExtension {
                         throw new CommonException(String.format("创建%s目录失败",
                                                                 destinationFileInDisk));
                 } else {
+                    //不复写已存在的文件
+                    if (!override && destinationFile.exists())
+                        continue;
+
                     //复制文件
                     try (InputStream jarInputStream = jar.getInputStream(jar.getEntry(name));
                          FileOutputStream disOutputStream = new FileOutputStream(destinationFile)) {
@@ -662,7 +668,8 @@ public class FileExtension {
      * 程序是否在jar中运行
      */
     public static boolean isRunInJar()
-            throws IOException {
+            throws
+            IOException {
         return "jar".equals(ScanExtension.getResource("")
                                          .getURL()
                                          .getProtocol());

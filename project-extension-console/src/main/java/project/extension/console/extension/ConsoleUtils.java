@@ -137,10 +137,14 @@ public class ConsoleUtils {
                                ? null
                                : content.toString();
 
-        if (newLine)
-            output.append("\n");
+        boolean newLineFlag = false;
 
-        if (StringUtils.hasText(tip)) {
+        if (tip != null && tip.length() > 0) {
+            if (newLine) {
+                output.append("\n");
+                newLineFlag = true;
+            }
+
             output.append(String.format("%s%s : \033[0m",
                                         getEchoE(tipStyle,
                                                  tipColor,
@@ -148,12 +152,16 @@ public class ConsoleUtils {
                                         tip));
         }
 
-        if (StringUtils.hasText(contentString))
+        if (contentString != null && contentString.length() > 0) {
+            if (newLine && !newLineFlag)
+                output.append("\n");
+
             output.append(String.format("%s%s\033[0m",
                                         getEchoE(contentStyle,
                                                  contentColor,
                                                  contentBackgroundColor),
                                         contentString));
+        }
 
         for (int i = 0; i < blankLine; i++) {
             output.append("\n");

@@ -46,29 +46,59 @@ public abstract class TaskQueueHandler<Key> {
         this.name = name;
         this.state = TaskQueueHandlerState.已停止;
         this.taskQueue = new ConcurrentLinkedDeque<>();
+        this.priorityTaskQueue = new LinkedList<>();
         this.concurrentTaskMap = new ConcurrentHashMap<>();
+        this.concurrentPriorityTaskMap = new ConcurrentHashMap<>();
         this.scheduleTaskList = new ConcurrentLinkedQueue<>();
-        if (threadPoolSize == -1)
+        this.cf = new CompletableFuture<>();
+        this.cf_priority = new CompletableFuture<>();
+
+        if (threadPoolSize == -1) {
+            this.concurrentTaskLimit = Runtime.getRuntime()
+                                              .availableProcessors();
             this.concurrentTaskExecutor = Executors.newWorkStealingPool();
-        else if (threadPoolSize == 0)
+        } else if (threadPoolSize == 0) {
+            this.concurrentTaskLimit = 1;
             this.concurrentTaskExecutor = Executors.newSingleThreadScheduledExecutor();
-        else if (threadPoolSize == 1)
+        } else if (threadPoolSize == 1) {
+            this.concurrentTaskLimit = 1;
             this.concurrentTaskExecutor = Executors.newSingleThreadExecutor();
-        else
+        } else {
+            this.concurrentTaskLimit = threadPoolSize;
             this.concurrentTaskExecutor = Executors.newFixedThreadPool(threadPoolSize);
+        }
         this.logger = logger;
     }
 
     /**
+     * 并发任务上限
+     */
+    private final int concurrentTaskLimit;
+
+    /**
      * 主任务队列
+     * <p>先进先出</p>
      */
     private final Queue<Key> taskQueue;
 
     /**
-     * 并发子任务集合
+     * 高优先级队列
+     * <p>后进先出</p>
+     * <P>同步执行</P>
+     */
+    private final Deque<Key> priorityTaskQueue;
+
+    /**
+     * 主任务的并发子任务集合
      * <p>key：任意Key，value：异步任务</p>
      */
     private final ConcurrentMap<Object, CompletableFuture<Void>> concurrentTaskMap;
+
+    /**
+     * 高优先级任务的并发子任务集合
+     * <p>key：任意Key，value：异步任务</p>
+     */
+    private final ConcurrentMap<Object, CompletableFuture<Void>> concurrentPriorityTaskMap;
 
     /**
      * 延时子任务集合
@@ -85,6 +115,11 @@ public abstract class TaskQueueHandler<Key> {
      * 等待空闲
      */
     private CompletableFuture<Void> waitIdle;
+
+    /**
+     * 等待空闲(高优先级任务)
+     */
+    private CompletableFuture<Void> waitIdlePriority;
 
     /**
      * 定时器
@@ -107,11 +142,18 @@ public abstract class TaskQueueHandler<Key> {
     private TaskQueueHandlerState state;
 
     /**
-     * 死锁
+     * 主任务死锁
      * <p>一个不会主动完成的任务</p>
      * <p>返回值 true: 开始处理队列 , false: 停止处理队列 </p>
      */
     private CompletableFuture<Boolean> cf;
+
+    /**
+     * 高优先级任务死锁
+     * <p>一个不会主动完成的任务</p>
+     * <p>返回值 true: 开始处理队列 , false: 停止处理队列 </p>
+     */
+    private CompletableFuture<Boolean> cf_priority;
 
     /**
      * 日志组件
@@ -136,14 +178,21 @@ public abstract class TaskQueueHandler<Key> {
      * 待处理任务数量
      */
     public int getTaskCount() {
-        return taskQueue.size();
+        return taskQueue.size() + priorityTaskQueue.size();
+    }
+
+    /**
+     * 高优先级任务数量
+     */
+    public int getPriorityTaskCount() {
+        return priorityTaskQueue.size();
     }
 
     /**
      * 并发子任务数量
      */
     public int getConcurrentTaskCount() {
-        return concurrentTaskMap.size();
+        return concurrentTaskMap.size() + concurrentPriorityTaskMap.size();
     }
 
     /**
@@ -174,12 +223,18 @@ public abstract class TaskQueueHandler<Key> {
 
         cf = new CompletableFuture<>();
 
+        cf_priority = new CompletableFuture<>();
+
         startTime = new Date();
 
         this.state = TaskQueueHandlerState.空闲;
 
-        //异步执行
-        CompletableFuture.runAsync(this::run,
+        //异步运行主任务
+        CompletableFuture.runAsync(this::runTask,
+                                   Executors.newSingleThreadExecutor());
+
+        //异步运行优先级任务
+        CompletableFuture.runAsync(this::runPriorityTask,
                                    Executors.newSingleThreadExecutor());
 
         if (autoHandler)
@@ -222,11 +277,11 @@ public abstract class TaskQueueHandler<Key> {
 
         this.state = TaskQueueHandlerState.停止中;
 
-        if (cf == null) cf = new CompletableFuture<>();
-
         startTime = null;
 
-        if (!cf.isDone()) cf.complete(false);
+        cf.complete(false);
+
+        cf_priority.complete(false);
 
         //取消定时任务
         if (timer != null)
@@ -240,7 +295,11 @@ public abstract class TaskQueueHandler<Key> {
         if (taskQueue != null)
             taskQueue.clear();
 
-        //清理并发子任务
+        //清理高优先级任务
+        if (priorityTaskQueue != null)
+            priorityTaskQueue.clear();
+
+        //清理主任务的并发子任务
         if (concurrentTaskMap != null)
             concurrentTaskMap.values()
                              .forEach(x -> {
@@ -250,6 +309,17 @@ public abstract class TaskQueueHandler<Key> {
 
                                  }
                              });
+
+        //清理高优先级任务的并发子任务
+        if (concurrentPriorityTaskMap != null)
+            concurrentPriorityTaskMap.values()
+                                     .forEach(x -> {
+                                         try {
+                                             x.cancel(true);
+                                         } catch (Exception ignore) {
+
+                                         }
+                                     });
 
         this.state = TaskQueueHandlerState.已停止;
     }
@@ -272,15 +342,9 @@ public abstract class TaskQueueHandler<Key> {
      */
     public void addTask(Key taskKey,
                         boolean handler) {
-        if (this.state.equals(TaskQueueHandlerState.停止中)
-                || this.state.equals(TaskQueueHandlerState.已停止))
-            throw new CommonException(String.format("%s已关闭",
-                                                    getName()));
-
-        taskQueue.add(taskKey);
-
-        if (handler)
-            this.handler();
+        addTask(taskKey,
+                false,
+                handler);
     }
 
     /**
@@ -301,22 +365,66 @@ public abstract class TaskQueueHandler<Key> {
      */
     public void addTasks(Collection<Key> taskKeys,
                          boolean handler) {
-        if (this.state.equals(TaskQueueHandlerState.停止中)
-                || this.state.equals(TaskQueueHandlerState.已停止))
-            throw new CommonException(String.format("%s已关闭",
-                                                    getName()));
-
-        taskQueue.addAll(taskKeys);
-
-        if (handler)
-            this.handler();
+        addTasks(taskKeys,
+                 false,
+                 handler);
     }
 
     /**
-     * 开始处理主任务队列
+     * 新增高优先级任务并立即开始处理
+     *
+     * @param taskKey 任务标识
+     */
+    public void addPriorityTask(Key taskKey) {
+        this.addPriorityTask(taskKey,
+                             true);
+    }
+
+    /**
+     * 新增高优先级任务
+     *
+     * @param taskKey 任务标识
+     * @param handler 是否立即开始处理
+     */
+    public void addPriorityTask(Key taskKey,
+                                boolean handler) {
+        addTask(taskKey,
+                true,
+                handler);
+    }
+
+    /**
+     * 新增高优先级任务集合并立即开始处理
+     *
+     * @param taskKeys 任务标识集合
+     */
+    public void addPriorityTasks(Collection<Key> taskKeys) {
+        this.addPriorityTasks(taskKeys,
+                              true);
+    }
+
+    /**
+     * 新增高优先级任务集合
+     *
+     * @param taskKeys 任务标识集合
+     * @param handler  是否立即开始处理
+     */
+    public void addPriorityTasks(Collection<Key> taskKeys,
+                                 boolean handler) {
+        addTasks(taskKeys,
+                 true,
+                 handler);
+    }
+
+    /**
+     * 开始处理任务队列
      */
     public void handler() {
-        if (cf != null) cf.complete(true);
+        //开始处理主任务
+        cf.complete(true);
+
+        //开始处理高优先级任务
+        cf_priority.complete(true);
     }
 
     /**
@@ -443,44 +551,90 @@ public abstract class TaskQueueHandler<Key> {
     }
 
     /**
-     * 运行
+     * 新增任务
+     *
+     * @param taskKey  任务标识
+     * @param priority 高优先级
+     * @param handler  是否立即开始处理
      */
-    private void run() {
+    private void addTask(Key taskKey,
+                         boolean priority,
+                         boolean handler) {
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
+        if (priority)
+            priorityTaskQueue.addLast(taskKey);
+        else
+            taskQueue.add(taskKey);
+
+        if (handler)
+            this.handler();
+    }
+
+    /**
+     * 新增任务集合
+     *
+     * @param taskKeys 任务标识集合
+     * @param priority 高优先级
+     * @param handler  是否立即开始处理
+     */
+    private void addTasks(Collection<Key> taskKeys,
+                          boolean priority,
+                          boolean handler) {
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
+        if (priority)
+            taskKeys.forEach(priorityTaskQueue::addLast);
+        else
+            taskQueue.addAll(taskKeys);
+
+        if (handler)
+            this.handler();
+    }
+
+    /**
+     * 运行主任务
+     */
+    private void runTask() {
         try {
             while (true) {
-                if (cf != null) {
-                    if (!cf.get()) return;
-                    if (waitIdle != null)
-                        waitIdle.cancel(true);
-                    this.state = TaskQueueHandlerState.运行中;
-                    cf = null;
-                }
+                if (!cf.get()) return;
 
-                if (taskQueue.isEmpty()) {
-                    cf = new CompletableFuture<>();
-                    waitIdle = CompletableFuture.runAsync(() -> {
-                        for (CompletableFuture<Void> task : concurrentTaskMap.values()) {
-                            try {
-                                task.wait();
-                            } catch (Exception ignore) {
+                cf = new CompletableFuture<>();
 
-                            }
-                        }
-                        this.state = TaskQueueHandlerState.空闲;
-                    });
-                    continue;
-                }
+                if (waitIdle != null)
+                    waitIdle.cancel(true);
+
+                this.state = TaskQueueHandlerState.运行中;
 
                 try {
-                    this.processingQueue();
+                    this.processingTaskQueue();
                 } catch (Exception ex) {
-                    logger.error(String.format("%s运行时发生异常，已跳过当前任务",
+                    logger.error(String.format("%s运行主任务时发生异常，已跳过当前任务",
                                                name),
                                  ex);
                 }
+
+                waitIdle = CompletableFuture.runAsync(() -> {
+                    try {
+                        CompletableFuture.allOf(concurrentTaskMap.values()
+                                                                 .toArray(new CompletableFuture[0]));
+                    } catch (Exception ignore) {
+
+                    }
+
+                    if (waitIdlePriority == null || waitIdlePriority.isDone())
+                        this.state = TaskQueueHandlerState.空闲;
+                });
             }
         } catch (Exception ex) {
-            logger.error(String.format("%s运行时发生异常, 程序已停止",
+            logger.error(String.format("%s运行主任务时发生异常, 程序已停止",
                                        name),
                          ex);
         }
@@ -489,13 +643,22 @@ public abstract class TaskQueueHandler<Key> {
     /**
      * 处理主任务队列
      */
-    private void processingQueue() {
-        int count = taskQueue.size();
-
-        for (int i = 0; i < count; i++) {
+    private void processingTaskQueue() {
+        while (!taskQueue.isEmpty()) {
             Key taskKey = taskQueue.poll();
 
             try {
+                //等待并发任务数量少于并发上限
+                while (concurrentTaskMap.size() >= concurrentTaskLimit) {
+                    try {
+                        CompletableFuture.anyOf(concurrentTaskMap.values()
+                                                                 .toArray(new CompletableFuture[0]))
+                                         .get();
+                    } catch (Exception ignore) {
+
+                    }
+                }
+
                 processingTask(taskKey);
             } catch (Exception ex) {
                 logger.error(String.format("%s处理主任务时发生异常，已跳过当前任务",
@@ -509,6 +672,81 @@ public abstract class TaskQueueHandler<Key> {
      * 处理主任务
      */
     protected abstract void processingTask(Key taskKey);
+
+    /**
+     * 运行高优先级任务
+     */
+    private void runPriorityTask() {
+        try {
+            while (true) {
+                if (!cf_priority.get()) return;
+
+                cf_priority = new CompletableFuture<>();
+
+                if (waitIdlePriority != null)
+                    waitIdlePriority.cancel(true);
+
+                this.state = TaskQueueHandlerState.运行中;
+
+                try {
+                    this.processingPriorityTaskQueue();
+                } catch (Exception ex) {
+                    logger.error(String.format("%s运行优先级任务时发生异常，已跳过当前任务",
+                                               name),
+                                 ex);
+                }
+
+                waitIdlePriority = CompletableFuture.runAsync(() -> {
+                    try {
+                        CompletableFuture.allOf(concurrentPriorityTaskMap.values()
+                                                                         .toArray(new CompletableFuture[0]));
+                    } catch (Exception ignore) {
+
+                    }
+
+                    if (waitIdle == null || waitIdle.isDone())
+                        this.state = TaskQueueHandlerState.空闲;
+                });
+            }
+        } catch (Exception ex) {
+            logger.error(String.format("%s运行优先级任务时发生异常, 程序已停止",
+                                       name),
+                         ex);
+        }
+    }
+
+    /**
+     * 处理高优先级任务队列
+     */
+    private void processingPriorityTaskQueue() {
+        while (!priorityTaskQueue.isEmpty()) {
+            Key taskKey = priorityTaskQueue.pollLast();
+
+            try {
+                //等待并发任务数量少于并发上限
+                while (concurrentPriorityTaskMap.size() >= concurrentTaskLimit) {
+                    try {
+                        CompletableFuture.anyOf(concurrentPriorityTaskMap.values()
+                                                                         .toArray(new CompletableFuture[0]))
+                                         .get();
+                    } catch (Exception ignore) {
+
+                    }
+                }
+
+                processingPriorityTask(taskKey);
+            } catch (Exception ex) {
+                logger.error(String.format("%s处理高优先级任务时发生异常，已跳过当前任务",
+                                           name),
+                             ex);
+            }
+        }
+    }
+
+    /**
+     * 处理高优先级任务
+     */
+    protected abstract void processingPriorityTask(Key taskKey);
 
     /**
      * 新增并发子任务
@@ -551,6 +789,49 @@ public abstract class TaskQueueHandler<Key> {
      */
     protected <T> void removeConcurrentTask(T key) {
         concurrentTaskMap.remove(key);
+    }
+
+    /**
+     * 新增高优先级并发子任务
+     *
+     * @param key        任务标识
+     * @param runnable   执行操作
+     * @param thenAccept 操作结束后执行（可选）
+     */
+    protected <T> void putPriorityConcurrentTask(T key,
+                                                 Runnable runnable,
+                                                 @Nullable
+                                                         Consumer<Void> thenAccept) {
+        if (this.state.equals(TaskQueueHandlerState.停止中)
+                || this.state.equals(TaskQueueHandlerState.已停止))
+            throw new CommonException(String.format("%s已关闭",
+                                                    getName()));
+
+        concurrentPriorityTaskMap.put(key,
+                                      thenAccept == null
+                                      ? CompletableFuture.runAsync(runnable,
+                                                                   concurrentTaskExecutor)
+                                      : CompletableFuture.runAsync(runnable,
+                                                                   concurrentTaskExecutor)
+                                                         .thenAcceptAsync(thenAccept));
+    }
+
+    /**
+     * 是否存在指定的高优先级并发子任务
+     *
+     * @param key 任务标识
+     */
+    protected <T> boolean containsPriorityConcurrentTask(T key) {
+        return concurrentPriorityTaskMap.containsKey(key);
+    }
+
+    /**
+     * 移除指定的高优先级并发子任务
+     *
+     * @param key 任务标识
+     */
+    protected <T> void removePriorityConcurrentTask(T key) {
+        concurrentPriorityTaskMap.remove(key);
     }
 
     /**
