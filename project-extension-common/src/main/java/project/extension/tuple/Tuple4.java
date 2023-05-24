@@ -1,5 +1,8 @@
 package project.extension.tuple;
 
+import com.alibaba.fastjson.annotation.JSONType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 包含四个元素的元组对象
  *
@@ -10,6 +13,7 @@ package project.extension.tuple;
  * @author LCTR
  * @date 2022-03-18
  */
+@JSONType(ignores = {"count"})
 public class Tuple4<A, B, C, D>
         implements ITuple {
     public A a;
@@ -28,6 +32,7 @@ public class Tuple4<A, B, C, D>
     }
 
     @Override
+    @JsonIgnore
     public int getCount() {
         return 4;
     }

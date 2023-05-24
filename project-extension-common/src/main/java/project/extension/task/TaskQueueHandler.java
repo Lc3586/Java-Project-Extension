@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.springframework.lang.Nullable;
 import project.extension.action.IAction0;
 import project.extension.action.IAction1;
+import project.extension.collections.CollectionsExtension;
 import project.extension.exception.CommonException;
 import project.extension.func.IFunc0;
 
@@ -622,11 +623,13 @@ public abstract class TaskQueueHandler<Key> {
                 }
 
                 waitIdle = CompletableFuture.runAsync(() -> {
-                    try {
-                        CompletableFuture.allOf(concurrentTaskMap.values()
-                                                                 .toArray(new CompletableFuture[0]));
-                    } catch (Exception ignore) {
+                    while (concurrentTaskMap.size() > 0) {
+                        try {
+                            CompletableFuture.allOf(CollectionsExtension.firstValue(concurrentTaskMap))
+                                             .get();
+                        } catch (Exception ignore) {
 
+                        }
                     }
 
                     if (waitIdlePriority == null || waitIdlePriority.isDone())
@@ -697,11 +700,13 @@ public abstract class TaskQueueHandler<Key> {
                 }
 
                 waitIdlePriority = CompletableFuture.runAsync(() -> {
-                    try {
-                        CompletableFuture.allOf(concurrentPriorityTaskMap.values()
-                                                                         .toArray(new CompletableFuture[0]));
-                    } catch (Exception ignore) {
+                    while (concurrentPriorityTaskMap.size() > 0) {
+                        try {
+                            CompletableFuture.allOf(CollectionsExtension.firstValue(concurrentPriorityTaskMap))
+                                             .get();
+                        } catch (Exception ignore) {
 
+                        }
                     }
 
                     if (waitIdle == null || waitIdle.isDone())
