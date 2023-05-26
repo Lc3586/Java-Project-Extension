@@ -393,16 +393,14 @@ public abstract class HubHandler {
         protected void processingTask(String uuid) {
             //异步执行
             super.putConcurrentTask(uuid,
-                                    () -> this.handlerTask(uuid),
-                                    x -> super.removeConcurrentTask(uuid));
+                                    () -> this.handlerTask(uuid));
         }
 
         @Override
         protected void processingPriorityTask(String uuid) {
             //异步执行
             super.putPriorityConcurrentTask(uuid,
-                                            () -> this.handlerTask(uuid),
-                                            x -> super.removeConcurrentTask(uuid));
+                                            () -> this.handlerTask(uuid));
         }
 
         /**
@@ -520,8 +518,7 @@ public abstract class HubHandler {
 
             //异步执行
             super.putConcurrentTask(key,
-                                    () -> this.handlerTask(key),
-                                    x -> super.removeConcurrentTask(key));
+                                    () -> this.handlerTask(key));
         }
 
         @Override
@@ -530,8 +527,7 @@ public abstract class HubHandler {
 
             //异步执行
             super.putConcurrentTask(key,
-                                    () -> this.handlerTask(key),
-                                    x -> super.removeConcurrentTask(key));
+                                    () -> this.handlerTask(key));
         }
 
         /**

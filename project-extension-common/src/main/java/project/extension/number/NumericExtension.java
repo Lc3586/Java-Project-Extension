@@ -46,6 +46,10 @@ public class NumericExtension {
                 || type
                 .equals(int.class)
                 || type
+                .equals(Long.class)
+                || type
+                .equals(long.class)
+                || type
                 .equals(Double.class)
                 || type
                 .equals(double.class)

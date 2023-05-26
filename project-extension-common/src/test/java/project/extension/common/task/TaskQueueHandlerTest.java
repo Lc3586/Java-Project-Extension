@@ -10,7 +10,6 @@ import project.extension.task.TaskQueueHandlerState;
 
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * 基础任务队列运行类测试
@@ -67,19 +66,20 @@ public class TaskQueueHandlerTest {
      */
     @Test
     @DisplayName("检查状态")
-    public void checkState() {
+    public void checkState()
+            throws
+            Throwable {
         TestTaskQueueHandler taskQueueHandler = new TestTaskQueueHandler();
 
         Assertions.assertEquals(TaskQueueHandlerState.已停止,
                                 taskQueueHandler.getState(),
                                 "程序未启动时应该为已停止状态");
 
-        CompletableFuture.runAsync(
-                () -> taskQueueHandler.start(true,
-                                             () -> {
-                                                 TaskExtension.delay(2000);
-                                                 return true;
-                                             }));
+        taskQueueHandler.start(true,
+                               () -> {
+                                   TaskExtension.delay(2000);
+                                   return true;
+                               });
 
         TaskExtension.delay(1000);
 
@@ -87,7 +87,8 @@ public class TaskQueueHandlerTest {
                                 taskQueueHandler.getState(),
                                 "如果有启动前要执行的方法，则程序应该为启动中状态");
 
-        taskQueueHandler.wait2Start(1500);
+        taskQueueHandler.wait2Start(1500)
+                        .get();
 
         Assertions.assertEquals(TaskQueueHandlerState.空闲,
                                 taskQueueHandler.getState(),
@@ -105,13 +106,15 @@ public class TaskQueueHandlerTest {
                                 taskQueueHandler.getState(),
                                 "程序在处理任务时应该为运行中状态");
 
-        taskQueueHandler.wait2Idle(20000);
+        taskQueueHandler.wait2Idle(20000)
+                        .get();
 
         Assertions.assertEquals(TaskQueueHandlerState.空闲,
                                 taskQueueHandler.getState(),
                                 "程序处理完全部任务后应该为空闲状态");
 
-        taskQueueHandler.shutdown();
+        taskQueueHandler.shutdown()
+                        .get();
 
         System.out.println("测试已通过");
     }
@@ -122,10 +125,13 @@ public class TaskQueueHandlerTest {
      */
     @Test
     @DisplayName("测试优先级任务是否能优先执行")
-    public void priorityTask() {
+    public void priorityTask()
+            throws
+            Throwable {
         TestTaskQueueHandler taskQueueHandler = new TestTaskQueueHandler();
 
-        taskQueueHandler.start(true);
+        taskQueueHandler.start(true)
+                        .get();
 
         for (int i = 0; i < 1000; i++) {
             taskQueueHandler.addTask(UUID.randomUUID());
@@ -147,7 +153,8 @@ public class TaskQueueHandlerTest {
         System.out.printf("还剩%s个主任务未执行",
                           taskQueueHandler.getTaskCount());
 
-        taskQueueHandler.shutdown();
+        taskQueueHandler.shutdown()
+                        .get();
 
         System.out.println("测试已通过");
     }
