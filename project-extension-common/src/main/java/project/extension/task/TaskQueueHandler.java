@@ -155,7 +155,9 @@ public abstract class TaskQueueHandler<Key> {
      */
     private CompletableFuture<Boolean> cf_priority;
 
-    private Integer running = 0;
+    private boolean on = false;
+
+    private boolean onPriority = false;
 
     /**
      * 模块名称
@@ -402,10 +404,12 @@ public abstract class TaskQueueHandler<Key> {
      */
     public void handler() {
         //开始处理主任务
-        cf.complete(true);
+        if (!taskQueue.isEmpty())
+            cf.complete(true);
 
         //开始处理高优先级任务
-        cf_priority.complete(true);
+        if (!priorityTaskQueue.isEmpty())
+            cf_priority.complete(true);
     }
 
     /**
@@ -577,22 +581,18 @@ public abstract class TaskQueueHandler<Key> {
 
     /**
      * 切换状态
-     *
-     * @param state 状态
      */
-    private synchronized void swatch(boolean state) {
-        running += state
-                   ? 1
-                   : -1;
+    private synchronized void swatch(boolean on,
+                                     boolean priority) {
+        if (priority)
+            this.onPriority = on;
+        else
+            this.on = on;
 
-        if (running > 2)
-            running = 2;
-
-        if (running > 0)
-            this.state = TaskQueueHandlerState.运行中;
-
-        if (running == 0)
+        if (!this.onPriority && !this.on)
             this.state = TaskQueueHandlerState.空闲;
+        else
+            this.state = TaskQueueHandlerState.运行中;
     }
 
     /**
@@ -656,7 +656,8 @@ public abstract class TaskQueueHandler<Key> {
                 if (waitIdle != null)
                     waitIdle.cancel(true);
 
-                swatch(true);
+                swatch(true,
+                       false);
 
                 try {
                     this.processingTaskQueue();
@@ -676,8 +677,8 @@ public abstract class TaskQueueHandler<Key> {
                         }
                     }
 
-                    if (concurrentTaskMap.size() == 0)
-                        swatch(false);
+                    swatch(false,
+                           false);
                 });
             }
         } catch (Exception ex) {
@@ -733,7 +734,8 @@ public abstract class TaskQueueHandler<Key> {
                 if (waitIdlePriority != null)
                     waitIdlePriority.cancel(true);
 
-                swatch(true);
+                swatch(true,
+                       true);
 
                 try {
                     this.processingPriorityTaskQueue();
@@ -753,8 +755,8 @@ public abstract class TaskQueueHandler<Key> {
                         }
                     }
 
-                    if (concurrentPriorityTaskMap.size() == 0)
-                        swatch(false);
+                    swatch(false,
+                           true);
                 });
             }
         } catch (Exception ex) {
