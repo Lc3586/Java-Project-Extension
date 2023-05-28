@@ -30,19 +30,15 @@ public class TaskQueueHandlerTest {
         @Override
         protected void processingTask(UUID taskKey) {
             //异步执行
-            super.putConcurrentTask(taskKey,
-                                    () -> this.handlerTask(taskKey,
-                                                           false),
-                                    x -> super.removeConcurrentTask(taskKey));
+            super.addConcurrentTask(() -> this.handlerTask(taskKey,
+                                                           false));
         }
 
         @Override
         protected void processingPriorityTask(UUID taskKey) {
             //异步执行
-            super.putPriorityConcurrentTask(taskKey,
-                                            () -> this.handlerTask(taskKey,
-                                                                   true),
-                                            x -> super.removePriorityConcurrentTask(taskKey));
+            super.addPriorityConcurrentTask(() -> this.handlerTask(taskKey,
+                                                                   true));
         }
 
         private void handlerTask(UUID taskKey,
@@ -143,7 +139,7 @@ public class TaskQueueHandlerTest {
 
         TaskExtension.delay(10000);
 
-        Assertions.assertTrue(taskQueueHandler.getTaskCount() > 0,
+        Assertions.assertTrue(taskQueueHandler.getHandlerTaskCount() > 0,
                               "主任务执行异常");
 
         Assertions.assertEquals(0,
@@ -151,7 +147,7 @@ public class TaskQueueHandlerTest {
                                 "优先级任务没有优先执行");
 
         System.out.printf("还剩%s个主任务未执行",
-                          taskQueueHandler.getTaskCount());
+                          taskQueueHandler.getHandlerTaskCount());
 
         taskQueueHandler.shutdown()
                         .get();
