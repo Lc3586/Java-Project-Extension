@@ -143,8 +143,8 @@ public class MappedStatementHandler {
         aop.mappedStatement(new MappedStatementArgs(false,
                                                     ms));
 
-        // 缓存
-        if (!configuration.hasStatement(msId)) configuration.addMappedStatement(ms);
+//        // 缓存
+//        if (!configuration.hasStatement(msId)) configuration.addMappedStatement(ms);
 
         return ms;
 
