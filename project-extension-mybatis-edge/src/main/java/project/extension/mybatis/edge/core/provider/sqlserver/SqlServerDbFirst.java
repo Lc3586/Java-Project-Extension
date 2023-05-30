@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.core.provider.sqlserver;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
@@ -31,8 +30,7 @@ public class SqlServerDbFirst
     public SqlServerDbFirst(DataSourceConfig config,
                             INaiveAdo ado) {
         super(config,
-              ado,
-              "SqlServerDbFirst");
+              ado);
         initialization();
     }
 
@@ -383,7 +381,7 @@ public class SqlServerDbFirst
                                    currentDatabase);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -461,7 +459,7 @@ public class SqlServerDbFirst
                             currentDatabase);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -502,7 +500,7 @@ public class SqlServerDbFirst
                                    currentDatabase);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -547,7 +545,7 @@ public class SqlServerDbFirst
                                    currentDatabase);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -1077,7 +1075,7 @@ public class SqlServerDbFirst
             ModuleException {
         String sql = " select name from sys.databases where name not in ('master','tempdb','model','msdb')";
         return this.ado.selectList(getSqlSession(),
-                                   getMSId(MD5Utils.hash(sql)),
+                                   getMSId(),
                                    sql,
                                    null,
                                    null,
@@ -1152,7 +1150,7 @@ public class SqlServerDbFirst
                                    currentDatabase);
 
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,

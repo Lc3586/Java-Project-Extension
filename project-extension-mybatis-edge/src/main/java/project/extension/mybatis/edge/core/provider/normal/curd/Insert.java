@@ -2,7 +2,6 @@ package project.extension.mybatis.edge.core.provider.normal.curd;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.config.DataSourceConfig;
@@ -75,14 +74,10 @@ public abstract class Insert<T>
     /**
      * 获取标识
      *
-     * @param values 附加值
      * @return 标识
      */
-    protected String getMSId(String... values) {
-        return String.format("%s:%s",
-                             msIdPrefix,
-                             String.join("-",
-                                         values));
+    protected String getMSId() {
+        return ado.getCurrentMSId();
     }
 
     /**
@@ -334,9 +329,7 @@ public abstract class Insert<T>
         for (Object data : inserter.getDataList()) {
             String script = currentScript(false,
                                           data);
-            String msId = getMSId(MD5Utils.hash(script),
-                                  inserter.getDtoType()
-                                          .getTypeName());
+            String msId = getMSId();
 
             //批量插入
             int currentRows = aop.invokeWithAop(() -> insert(msId,

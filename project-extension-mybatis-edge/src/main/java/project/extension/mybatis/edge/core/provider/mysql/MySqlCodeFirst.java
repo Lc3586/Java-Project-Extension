@@ -16,8 +16,7 @@ public class MySqlCodeFirst
     protected MySqlCodeFirst(DataSourceConfig config,
                              INaiveAdo ado) {
         super(config,
-              ado,
-              "MySqlCodeFirst");
+              ado);
     }
 
     @Override

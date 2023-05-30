@@ -16,8 +16,7 @@ public class PostgreSQLCodeFirst
     protected PostgreSQLCodeFirst(DataSourceConfig config,
                                   INaiveAdo ado) {
         super(config,
-              ado,
-              "PostgreSQLCodeFirst");
+              ado);
     }
 
     @Override

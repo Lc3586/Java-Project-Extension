@@ -2,7 +2,6 @@ package project.extension.mybatis.edge.core.provider.normal.curd;
 
 import org.apache.ibatis.session.SqlSession;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
@@ -43,8 +42,6 @@ public abstract class Update<T>
 
     private final Class<T> entityType;
 
-    private final String msIdPrefix;
-
     private final IWhere<T, IWhereSource<T>> where;
 
     public Update(DataSourceConfig config,
@@ -57,8 +54,6 @@ public abstract class Update<T>
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.updater = new UpdaterDTO();
         this.entityType = entityType;
-        this.msIdPrefix = String.format("Update:%s",
-                                        entityType.getTypeName());
         this.where = new WhereProvider<>(this);
         initialization();
     }
@@ -78,14 +73,10 @@ public abstract class Update<T>
     /**
      * 获取标识
      *
-     * @param values 附加值
      * @return 标识
      */
-    protected String getMSId(String... values) {
-        return String.format("%s:%s",
-                             msIdPrefix,
-                             String.join("-",
-                                         values));
+    protected String getMSId() {
+        return ado.getCurrentMSId();
     }
 
     /**
@@ -364,9 +355,7 @@ public abstract class Update<T>
             for (Object data : updater.getDataList()) {
                 String script = currentScript(false,
                                               data);
-                String msId = getMSId(MD5Utils.hash(script),
-                                      updater.getDtoType()
-                                             .getTypeName());
+                String msId = getMSId();
 
                 int currentRows = aop.invokeWithAop(() -> this.ado.update(
                                                             getSqlSession(),
@@ -396,9 +385,7 @@ public abstract class Update<T>
 
             String script = currentScript(false,
                                           null);
-            String msId = getMSId(MD5Utils.hash(script),
-                                  updater.getDtoType()
-                                         .getTypeName());
+            String msId = getMSId();
 
             int currentRows = aop.invokeWithAop(() -> this.ado.update(
                                                         getSqlSession(),

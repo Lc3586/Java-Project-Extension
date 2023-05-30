@@ -1,15 +1,18 @@
 package project.extension.mybatis.edge.core.mapper;
 
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.apache.ibatis.executor.keygen.SelectKeyGenerator;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import project.extension.Identity.SnowFlake;
 import project.extension.cryptography.MD5Utils;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.MappedStatementArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
+import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.model.NameConvertType;
 
 import java.lang.reflect.Field;
@@ -17,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * MappedStatement处理类
@@ -26,11 +31,57 @@ import java.util.Map;
  */
 @Component
 public class MappedStatementHandler {
-    public MappedStatementHandler(INaiveAop aop) {
+    public MappedStatementHandler(INaiveAop aop,
+                                  MyBatisEdgeBaseConfig baseConfig) {
         this.aop = (NaiveAopProvider) aop;
+        this.maxMappedStatementSize = baseConfig.getMaxMappedStatementSize();
     }
 
     private final NaiveAopProvider aop;
+
+    private final Long maxMappedStatementSize;
+
+    private long currentMappedStatementSize = 0L;
+
+    private final ConcurrentHashMap<Long, ConcurrentLinkedQueue<String>> currentIdMap = new ConcurrentHashMap<>();
+
+    private final SnowFlake keyGenerate = new SnowFlake(1,
+                                                        1);
+
+    /**
+     * 获取id
+     */
+    public String getId() {
+        Long currentThreadId = Thread.currentThread()
+                                     .getId();
+        String id;
+        if (currentMappedStatementSize < maxMappedStatementSize) {
+            id = String.format("%s:%s",
+                               currentThreadId,
+                               keyGenerate.nextId2String());
+
+            if (!currentIdMap.containsKey(currentThreadId))
+                currentIdMap.put(currentThreadId,
+                                 new ConcurrentLinkedQueue<>());
+
+            currentIdMap.get(currentThreadId)
+                        .add(id);
+        } else {
+            //重新使用队列首个id，并重新添加至队尾
+            id = currentIdMap.get(currentThreadId)
+                             .poll();
+
+            if (id == null)
+                id = String.format("%s:%s",
+                                   currentThreadId,
+                                   keyGenerate.nextId2String());
+
+            currentIdMap.get(currentThreadId)
+                        .add(id);
+        }
+
+        return id;
+    }
 
     /**
      * 是否存在
@@ -143,8 +194,8 @@ public class MappedStatementHandler {
         aop.mappedStatement(new MappedStatementArgs(false,
                                                     ms));
 
-//        // 缓存
-//        if (!configuration.hasStatement(msId)) configuration.addMappedStatement(ms);
+        currentMappedStatementSize += ObjectSizeCalculator.getObjectSize(ms);
+        if (!configuration.hasStatement(msId)) configuration.addMappedStatement(ms);
 
         return ms;
 

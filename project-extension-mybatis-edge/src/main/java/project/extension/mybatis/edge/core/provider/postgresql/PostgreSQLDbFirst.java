@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
@@ -35,8 +34,7 @@ public class PostgreSQLDbFirst
     public PostgreSQLDbFirst(DataSourceConfig config,
                              INaiveAdo ado) {
         super(config,
-              ado,
-              "PostgreSQLDbFirst");
+              ado);
         initialization();
 
         //TODO 待实现
@@ -605,7 +603,7 @@ public class PostgreSQLDbFirst
                                                    : " is null"));
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -658,7 +656,7 @@ public class PostgreSQLDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -695,7 +693,7 @@ public class PostgreSQLDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -733,7 +731,7 @@ public class PostgreSQLDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -771,7 +769,7 @@ public class PostgreSQLDbFirst
         //从数据库中查询
         String sql = " select \"schema_name\" from information_schema.schemata where \"schema_owner\"=(select current_user)";
         String userId = this.ado.selectOne(getSqlSession(),
-                                           getMSId(MD5Utils.hash(sql)),
+                                           getMSId(),
                                            sql,
                                            null,
                                            null,
@@ -1429,7 +1427,7 @@ public class PostgreSQLDbFirst
             ModuleException {
         String sql = " select datname from pg_database where datname not in ('template1', 'template0')";
         return this.ado.selectList(getSqlSession(),
-                                   getMSId(MD5Utils.hash(sql)),
+                                   getMSId(),
                                    sql,
                                    null,
                                    null,
@@ -1493,7 +1491,7 @@ public class PostgreSQLDbFirst
                                    : " is null");
 
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,

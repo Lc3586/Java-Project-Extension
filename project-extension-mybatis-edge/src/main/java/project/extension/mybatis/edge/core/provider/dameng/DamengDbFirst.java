@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.core.provider.dameng;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
@@ -32,8 +31,7 @@ public class DamengDbFirst
     public DamengDbFirst(DataSourceConfig config,
                          INaiveAdo ado) {
         super(config,
-              ado,
-              "DamengDbFirst");
+              ado);
         initialization();
     }
 
@@ -393,7 +391,7 @@ public class DamengDbFirst
                                                    : " is null"));
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -438,7 +436,7 @@ public class DamengDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -483,7 +481,7 @@ public class DamengDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -546,7 +544,7 @@ public class DamengDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -566,7 +564,7 @@ public class DamengDbFirst
         //从数据库中查询
         String sql = " select username from user_users";
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,
@@ -1162,7 +1160,7 @@ public class DamengDbFirst
             ModuleException {
         String sql = " select username from all_users";
         return this.ado.selectList(getSqlSession(),
-                                   getMSId(MD5Utils.hash(sql)),
+                                   getMSId(),
                                    sql,
                                    null,
                                    null,
@@ -1226,7 +1224,7 @@ public class DamengDbFirst
                                    : " is null");
 
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,

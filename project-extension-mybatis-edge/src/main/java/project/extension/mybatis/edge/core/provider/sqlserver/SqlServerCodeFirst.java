@@ -16,8 +16,7 @@ public class SqlServerCodeFirst
     protected SqlServerCodeFirst(DataSourceConfig config,
                                  INaiveAdo ado) {
         super(config,
-              ado,
-              "SqlServerCodeFirst");
+              ado);
     }
 
     @Override

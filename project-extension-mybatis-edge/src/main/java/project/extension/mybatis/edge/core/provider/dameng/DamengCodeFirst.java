@@ -16,8 +16,7 @@ public class DamengCodeFirst
     protected DamengCodeFirst(DataSourceConfig config,
                               INaiveAdo ado) {
         super(config,
-              ado,
-              "DamengCodeFirst");
+              ado);
     }
 
     @Override

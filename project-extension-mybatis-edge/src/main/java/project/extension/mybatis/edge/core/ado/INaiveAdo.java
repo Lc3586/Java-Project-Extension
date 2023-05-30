@@ -232,6 +232,11 @@ public interface INaiveAdo {
             ModuleException;
 
     /**
+     * 获取当前的标识
+     */
+    String getCurrentMSId();
+
+    /**
      * 查询单条记录
      *
      * @param sqlSession         指定SQL会话

@@ -24,11 +24,9 @@ import java.util.regex.Pattern;
 public abstract class DbFirst
         implements IDbFirst {
     public DbFirst(DataSourceConfig config,
-                   INaiveAdo ado,
-                   String msIdPrefix) {
+                   INaiveAdo ado) {
         this.config = config;
         this.ado = ado;
-        this.msIdPrefix = msIdPrefix;
     }
 
     /**
@@ -39,8 +37,6 @@ public abstract class DbFirst
     protected final DataSourceConfig config;
 
     protected final INaiveAdo ado;
-
-    private final String msIdPrefix;
 
     /**
      * 复制类型转换映射数据
@@ -64,14 +60,10 @@ public abstract class DbFirst
     /**
      * 获取标识
      *
-     * @param values 附加值
      * @return 标识
      */
-    protected String getMSId(String... values) {
-        return String.format("%s:%s",
-                             msIdPrefix,
-                             String.join("-",
-                                         values));
+    protected String getMSId() {
+        return ado.getCurrentMSId();
     }
 
     /**

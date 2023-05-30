@@ -1,7 +1,6 @@
 package project.extension.mybatis.edge.core.provider.normal.curd;
 
 import org.apache.ibatis.session.SqlSession;
-import project.extension.cryptography.MD5Utils;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
@@ -40,8 +39,6 @@ public abstract class Select<T>
 
     protected final Class<T> entityType;
 
-    private final String msIdPrefix;
-
     protected final IWhere<T, IWhereSource<T>> where;
 
     protected final IOrderBy<T, IOrderBySource<T>> orderBy;
@@ -56,8 +53,6 @@ public abstract class Select<T>
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
         this.executor = new ExecutorDTO();
         this.entityType = entityType;
-        this.msIdPrefix = String.format("Select:%s",
-                                        entityType.getTypeName());
         this.where = new WhereProvider<>(this);
         this.orderBy = new OrderByProvider<>(this);
         initialization();
@@ -78,14 +73,10 @@ public abstract class Select<T>
     /**
      * 获取标识
      *
-     * @param values 附加值
      * @return 标识
      */
-    protected String getMSId(String... values) {
-        return String.format("%s:%s",
-                             msIdPrefix,
-                             String.join("-",
-                                         values));
+    protected String getMSId() {
+        return ado.getCurrentMSId();
     }
 
     /**
@@ -462,9 +453,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 Boolean.class.getTypeName()),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -502,8 +491,7 @@ public abstract class Select<T>
         String sql = paging();
 
         return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
-                                                           getMSId(MD5Utils.hash(sql),
-                                                                   entityType.getTypeName()),
+                                                           getMSId(),
                                                            sql,
                                                            null,
                                                            executor.getParameter(),
@@ -528,9 +516,7 @@ public abstract class Select<T>
         String sql = paging();
 
         return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
-                                                           getMSId(MD5Utils.hash(sql),
-                                                                   entityType.getTypeName(),
-                                                                   dtoType.getTypeName()),
+                                                           getMSId(),
                                                            sql,
                                                            null,
                                                            executor.getParameter(),
@@ -554,9 +540,7 @@ public abstract class Select<T>
         String sql = paging();
 
         return aop.invokeWithAop(() -> this.ado.selectMapList(getSqlSession(),
-                                                              getMSId(MD5Utils.hash(sql),
-                                                                      entityType.getTypeName(),
-                                                                      HashMap.class.getTypeName()),
+                                                              getMSId(),
                                                               sql,
                                                               null,
                                                               executor.getParameter(),
@@ -584,8 +568,7 @@ public abstract class Select<T>
                                                       1);
 
         return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
-                                                          getMSId(MD5Utils.hash(sql),
-                                                                  entityType.getTypeName()),
+                                                          getMSId(),
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
@@ -614,9 +597,7 @@ public abstract class Select<T>
                                                       1);
 
         return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
-                                                          getMSId(MD5Utils.hash(sql),
-                                                                  entityType.getTypeName(),
-                                                                  dtoType.getTypeName()),
+                                                          getMSId(),
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
@@ -650,9 +631,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 fieldName),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -680,9 +659,7 @@ public abstract class Select<T>
                                                       1);
 
         return aop.invokeWithAop(() -> this.ado.selectMap(getSqlSession(),
-                                                          getMSId(MD5Utils.hash(sql),
-                                                                  entityType.getTypeName(),
-                                                                  HashMap.class.getTypeName()),
+                                                          getMSId(),
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
@@ -710,9 +687,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 Long.class.getTypeName()),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -747,9 +722,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 fieldName),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -784,9 +757,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 fieldName),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -820,9 +791,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 fieldName),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -856,9 +825,7 @@ public abstract class Select<T>
 
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(MD5Utils.hash(sql),
-                                                 entityType.getTypeName(),
-                                                 fieldName),
+                                         getMSId(),
                                          sql,
                                          null,
                                          executor.getParameter(),

@@ -1,6 +1,5 @@
 package project.extension.mybatis.edge.core.provider.oracle;
 
-import project.extension.cryptography.MD5Utils;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.normal.CodeFirst;
@@ -17,8 +16,7 @@ public class OracleCodeFirst
     protected OracleCodeFirst(DataSourceConfig config,
                               INaiveAdo ado) {
         super(config,
-              ado,
-              "OracleCodeFirst");
+              ado);
     }
 
     /**
@@ -44,7 +42,7 @@ public class OracleCodeFirst
                 + "END;";
 
         this.ado.selectOne(getSqlSession(),
-                           getMSId(MD5Utils.hash(sql)),
+                           getMSId(),
                            sql,
                            null,
                            null,
@@ -77,7 +75,7 @@ public class OracleCodeFirst
                 + "END;";
 
         this.ado.selectOne(getSqlSession(),
-                           getMSId(MD5Utils.hash(sql)),
+                           getMSId(),
                            sql,
                            null,
                            null,

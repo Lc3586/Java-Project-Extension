@@ -37,6 +37,11 @@ public class MyBatisEdgeBaseConfig {
     private String configLocation;
 
     /**
+     * MappedStatement占用空间上限（字节数）
+     */
+    private Long maxMappedStatementSize;
+
+    /**
      * 默认的需要扫描的存放实体类的包（包括TypeAliasesPackage）
      */
     private List<String> scanEntitiesPackages;

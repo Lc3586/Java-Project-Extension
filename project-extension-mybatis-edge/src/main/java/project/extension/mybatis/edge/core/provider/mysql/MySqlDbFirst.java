@@ -4,7 +4,6 @@ import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.apache.commons.collections4.map.CaseInsensitiveMap;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
@@ -31,8 +30,7 @@ public class MySqlDbFirst
     public MySqlDbFirst(DataSourceConfig config,
                         INaiveAdo ado) {
         super(config,
-              ado,
-              "MySqlDbFirst");
+              ado);
         initialization();
     }
 
@@ -331,7 +329,7 @@ public class MySqlDbFirst
                                                    : " is null"));
 
         return super.ado.selectMapList(getSqlSession(),
-                                       getMSId(MD5Utils.hash(sql)),
+                                       getMSId(),
                                        sql,
                                        null,
                                        null,
@@ -373,7 +371,7 @@ public class MySqlDbFirst
                                    tablesMatcher);
 
         return super.ado.selectMapList(getSqlSession(),
-                                       getMSId(MD5Utils.hash(sql)),
+                                       getMSId(),
                                        sql,
                                        null,
                                        null,
@@ -413,7 +411,7 @@ public class MySqlDbFirst
                                    tablesMatcher);
 
         return super.ado.selectMapList(getSqlSession(),
-                                       getMSId(MD5Utils.hash(sql)),
+                                       getMSId(),
                                        sql,
                                        null,
                                        null,
@@ -453,7 +451,7 @@ public class MySqlDbFirst
                                    tablesMatcher);
 
         return super.ado.selectMapList(getSqlSession(),
-                                       getMSId(MD5Utils.hash(sql)),
+                                       getMSId(),
                                        sql,
                                        null,
                                        null,
@@ -982,7 +980,7 @@ public class MySqlDbFirst
             ModuleException {
         String sql = " select schema_name from information_schema.schemata where schema_name not in ('information_schema', 'mysql', 'performance_schema')";
         return super.ado.selectList(getSqlSession(),
-                                    getMSId(MD5Utils.hash(sql)),
+                                    getMSId(),
                                     sql,
                                     null,
                                     null,
@@ -1046,7 +1044,7 @@ public class MySqlDbFirst
                                    : " is null");
 
         return super.ado.selectOne(getSqlSession(),
-                                   getMSId(MD5Utils.hash(sql)),
+                                   getMSId(),
                                    sql,
                                    null,
                                    null,

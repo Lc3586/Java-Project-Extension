@@ -3,7 +3,6 @@ package project.extension.mybatis.edge.core.provider.oracle;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
-import project.extension.cryptography.MD5Utils;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.config.DataSourceConfig;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
@@ -34,8 +33,7 @@ public class OracleDbFirst
                          INaiveAdo ado,
                          ICodeFirst codeFirst) {
         super(config,
-              ado,
-              "OracleDbFirst");
+              ado);
         initialization();
         //创建需要的数据方法
         codeFirst.createOrReplaceFunctions();
@@ -366,7 +364,7 @@ public class OracleDbFirst
                                                    : " is null"));
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -412,7 +410,7 @@ public class OracleDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -457,7 +455,7 @@ public class OracleDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -520,7 +518,7 @@ public class OracleDbFirst
                                    tablesMatcher);
 
         return this.ado.selectMapList(getSqlSession(),
-                                      getMSId(MD5Utils.hash(sql)),
+                                      getMSId(),
                                       sql,
                                       null,
                                       null,
@@ -556,7 +554,7 @@ public class OracleDbFirst
         //从数据库中查询
         String sql = " select username from user_users";
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,
@@ -1152,7 +1150,7 @@ public class OracleDbFirst
             ModuleException {
         String sql = " select username from all_users";
         return this.ado.selectList(getSqlSession(),
-                                   getMSId(MD5Utils.hash(sql)),
+                                   getMSId(),
                                    sql,
                                    null,
                                    null,
@@ -1216,7 +1214,7 @@ public class OracleDbFirst
                                    : " is null");
 
         return this.ado.selectOne(getSqlSession(),
-                                  getMSId(MD5Utils.hash(sql)),
+                                  getMSId(),
                                   sql,
                                   null,
                                   null,

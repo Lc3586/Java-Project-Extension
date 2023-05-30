@@ -445,6 +445,11 @@ public class NaiveAdoProvider
     }
 
     @Override
+    public String getCurrentMSId() {
+        return mappedStatementHandler.getId();
+    }
+
+    @Override
     public <TParameter, TResult> TResult selectOne(SqlSession sqlSession,
                                                    String msId,
                                                    String script,

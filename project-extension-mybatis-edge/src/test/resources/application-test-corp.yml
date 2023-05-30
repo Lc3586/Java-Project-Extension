@@ -6,6 +6,8 @@ project:
       dataSource: mysql
       # mybatis配置文件路径
       configLocation: classpath:mybatis/mybatis-config.xml
+      # MappedStatement占用空间上限（字节数）
+      maxMappedStatementSize: 102400
       # 需要扫描的存放实体类的包（包括TypeAliasesPackage）
       scanEntitiesPackages: project.extension.mybatis.edge.entity.**
       # 需要扫描的存放Mapper接口类的包（可选）
