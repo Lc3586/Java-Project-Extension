@@ -10,7 +10,6 @@ import org.springframework.lang.Nullable;
 import project.extension.collections.CollectionsExtension;
 import project.extension.mybatis.edge.annotations.ColumnSetting;
 import project.extension.mybatis.edge.annotations.MappingSetting;
-import project.extension.mybatis.edge.extention.CommonUtils;
 import project.extension.mybatis.edge.model.NameConvertType;
 import project.extension.openapi.extention.SchemaExtension;
 import project.extension.type.TypeExtension;

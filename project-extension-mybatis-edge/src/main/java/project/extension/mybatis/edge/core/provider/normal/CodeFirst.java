@@ -36,6 +36,6 @@ public abstract class CodeFirst
      * @return 标识
      */
     protected String getMSId() {
-        return ado.getCurrentMSId();
+        return ado.getMSId();
     }
 }

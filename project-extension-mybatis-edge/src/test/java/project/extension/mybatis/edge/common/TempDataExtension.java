@@ -133,7 +133,7 @@ public class TempDataExtension {
                 } else if (Short.class.equals(field.getType())
                         || short.class.equals(field.getType())) {
                     field.set(data,
-                              TestDataHelper.generateBoolean());
+                              TestDataHelper.generateShort());
                 } else if (Integer.class.equals(field.getType())
                         || int.class.equals(field.getType())) {
                     field.set(data,
@@ -177,8 +177,8 @@ public class TempDataExtension {
                         int precision = columnSetting.precision();
                         int scale = columnSetting.scale();
                         field.set(data,
-                                  TestDataHelper.generateDouble(precision,
-                                                                scale));
+                                  TestDataHelper.generateBigDecimal(precision,
+                                                                    scale));
                     }
                 } else if (java.sql.Date.class.equals(field.getType())) {
                     field.set(data,

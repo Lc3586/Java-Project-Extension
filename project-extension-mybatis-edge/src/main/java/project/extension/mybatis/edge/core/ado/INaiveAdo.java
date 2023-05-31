@@ -234,7 +234,7 @@ public interface INaiveAdo {
     /**
      * 获取当前的标识
      */
-    String getCurrentMSId();
+    String getMSId();
 
     /**
      * 查询单条记录

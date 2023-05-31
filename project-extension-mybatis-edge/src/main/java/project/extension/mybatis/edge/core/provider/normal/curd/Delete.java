@@ -77,7 +77,7 @@ public abstract class Delete<T>
      * @return 标识
      */
     protected String getMSId() {
-        return ado.getCurrentMSId();
+        return ado.getMSId();
     }
 
     /**

@@ -76,7 +76,7 @@ public abstract class Update<T>
      * @return 标识
      */
     protected String getMSId() {
-        return ado.getCurrentMSId();
+        return ado.getMSId();
     }
 
     /**

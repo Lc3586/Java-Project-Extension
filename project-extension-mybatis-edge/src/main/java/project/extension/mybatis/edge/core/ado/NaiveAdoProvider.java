@@ -100,7 +100,11 @@ public class NaiveAdoProvider
      * 结束Sql查询后执行
      */
     private void afterExecute(SqlSession sqlSession,
-                              boolean success) {
+                              boolean success,
+                              String msId) {
+        mappedStatementHandler.returnId(msId,
+                                        sqlSession.getConfiguration());
+
         if (isTransactionAlreadyExisting())
             return;
 
@@ -445,8 +449,8 @@ public class NaiveAdoProvider
     }
 
     @Override
-    public String getCurrentMSId() {
-        return mappedStatementHandler.getId();
+    public String getMSId() {
+        return mappedStatementHandler.applyId();
     }
 
     @Override
@@ -487,7 +491,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -530,7 +535,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -572,7 +578,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -615,7 +622,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -649,7 +657,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -684,7 +693,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -718,7 +728,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -753,7 +764,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -806,7 +818,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -858,7 +871,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -897,7 +911,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -937,7 +952,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -976,7 +992,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
@@ -1016,7 +1033,8 @@ public class NaiveAdoProvider
             return result;
         } finally {
             afterExecute(sqlSession,
-                         success);
+                         success,
+                         msId);
         }
     }
 
