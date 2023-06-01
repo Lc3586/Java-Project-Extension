@@ -466,24 +466,24 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               resultType,
-                                               resultMainTagLevel,
-                                               resultCustomTags,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          resultType,
+                                          resultMainTagLevel,
+                                          resultCustomTags,
+                                          nameConvertType);
 
             TResult result = sqlSession.selectOne(msId,
                                                   parameterHashMap);
@@ -511,23 +511,23 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               resultType,
-                                               resultMainTagLevel,
-                                               resultCustomTags,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          resultType,
+                                          resultMainTagLevel,
+                                          resultCustomTags,
+                                          nameConvertType);
 
             TResult result = sqlSession.selectOne(msId,
                                                   parameter);
@@ -553,24 +553,24 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               resultType,
-                                               resultMainTagLevel,
-                                               resultCustomTags,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          resultType,
+                                          resultMainTagLevel,
+                                          resultCustomTags,
+                                          nameConvertType);
 
             List<TResult> result = sqlSession.selectList(msId,
                                                          parameterHashMap);
@@ -598,23 +598,23 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               resultType,
-                                               resultMainTagLevel,
-                                               resultCustomTags,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          resultType,
+                                          resultMainTagLevel,
+                                          resultCustomTags,
+                                          nameConvertType);
 
             List<TResult> result = sqlSession.selectList(msId,
                                                          parameter);
@@ -639,17 +639,17 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               resultType,
-                                               resultFields,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          resultType,
+                                          resultFields,
+                                          nameConvertType);
 
             Map<String, Object> result = sqlSession.selectOne(msId,
                                                               parameterHashMap);
@@ -676,16 +676,16 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               resultType,
-                                               resultFields,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          resultType,
+                                          resultFields,
+                                          nameConvertType);
 
             Map<String, Object> result = sqlSession.selectOne(msId,
                                                               parameter);
@@ -710,17 +710,17 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               resultType,
-                                               resultFields,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          resultType,
+                                          resultFields,
+                                          nameConvertType);
 
             List<Map<String, Object>> result = sqlSession.selectList(msId,
                                                                      parameterHashMap);
@@ -747,16 +747,16 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.SELECT,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               resultType,
-                                               resultFields,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.SELECT,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          resultType,
+                                          resultFields,
+                                          nameConvertType);
 
             List<Map<String, Object>> result = sqlSession.selectList(msId,
                                                                      parameter);
@@ -793,24 +793,24 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.INSERT,
-                                               useGeneratedKeys,
-                                               keyProperty,
-                                               keyColumn,
-                                               useSelectKey,
-                                               selectKeyScript,
-                                               selectKeyType,
-                                               parameterType,
-                                               parameterHashMap,
-                                               outParameterHashMap,
-                                               inOutParameterHashMap,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.INSERT,
+                                          useGeneratedKeys,
+                                          keyProperty,
+                                          keyColumn,
+                                          useSelectKey,
+                                          selectKeyScript,
+                                          selectKeyType,
+                                          parameterType,
+                                          parameterHashMap,
+                                          outParameterHashMap,
+                                          inOutParameterHashMap,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.insert(msId,
                                            parameterHashMap);
@@ -847,23 +847,23 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.INSERT,
-                                               useGeneratedKeys,
-                                               keyProperty,
-                                               keyColumn,
-                                               useSelectKey,
-                                               selectKeyScript,
-                                               selectKeyType,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.INSERT,
+                                          useGeneratedKeys,
+                                          keyProperty,
+                                          keyColumn,
+                                          useSelectKey,
+                                          selectKeyScript,
+                                          selectKeyType,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.insert(msId,
                                            parameter);
@@ -886,24 +886,24 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.UPDATE,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.UPDATE,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.update(msId,
                                            parameterHashMap);
@@ -928,23 +928,23 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.UPDATE,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.UPDATE,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.update(msId,
                                            parameter);
@@ -967,24 +967,24 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.DELETE,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterHashMap,
-                                               null,
-                                               null,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.DELETE,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterHashMap,
+                                          null,
+                                          null,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.delete(msId,
                                            parameterHashMap);
@@ -1009,23 +1009,23 @@ public class NaiveAdoProvider
         boolean success = false;
 
         try {
-            mappedStatementHandler.getOrCreate(getConfiguration(),
-                                               msId,
-                                               script,
-                                               SqlCommandType.DELETE,
-                                               false,
-                                               null,
-                                               null,
-                                               false,
-                                               null,
-                                               null,
-                                               parameterType,
-                                               parameterMainTagLevel,
-                                               parameterCustomTags,
-                                               Integer.class,
-                                               null,
-                                               null,
-                                               nameConvertType);
+            mappedStatementHandler.create(getConfiguration(),
+                                          msId,
+                                          script,
+                                          SqlCommandType.DELETE,
+                                          false,
+                                          null,
+                                          null,
+                                          false,
+                                          null,
+                                          null,
+                                          parameterType,
+                                          parameterMainTagLevel,
+                                          parameterCustomTags,
+                                          Integer.class,
+                                          null,
+                                          null,
+                                          nameConvertType);
 
             int result = sqlSession.delete(msId,
                                            parameter);

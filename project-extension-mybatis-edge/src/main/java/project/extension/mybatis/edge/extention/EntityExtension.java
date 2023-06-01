@@ -217,15 +217,15 @@ public class EntityExtension
         }
     }
 
-    public String newStringId(String format) {
+    public synchronized String newStringId(String format) {
         return snowFlake.nextId2String(format);
     }
 
-    public String newStringId() {
+    public synchronized String newStringId() {
         return newStringId("D");
     }
 
-    public Long newLongId() {
+    public synchronized Long newLongId() {
         return snowFlake.nextId();
     }
 

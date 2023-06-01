@@ -82,6 +82,7 @@ public class X210MapperOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -130,6 +131,7 @@ public class X210MapperOfCurdTest {
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -214,6 +216,7 @@ public class X210MapperOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TIE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -257,6 +260,7 @@ public class X210MapperOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TCE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -300,6 +304,7 @@ public class X210MapperOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TBE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",

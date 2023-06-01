@@ -50,7 +50,7 @@ public class NaiveMybatisAop {
      *
      * @param aop AOP
      */
-    @Autowired
+//    @Autowired
     public void addListener(INaiveAop aop) {
         aop.curdBeforeAddListener(arg -> {
             //CURD操作执行之前触发

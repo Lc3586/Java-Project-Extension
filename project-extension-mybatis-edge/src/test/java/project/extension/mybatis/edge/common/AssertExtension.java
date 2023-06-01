@@ -19,13 +19,15 @@ public class AssertExtension {
      *
      * @param data1      数据1
      * @param data2      数据2
+     * @param printInfo  输出信息
      * @param fieldNames 要比较的字段
      */
     public static void assertEquals(Object data1,
                                     Object data2,
+                                    boolean printInfo,
                                     String... fieldNames)
             throws
-            Throwable {
+            Exception {
         Class<?> type = data1.getClass();
 
         for (String fieldName : fieldNames) {
@@ -63,6 +65,9 @@ public class AssertExtension {
                                                   fieldName,
                                                   value1,
                                                   value2));
+
+            if (!printInfo)
+                return;
 
             String value1Output = value1 == null
                                   ? ""

@@ -77,6 +77,7 @@ public class X400BasicsOfRepositoryCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -128,6 +129,7 @@ public class X400BasicsOfRepositoryCurdTest {
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查更新的数据，Id：%s\r\n",

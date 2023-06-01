@@ -36,6 +36,8 @@ public class TempDataExtension {
      */
     private static final Map<Long, String> threadTransactionMap = new HashMap<>();
 
+    private static final EntityExtension entityExtension = new EntityExtension(null);
+
     /**
      * 获取数据
      *
@@ -198,7 +200,7 @@ public class TempDataExtension {
                 }
             }
 
-            return new EntityExtension(null).initialization(data);
+            return entityExtension.initialization(data);
         } catch (Exception ex) {
             BusinessException businessException = new BusinessException(String.format("生成%s类型的数据失败",
                                                                                       type.getName()),

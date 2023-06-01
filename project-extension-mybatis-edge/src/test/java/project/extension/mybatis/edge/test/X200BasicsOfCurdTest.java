@@ -86,6 +86,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -140,6 +141,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataUpdate,
                                      dataCheckUpdate,
+                                     true,
                                      TGE_Fields.allFields);
 
         System.out.printf("\r\n已复查更新的数据，Id：%s\r\n",
@@ -235,6 +237,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TIE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -284,6 +287,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TCE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
@@ -333,6 +337,7 @@ public class X200BasicsOfCurdTest {
 
         AssertExtension.assertEquals(dataCreate,
                                      dataCheckCreate,
+                                     true,
                                      TBE_Fields.allFields);
 
         System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",

@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  */
 @SuppressWarnings("rawtypes")
 public class MappedStatementIdManager {
-    private static final ConcurrentHashMap<Long, ConcurrentHashMap<String, Boolean>> idMap = new ConcurrentHashMap<>();
+    public static int used = 0;
 
     private static final ConcurrentHashMap<String, Queue<String>> subIdMap = new ConcurrentHashMap<>();
 
@@ -54,37 +54,8 @@ public class MappedStatementIdManager {
      * 申请一个id
      */
     public static synchronized String applyId() {
-        Long currentThreadId = Thread.currentThread()
-                                     .getId();
-
-        if (!idMap.containsKey(currentThreadId))
-            idMap.put(currentThreadId,
-                      new ConcurrentHashMap<>());
-
-        String resultId = null;
-        for (String id : idMap.get(currentThreadId)
-                              .keySet()) {
-            if (idMap.get(currentThreadId)
-                     .get(id))
-                continue;
-
-            resultId = id;
-            idMap.get(currentThreadId)
-                 .put(id,
-                      true);
-        }
-
-        if (resultId == null) {
-            resultId = String.format("%s:%s",
-                                     currentThreadId,
-                                     keyGenerate.nextId2String());
-
-            idMap.get(currentThreadId)
-                 .put(resultId,
-                      true);
-        }
-
-        return resultId;
+        used++;
+        return keyGenerate.nextId2String();
     }
 
     /**
@@ -111,12 +82,7 @@ public class MappedStatementIdManager {
      */
     public static synchronized void returnId(String id,
                                              Configuration configuration) {
-        Long currentThreadId = Thread.currentThread()
-                                     .getId();
-
-        idMap.get(currentThreadId)
-             .put(id,
-                  false);
+        used--;
 
         if (subIdMap.containsKey(id)) {
             //归还附属id
@@ -126,6 +92,8 @@ public class MappedStatementIdManager {
                                  .poll(),
                          configuration);
             }
+
+            subIdMap.remove(id);
         }
 
         getConfigurationHashMapField("mappedStatements",

@@ -94,12 +94,12 @@ public class MappedStatementHandler {
                                                                       sqlCommandType);
 
         if (useSelectKey) {
-            SelectKeyGenerator selectKeyGenerator = new SelectKeyGenerator(getOrCreateSelectKey(configuration,
-                                                                                                MappedStatementIdManager.applySubId(msId),
-                                                                                                selectKeyScript,
-                                                                                                keyProperty,
-                                                                                                keyColumn,
-                                                                                                selectKeyType),
+            SelectKeyGenerator selectKeyGenerator = new SelectKeyGenerator(createSelectKey(configuration,
+                                                                                           MappedStatementIdManager.applySubId(msId),
+                                                                                           selectKeyScript,
+                                                                                           keyProperty,
+                                                                                           keyColumn,
+                                                                                           selectKeyType),
                                                                            true);
 
             builder.keyGenerator(selectKeyGenerator);
@@ -150,19 +150,19 @@ public class MappedStatementHandler {
 //        return builder.build();
     }
 
-    public <TParameter, TResult> MappedStatement getOrCreate(Configuration configuration,
-                                                             String msId,
-                                                             String script,
-                                                             SqlCommandType sqlCommandType,
-                                                             @Nullable
-                                                                     Class<TParameter> inParameterType,
-                                                             Map<String, Object> inParameterHashMap,
-                                                             Map<String, Field> outParameterHashMap,
-                                                             Map<String, Field> inOutParameterHashMap,
-                                                             @Nullable
-                                                                     Class<TResult> resultType,
-                                                             Collection<String> resultFields,
-                                                             NameConvertType nameConvertType) {
+    public <TParameter, TResult> MappedStatement create(Configuration configuration,
+                                                        String msId,
+                                                        String script,
+                                                        SqlCommandType sqlCommandType,
+                                                        @Nullable
+                                                                Class<TParameter> inParameterType,
+                                                        Map<String, Object> inParameterHashMap,
+                                                        Map<String, Field> outParameterHashMap,
+                                                        Map<String, Field> inOutParameterHashMap,
+                                                        @Nullable
+                                                                Class<TResult> resultType,
+                                                        Collection<String> resultFields,
+                                                        NameConvertType nameConvertType) {
         ParameterMap parameterMap = MapBuilder.getHashMapParameterMap(configuration,
                                                                       msId,
                                                                       inParameterType,
@@ -191,33 +191,33 @@ public class MappedStatementHandler {
                       resultMap);
     }
 
-    public <TParameter, TResult> MappedStatement getOrCreate(Configuration configuration,
-                                                             String msId,
-                                                             String script,
-                                                             SqlCommandType sqlCommandType,
-                                                             @Nullable
-                                                                     boolean useGeneratedKeys,
-                                                             @Nullable
-                                                                     String keyProperty,
-                                                             @Nullable
-                                                                     String keyColumn,
-                                                             @Nullable
-                                                                     boolean useSelectKey,
-                                                             @Nullable
-                                                                     String selectKeyScript,
-                                                             @Nullable
-                                                                     Class<?> selectKeyType,
-                                                             @Nullable
-                                                                     Class<TParameter> parameterType,
-                                                             Map<String, Object> parameterHashMap,
-                                                             Map<String, Field> outParameterHashMap,
-                                                             Map<String, Field> inOutParameterHashMap,
-                                                             Class<TResult> resultType,
-                                                             @Nullable
-                                                                     Integer resultMainTagLevel,
-                                                             @Nullable
-                                                                     Collection<String> resultCustomTags,
-                                                             NameConvertType nameConvertType) {
+    public <TParameter, TResult> MappedStatement create(Configuration configuration,
+                                                        String msId,
+                                                        String script,
+                                                        SqlCommandType sqlCommandType,
+                                                        @Nullable
+                                                                boolean useGeneratedKeys,
+                                                        @Nullable
+                                                                String keyProperty,
+                                                        @Nullable
+                                                                String keyColumn,
+                                                        @Nullable
+                                                                boolean useSelectKey,
+                                                        @Nullable
+                                                                String selectKeyScript,
+                                                        @Nullable
+                                                                Class<?> selectKeyType,
+                                                        @Nullable
+                                                                Class<TParameter> parameterType,
+                                                        Map<String, Object> parameterHashMap,
+                                                        Map<String, Field> outParameterHashMap,
+                                                        Map<String, Field> inOutParameterHashMap,
+                                                        Class<TResult> resultType,
+                                                        @Nullable
+                                                                Integer resultMainTagLevel,
+                                                        @Nullable
+                                                                Collection<String> resultCustomTags,
+                                                        NameConvertType nameConvertType) {
         ParameterMap parameterMap = MapBuilder.getHashMapParameterMap(configuration,
                                                                       msId,
                                                                       parameterType,
@@ -249,18 +249,18 @@ public class MappedStatementHandler {
                       resultMap);
     }
 
-    public <TParameter, TResult> MappedStatement getOrCreate(Configuration configuration,
-                                                             String msId,
-                                                             String script,
-                                                             SqlCommandType sqlCommandType,
-                                                             Class<TParameter> parameterType,
-                                                             @Nullable
-                                                                     Integer parameterMainTagLevel,
-                                                             @Nullable
-                                                                     Collection<String> parameterCustomTags,
-                                                             Class<TResult> resultType,
-                                                             Collection<String> resultFields,
-                                                             NameConvertType nameConvertType) {
+    public <TParameter, TResult> MappedStatement create(Configuration configuration,
+                                                        String msId,
+                                                        String script,
+                                                        SqlCommandType sqlCommandType,
+                                                        Class<TParameter> parameterType,
+                                                        @Nullable
+                                                                Integer parameterMainTagLevel,
+                                                        @Nullable
+                                                                Collection<String> parameterCustomTags,
+                                                        Class<TResult> resultType,
+                                                        Collection<String> resultFields,
+                                                        NameConvertType nameConvertType) {
         ParameterMap parameterMap = MapBuilder.getParameterMap(configuration,
                                                                msId,
                                                                parameterType,
@@ -288,33 +288,33 @@ public class MappedStatementHandler {
                       resultMap);
     }
 
-    public <TParameter, TResult> MappedStatement getOrCreate(Configuration configuration,
-                                                             String msId,
-                                                             String script,
-                                                             SqlCommandType sqlCommandType,
-                                                             @Nullable
-                                                                     boolean useGeneratedKeys,
-                                                             @Nullable
-                                                                     String keyProperty,
-                                                             @Nullable
-                                                                     String keyColumn,
-                                                             @Nullable
-                                                                     boolean useSelectKey,
-                                                             @Nullable
-                                                                     String selectKeyScript,
-                                                             @Nullable
-                                                                     Class<?> selectKeyType,
-                                                             Class<TParameter> parameterType,
-                                                             @Nullable
-                                                                     Integer parameterMainTagLevel,
-                                                             @Nullable
-                                                                     Collection<String> parameterCustomTags,
-                                                             Class<TResult> resultType,
-                                                             @Nullable
-                                                                     Integer resultMainTagLevel,
-                                                             @Nullable
-                                                                     Collection<String> resultCustomTags,
-                                                             NameConvertType nameConvertType) {
+    public <TParameter, TResult> MappedStatement create(Configuration configuration,
+                                                        String msId,
+                                                        String script,
+                                                        SqlCommandType sqlCommandType,
+                                                        @Nullable
+                                                                boolean useGeneratedKeys,
+                                                        @Nullable
+                                                                String keyProperty,
+                                                        @Nullable
+                                                                String keyColumn,
+                                                        @Nullable
+                                                                boolean useSelectKey,
+                                                        @Nullable
+                                                                String selectKeyScript,
+                                                        @Nullable
+                                                                Class<?> selectKeyType,
+                                                        Class<TParameter> parameterType,
+                                                        @Nullable
+                                                                Integer parameterMainTagLevel,
+                                                        @Nullable
+                                                                Collection<String> parameterCustomTags,
+                                                        Class<TResult> resultType,
+                                                        @Nullable
+                                                                Integer resultMainTagLevel,
+                                                        @Nullable
+                                                                Collection<String> resultCustomTags,
+                                                        NameConvertType nameConvertType) {
         ParameterMap parameterMap = MapBuilder.getParameterMap(configuration,
                                                                msId,
                                                                parameterType,
@@ -345,12 +345,12 @@ public class MappedStatementHandler {
                       resultMap);
     }
 
-    public MappedStatement getOrCreateSelectKey(Configuration configuration,
-                                                String msId,
-                                                String script,
-                                                String keyProperty,
-                                                String keyColumn,
-                                                Class<?> keyType) {
+    public MappedStatement createSelectKey(Configuration configuration,
+                                           String msId,
+                                           String script,
+                                           String keyProperty,
+                                           String keyColumn,
+                                           Class<?> keyType) {
         ResultMap resultMap = MapBuilder.getResultMap(configuration,
                                                       msId,
                                                       keyType,
