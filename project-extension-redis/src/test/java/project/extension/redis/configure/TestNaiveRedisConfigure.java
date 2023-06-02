@@ -27,7 +27,8 @@ public class TestNaiveRedisConfigure
     @Bean
     public RedisTemplate<String, TestDTO> redisTemplate(RedisConnectionFactory connectionFactory) {
         return super.redisTemplate(connectionFactory,
-                                   TestDTO.class);
+                                   TestDTO.class,
+                                   true);
     }
 
     /**
