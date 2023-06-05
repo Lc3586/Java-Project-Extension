@@ -1,8 +1,6 @@
 package project.extension.httpClient;
 
 import com.alibaba.fastjson.JSON;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
@@ -10,6 +8,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import project.extension.collections.MapExtension;
+import project.extension.exception.CommonException;
 import project.extension.tuple.Tuple2;
 
 import java.util.Map;
@@ -22,9 +21,6 @@ import java.util.stream.Collectors;
  * @date 2022年1月7日
  */
 public class HttpClientUtils {
-
-    private static final Logger log = LoggerFactory.getLogger(HttpClientUtils.class);
-
     /**
      * 执行Post请求
      * 数据将以JSON格式发送
@@ -39,11 +35,43 @@ public class HttpClientUtils {
                                                                     Object data,
                                                             @Nullable
                                                                     HttpHeaders headers) {
+        return postDataAsJson(url,
+                              data,
+                              headers,
+                              null,
+                              null,
+                              null);
+    }
+
+    /**
+     * 执行Post请求
+     * 数据将以JSON格式发送
+     *
+     * @param url     地址
+     * @param data    数据
+     * @param headers 头
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> postDataAsJson(String url,
+                                                            @Nullable
+                                                                    Object data,
+                                                            @Nullable
+                                                                    HttpHeaders headers,
+                                                            @Nullable
+                                                                    Integer connectionRequestTimeout,
+                                                            @Nullable
+                                                                    Integer connectTimeout,
+                                                            @Nullable
+                                                                    Integer readTimeout) {
         String jsonData = JSON.toJSONString(data);
         return postJsonData(url,
                             jsonData,
-                            headers);
+                            headers,
+                            connectionRequestTimeout,
+                            connectTimeout,
+                            readTimeout);
     }
+
 
     /**
      * 执行Post请求
@@ -58,6 +86,33 @@ public class HttpClientUtils {
                                                                   String data,
                                                           @Nullable
                                                                   HttpHeaders headers) {
+        return postJsonData(url,
+                            data,
+                            headers,
+                            null,
+                            null,
+                            null);
+    }
+
+    /**
+     * 执行Post请求
+     *
+     * @param url     地址
+     * @param data    Json字符串
+     * @param headers 头
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> postJsonData(String url,
+                                                          @Nullable
+                                                                  String data,
+                                                          @Nullable
+                                                                  HttpHeaders headers,
+                                                          @Nullable
+                                                                  Integer connectionRequestTimeout,
+                                                          @Nullable
+                                                                  Integer connectTimeout,
+                                                          @Nullable
+                                                                  Integer readTimeout) {
         if (headers == null)
             headers = new HttpHeaders();
         if (headers.containsKey("Content-Type"))
@@ -69,7 +124,10 @@ public class HttpClientUtils {
         HttpEntity<String> entity = getEntity(data,
                                               headers);
         return postData(url,
-                        entity);
+                        entity,
+                        connectionRequestTimeout,
+                        connectTimeout,
+                        readTimeout);
     }
 
     /**
@@ -80,16 +138,47 @@ public class HttpClientUtils {
      * @param headers 头
      * @return (响应状态, 响应数据)
      */
-    public static Tuple2<HttpStatus, String> postData(String url,
-                                                      @Nullable
-                                                              Object data,
-                                                      @Nullable
-                                                              HttpHeaders headers)
-            throws
-            IllegalAccessException {
-        Map<String, Object> map = data == null
-                                  ? null
-                                  : MapExtension.convertObject2Map(data);
+    public static Tuple2<HttpStatus, String> postObjectData(String url,
+                                                            @Nullable
+                                                                    Object data,
+                                                            @Nullable
+                                                                    HttpHeaders headers) {
+        return postObjectData(url,
+                              data,
+                              headers,
+                              null,
+                              null,
+                              null);
+    }
+
+    /**
+     * 执行Post请求
+     *
+     * @param url     地址
+     * @param data    数据
+     * @param headers 头
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> postObjectData(String url,
+                                                            @Nullable
+                                                                    Object data,
+                                                            @Nullable
+                                                                    HttpHeaders headers,
+                                                            @Nullable
+                                                                    Integer connectionRequestTimeout,
+                                                            @Nullable
+                                                                    Integer connectTimeout,
+                                                            @Nullable
+                                                                    Integer readTimeout) {
+        Map<String, Object> map;
+        try {
+            map = data == null
+                  ? null
+                  : MapExtension.convertObject2Map(data);
+        } catch (IllegalAccessException ex) {
+            throw new CommonException("对象转map失败",
+                                      ex);
+        }
         MultiValueMap<String, Object> m_map = data == null
                                               ? null
                                               : new LinkedMultiValueMap<>();
@@ -101,8 +190,12 @@ public class HttpClientUtils {
 
         return postData(url,
                         m_map,
-                        headers);
+                        headers,
+                        connectionRequestTimeout,
+                        connectTimeout,
+                        readTimeout);
     }
+
 
     /**
      * 执行Post请求
@@ -117,10 +210,40 @@ public class HttpClientUtils {
                                                               MultiValueMap<String, Object> data,
                                                       @Nullable
                                                               HttpHeaders headers) {
+        return postData(url,
+                        data,
+                        headers,
+                        null,
+                        null,
+                        null);
+    }
+
+    /**
+     * 执行Post请求
+     *
+     * @param url     地址
+     * @param data    数据
+     * @param headers 头
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> postData(String url,
+                                                      @Nullable
+                                                              MultiValueMap<String, Object> data,
+                                                      @Nullable
+                                                              HttpHeaders headers,
+                                                      @Nullable
+                                                              Integer connectionRequestTimeout,
+                                                      @Nullable
+                                                              Integer connectTimeout,
+                                                      @Nullable
+                                                              Integer readTimeout) {
         HttpEntity<MultiValueMap<String, Object>> entity = getEntity(data,
                                                                      headers);
         return postData(url,
-                        entity);
+                        entity,
+                        connectionRequestTimeout,
+                        connectTimeout,
+                        readTimeout);
     }
 
     /**
@@ -158,10 +281,43 @@ public class HttpClientUtils {
     public static <T> Tuple2<HttpStatus, String> postData(String url,
                                                           @Nullable
                                                                   HttpEntity<T> entity) {
+        return postData(url,
+                        entity,
+                        null,
+                        null,
+                        null);
+    }
+
+    /**
+     * 执行Post请求
+     * 数据将以JSON格式发送
+     *
+     * @param url                      地址
+     * @param entity                   请求体
+     * @param connectionRequestTimeout 请求连接超时时间（ms）
+     * @param connectTimeout           连接超时时间（ms）
+     * @param readTimeout              读取数据超时时间（ms）
+     * @return (响应状态, 响应数据)
+     */
+    public static <T> Tuple2<HttpStatus, String> postData(String url,
+                                                          @Nullable
+                                                                  HttpEntity<T> entity,
+                                                          @Nullable
+                                                                  Integer connectionRequestTimeout,
+                                                          @Nullable
+                                                                  Integer connectTimeout,
+                                                          @Nullable
+                                                                  Integer readTimeout) {
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        httpRequestFactory.setConnectionRequestTimeout(10 * 1000);
-        httpRequestFactory.setConnectTimeout(10 * 1000);
-        httpRequestFactory.setReadTimeout(10 * 1000);
+        if (connectionRequestTimeout == null)
+            connectionRequestTimeout = 10000;
+        if (connectTimeout == null)
+            connectTimeout = 10000;
+        if (readTimeout == null)
+            readTimeout = 10000;
+        httpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
+        httpRequestFactory.setConnectTimeout(connectTimeout);
+        httpRequestFactory.setReadTimeout(readTimeout);
         RestTemplate restTemplate = new RestTemplate(httpRequestFactory);
         ResponseEntity<String> response = restTemplate.exchange(url,
                                                                 HttpMethod.POST,
@@ -169,6 +325,27 @@ public class HttpClientUtils {
                                                                 String.class);
         return new Tuple2<>(response.getStatusCode(),
                             response.getBody());
+    }
+
+    /**
+     * 执行Get请求
+     *
+     * @param url     地址
+     * @param params  参数键值对集合
+     * @param headers 请求头
+     */
+    public static ResponseEntity<String> doGet(String url,
+                                               @Nullable
+                                                       Map<String, Object> params,
+                                               @Nullable
+                                                       MultiValueMap<String, String> headers) {
+        return doGet(url,
+                     params,
+                     headers,
+                     null,
+                     null,
+                     null,
+                     null);
     }
 
     /**
@@ -186,8 +363,47 @@ public class HttpClientUtils {
                                                        MultiValueMap<String, String> headers,
                                                @Nullable
                                                        Boolean instanceFollowRedirects) {
+        return doGet(url,
+                     params,
+                     headers,
+                     instanceFollowRedirects,
+                     null,
+                     null,
+                     null);
+    }
+
+    /**
+     * 执行Get请求
+     *
+     * @param url                      地址
+     * @param params                   参数键值对集合
+     * @param headers                  请求头
+     * @param instanceFollowRedirects  是否自动重定向（默认为true）
+     * @param connectionRequestTimeout 请求连接超时时间（ms）
+     * @param connectTimeout           连接超时时间（ms）
+     * @param readTimeout              读取数据超时时间（ms）
+     */
+    public static ResponseEntity<String> doGet(String url,
+                                               @Nullable
+                                                       Map<String, Object> params,
+                                               @Nullable
+                                                       MultiValueMap<String, String> headers,
+                                               @Nullable
+                                                       Boolean instanceFollowRedirects,
+                                               @Nullable
+                                                       Integer connectionRequestTimeout,
+                                               @Nullable
+                                                       Integer connectTimeout,
+                                               @Nullable
+                                                       Integer readTimeout) {
         if (instanceFollowRedirects == null)
             instanceFollowRedirects = true;
+        if (connectionRequestTimeout == null)
+            connectionRequestTimeout = 10000;
+        if (connectTimeout == null)
+            connectTimeout = 10000;
+        if (readTimeout == null)
+            readTimeout = 10000;
 
         HttpComponentsClientHttpRequestFactory clientHttpRequestFactory;
         if (instanceFollowRedirects)
@@ -195,9 +411,9 @@ public class HttpClientUtils {
         else
             clientHttpRequestFactory = new DisableRedirectClientHttpRequestFactory();
 
-        clientHttpRequestFactory.setConnectionRequestTimeout(10 * 1000);
-        clientHttpRequestFactory.setConnectTimeout(10 * 1000);
-        clientHttpRequestFactory.setReadTimeout(10 * 1000);
+        clientHttpRequestFactory.setConnectionRequestTimeout(connectionRequestTimeout);
+        clientHttpRequestFactory.setConnectTimeout(connectTimeout);
+        clientHttpRequestFactory.setReadTimeout(readTimeout);
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory);
 
         HttpHeaders httpHeaders = null;
@@ -238,6 +454,28 @@ public class HttpClientUtils {
     /**
      * 执行Get请求
      *
+     * @param url     地址
+     * @param params  参数键值对集合
+     * @param headers 请求头
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> getData(String url,
+                                                     @Nullable
+                                                             Map<String, Object> params,
+                                                     @Nullable
+                                                             MultiValueMap<String, String> headers) {
+        return getData(url,
+                       params,
+                       headers,
+                       null,
+                       null,
+                       null,
+                       null);
+    }
+
+    /**
+     * 执行Get请求
+     *
      * @param url                     地址
      * @param params                  参数键值对集合
      * @param headers                 请求头
@@ -251,10 +489,44 @@ public class HttpClientUtils {
                                                              MultiValueMap<String, String> headers,
                                                      @Nullable
                                                              Boolean instanceFollowRedirects) {
+        return getData(url,
+                       params,
+                       headers,
+                       null,
+                       null,
+                       null,
+                       null);
+    }
+
+    /**
+     * 执行Get请求
+     *
+     * @param url                     地址
+     * @param params                  参数键值对集合
+     * @param headers                 请求头
+     * @param instanceFollowRedirects 是否自动重定向（默认为true）
+     * @return (响应状态, 响应数据)
+     */
+    public static Tuple2<HttpStatus, String> getData(String url,
+                                                     @Nullable
+                                                             Map<String, Object> params,
+                                                     @Nullable
+                                                             MultiValueMap<String, String> headers,
+                                                     @Nullable
+                                                             Boolean instanceFollowRedirects,
+                                                     @Nullable
+                                                             Integer connectionRequestTimeout,
+                                                     @Nullable
+                                                             Integer connectTimeout,
+                                                     @Nullable
+                                                             Integer readTimeout) {
         ResponseEntity<String> response = doGet(url,
                                                 params,
                                                 headers,
-                                                instanceFollowRedirects);
+                                                instanceFollowRedirects,
+                                                connectionRequestTimeout,
+                                                connectTimeout,
+                                                readTimeout);
 
         return new Tuple2<>(response.getStatusCode(),
                             response.getBody());
