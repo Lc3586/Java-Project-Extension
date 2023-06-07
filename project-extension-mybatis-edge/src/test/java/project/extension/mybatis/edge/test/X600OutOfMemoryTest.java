@@ -33,6 +33,14 @@ public class X600OutOfMemoryTest {
         OrmObjectResolve.injection();
     }
 
+    /**
+     * 清理数据
+     */
+    @AfterAll
+    public static void clean() {
+        TempDataExtension.clearUp();
+    }
+
     static final ConcurrentMap<String, Long> idMap = new ConcurrentHashMap<>();
 
     /**
@@ -95,6 +103,11 @@ public class X600OutOfMemoryTest {
                                                               System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
                                                                                 dataCheckCreate.getId());
 
+                                                              TempDataExtension.putData(name,
+                                                                                        TestGeneralEntity.class,
+                                                                                        dataCheckCreate.getId(),
+                                                                                        dataCheckCreate);
+
                                                               int rowsDelete = naiveSql.delete(TestGeneralEntity.class,
                                                                                                dataCreate)
                                                                                        .executeAffrows();
@@ -117,6 +130,10 @@ public class X600OutOfMemoryTest {
 
                                                               System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",
                                                                                 dataCreate.getId());
+
+                                                              TempDataExtension.removeData(name,
+                                                                                           TestGeneralEntity.class,
+                                                                                           dataCreate.getId());
                                                           } catch (IllegalArgumentException ex) {
                                                               String id = Pattern.compile("^Mapped Statements collection does not contain value for (.*?)$")
                                                                                  .matcher(ex.getMessage())
