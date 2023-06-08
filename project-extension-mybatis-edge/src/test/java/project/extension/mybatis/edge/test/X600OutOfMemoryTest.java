@@ -3,6 +3,7 @@ package project.extension.mybatis.edge.test;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import project.extension.console.extension.ConsoleUtils;
 import project.extension.mybatis.edge.common.AssertExtension;
 import project.extension.mybatis.edge.common.OrmObjectResolve;
 import project.extension.mybatis.edge.common.TempDataExtension;
@@ -58,7 +59,7 @@ public class X600OutOfMemoryTest {
         CompletableFuture[] tasks = new CompletableFuture[20];
         ExecutorService pool = Executors.newFixedThreadPool(tasks.length);
 
-        for (int i = 0; i < tasks.length; i++) {
+        for (int i = 0; i < 20; i++) {
             tasks[i] = CompletableFuture.runAsync(() -> {
                                                       for (int j = 0; j < 100; j++) {
                                                           try {
@@ -83,8 +84,8 @@ public class X600OutOfMemoryTest {
                                                                                       rowsCreate,
                                                                                       "新增数据失败");
 
-                                                              System.out.printf("\r\n已新增数据，Id：%s\r\n",
-                                                                                dataCreate.getId());
+//                                                              System.out.printf("\r\n已新增数据，Id：%s\r\n",
+//                                                                                dataCreate.getId());
 
                                                               TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
                                                                                                           .where(x -> x.and(TGE_Fields.id,
@@ -97,11 +98,11 @@ public class X600OutOfMemoryTest {
 
                                                               AssertExtension.assertEquals(dataCreate,
                                                                                            dataCheckCreate,
-                                                                                           true,
+                                                                                           false,
                                                                                            TGE_Fields.allFields);
 
-                                                              System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
-                                                                                dataCheckCreate.getId());
+//                                                              System.out.printf("\r\n已复查新增的数据，Id：%s\r\n",
+//                                                                                dataCheckCreate.getId());
 
                                                               TempDataExtension.putData(name,
                                                                                         TestGeneralEntity.class,
@@ -116,8 +117,8 @@ public class X600OutOfMemoryTest {
                                                                                       rowsDelete,
                                                                                       "删除数据失败");
 
-                                                              System.out.printf("\r\n已删除数据，Id：%s\r\n",
-                                                                                dataCreate.getId());
+//                                                              System.out.printf("\r\n已删除数据，Id：%s\r\n",
+//                                                                                dataCreate.getId());
 
                                                               TestGeneralEntity dataCheckDelete = naiveSql.select(TestGeneralEntity.class)
                                                                                                           .where(x -> x.and(TGE_Fields.id,
@@ -128,8 +129,8 @@ public class X600OutOfMemoryTest {
                                                               Assertions.assertNull(dataCheckDelete,
                                                                                     "数据未删除");
 
-                                                              System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",
-                                                                                dataCreate.getId());
+//                                                              System.out.printf("\r\n已复查删除的数据，Id：%s\r\n",
+//                                                                                dataCreate.getId());
 
                                                               TempDataExtension.removeData(name,
                                                                                            TestGeneralEntity.class,
@@ -155,12 +156,15 @@ public class X600OutOfMemoryTest {
         CompletableFuture<Void> printTask = CompletableFuture.runAsync(() -> {
                                                                            while (true) {
                                                                                try {
-                                                                                   System.out.printf("\r\n并发查询量：%d\r\n",
-                                                                                                     MappedStatementIdManager.used);
+                                                                                   ConsoleUtils.consoleWrite("并发量",
+                                                                                                             MappedStatementIdManager.used);
 
                                                                                    if (CompletableFuture.allOf(tasks)
-                                                                                                        .isDone() && MappedStatementIdManager.used == 0)
+                                                                                                        .isDone() && MappedStatementIdManager.used == 0) {
+                                                                                       ConsoleUtils.consoleWrite("并发量",
+                                                                                                                 "已结束");
                                                                                        break;
+                                                                                   }
 
                                                                                    Thread.sleep(1000);
                                                                                } catch (Exception ignore) {

@@ -252,28 +252,44 @@ public abstract class Delete<T>
 
         if (deleter.getDataList()
                    .size() > 0) {
-            //删除指定数据
-            for (Object data : deleter.getDataList()) {
-                String script = currentScript(false,
-                                              data);
-                String msId = getMSId();
+            //批量操作时需要启用事务
+            boolean batch = deleter.getDataList()
+                                   .size() > 1;
+            if (batch)
+                ado.beginTransaction();
 
-                int currentRows = aop.invokeWithAop(() -> this.ado.delete(getSqlSession(),
-                                                                          msId,
-                                                                          script,
-                                                                          null,
-                                                                          deleter.getParameter(),
-                                                                          config.getNameConvertType()),
-                                                    CurdType.删除,
-                                                    config.getName(),
-                                                    script,
-                                                    deleter.getParameter(),
-                                                    deleter.getEntityType(),
-                                                    deleter.getDtoType());
+            try {
+                //删除指定数据
+                for (Object data : deleter.getDataList()) {
+                    String script = currentScript(false,
+                                                  data);
+                    String msId = getMSId();
 
-                if (currentRows < 0) {
-                    throw new ModuleException(Strings.getRowsDataException(currentRows));
-                } else if (currentRows > 0) rows++;
+                    int currentRows = aop.invokeWithAop(() -> this.ado.delete(getSqlSession(),
+                                                                              msId,
+                                                                              script,
+                                                                              null,
+                                                                              deleter.getParameter(),
+                                                                              config.getNameConvertType()),
+                                                        CurdType.删除,
+                                                        config.getName(),
+                                                        script,
+                                                        deleter.getParameter(),
+                                                        deleter.getEntityType(),
+                                                        deleter.getDtoType());
+
+                    if (currentRows < 0) {
+                        throw new ModuleException(Strings.getRowsDataException(currentRows));
+                    } else if (currentRows > 0) rows++;
+                }
+
+                if (batch)
+                    ado.transactionCommit();
+            } catch (Exception ex) {
+                if (batch)
+                    ado.transactionRollback();
+
+                throw ex;
             }
         } else {
             //根据条件删除

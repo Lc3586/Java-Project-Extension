@@ -326,28 +326,44 @@ public abstract class Insert<T>
 
         int rows = 0;
 
-        for (Object data : inserter.getDataList()) {
-            String script = currentScript(false,
-                                          data);
-            String msId = getMSId();
+        //批量操作时需要启用事务
+        boolean batch = inserter.getDataList()
+                                .size() > 1;
+        if (batch)
+            ado.beginTransaction();
 
-            //批量插入
-            int currentRows = aop.invokeWithAop(() -> insert(msId,
-                                                             script),
-                                                CurdType.插入,
-                                                config.getName(),
-                                                script,
-                                                inserter.getParameter(),
-                                                inserter.getEntityType(),
-                                                inserter.getDtoType());
+        try {
+            for (Object data : inserter.getDataList()) {
+                String script = currentScript(false,
+                                              data);
+                String msId = getMSId();
 
-            if (currentRows < 0) {
-                throw new ModuleException(Strings.getRowsDataException(currentRows));
-            } else if (currentRows > 0) {
-                rows++;
+                //批量插入
+                int currentRows = aop.invokeWithAop(() -> insert(msId,
+                                                                 script),
+                                                    CurdType.插入,
+                                                    config.getName(),
+                                                    script,
+                                                    inserter.getParameter(),
+                                                    inserter.getEntityType(),
+                                                    inserter.getDtoType());
 
-                setOutputValue(data);
+                if (currentRows < 0) {
+                    throw new ModuleException(Strings.getRowsDataException(currentRows));
+                } else if (currentRows > 0) {
+                    rows++;
+
+                    setOutputValue(data);
+                }
             }
+
+            if (batch)
+                ado.transactionCommit();
+        } catch (Exception ex) {
+            if (batch)
+                ado.transactionRollback();
+
+            throw ex;
         }
 
         return rows;

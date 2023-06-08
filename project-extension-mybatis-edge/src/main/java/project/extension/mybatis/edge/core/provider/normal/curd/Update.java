@@ -351,28 +351,44 @@ public abstract class Update<T>
 
         if (updater.getDataList()
                    .size() > 0) {
-            //更新指定数据
-            for (Object data : updater.getDataList()) {
-                String script = currentScript(false,
-                                              data);
-                String msId = getMSId();
+            //批量操作时需要启用事务
+            boolean batch = updater.getDataList()
+                                   .size() > 1;
+            if (batch)
+                ado.beginTransaction();
 
-                int currentRows = aop.invokeWithAop(() -> this.ado.update(
-                                                            getSqlSession(),
-                                                            msId,
-                                                            script,
-                                                            null,
-                                                            updater.getParameter(),
-                                                            config.getNameConvertType()),
-                                                    CurdType.更新,
-                                                    config.getName(),
-                                                    script,
-                                                    updater.getParameter(),
-                                                    updater.getEntityType(),
-                                                    updater.getDtoType());
-                if (currentRows < 0) {
-                    throw new ModuleException(Strings.getRowsDataException(currentRows));
-                } else if (currentRows > 0) rows++;
+            try {
+                //更新指定数据
+                for (Object data : updater.getDataList()) {
+                    String script = currentScript(false,
+                                                  data);
+                    String msId = getMSId();
+
+                    int currentRows = aop.invokeWithAop(() -> this.ado.update(
+                                                                getSqlSession(),
+                                                                msId,
+                                                                script,
+                                                                null,
+                                                                updater.getParameter(),
+                                                                config.getNameConvertType()),
+                                                        CurdType.更新,
+                                                        config.getName(),
+                                                        script,
+                                                        updater.getParameter(),
+                                                        updater.getEntityType(),
+                                                        updater.getDtoType());
+                    if (currentRows < 0) {
+                        throw new ModuleException(Strings.getRowsDataException(currentRows));
+                    } else if (currentRows > 0) rows++;
+                }
+
+                if (batch)
+                    ado.transactionCommit();
+            } catch (Exception ex) {
+                if (batch)
+                    ado.transactionRollback();
+
+                throw ex;
             }
         } else if (CollectionsExtension.anyPlus(updater.getCustomSetByFieldName())
                 || CollectionsExtension.anyPlus(updater.getDynamicSetters())) {

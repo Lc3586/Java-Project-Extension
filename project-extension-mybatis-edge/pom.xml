@@ -237,6 +237,12 @@
             <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>top.lctr</groupId>
+            <artifactId>project-extension-console</artifactId>
+            <version>1.0.6-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

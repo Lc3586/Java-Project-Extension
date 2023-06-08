@@ -6,7 +6,6 @@ import project.extension.mybatis.edge.globalization.Strings;
 import project.extension.standard.exception.ModuleException;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -19,30 +18,40 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  */
 @SuppressWarnings("rawtypes")
 public class MappedStatementIdManager {
+    /**
+     * 当前使用量
+     */
     public static int used = 0;
 
+    /**
+     * 附属id映射表
+     */
     private static final ConcurrentHashMap<String, Queue<String>> subIdMap = new ConcurrentHashMap<>();
 
     private static final SnowFlake keyGenerate = new SnowFlake(1,
                                                                1);
 
-    private static final ConcurrentHashMap<String, Field> fieldMap = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ConcurrentHashMap> configMap = new ConcurrentHashMap<>();
 
-    private static HashMap getConfigurationHashMapField(String name,
-                                                        Configuration configuration) {
+    /**
+     * 获取Configuration种存储指定数据的对象
+     *
+     * @param name          字段名
+     * @param configuration 配置
+     */
+    private static ConcurrentHashMap getConfigurationMapField(String name,
+                                                              Configuration configuration) {
         Class<?> type = configuration.getClass();
 
         try {
-            Field field;
-            if (!fieldMap.containsKey(name)) {
-                field = type.getDeclaredField(name);
+            if (!configMap.containsKey(name)) {
+                Field field = type.getDeclaredField(name);
                 field.setAccessible(true);
-                fieldMap.put(name,
-                             field);
-            } else
-                field = fieldMap.get(name);
+                configMap.put(name,
+                              (ConcurrentHashMap) field.get(configuration));
+            }
 
-            return (HashMap) field.get(configuration);
+            return configMap.get(name);
         } catch (Exception ex) {
             throw new ModuleException(Strings.getGetObjectFieldValueFailed(type.getTypeName(),
                                                                            name),
@@ -96,15 +105,15 @@ public class MappedStatementIdManager {
             subIdMap.remove(id);
         }
 
-        getConfigurationHashMapField("mappedStatements",
-                                     configuration).remove(id);
-        getConfigurationHashMapField("caches",
-                                     configuration).remove(id);
-        getConfigurationHashMapField("resultMaps",
-                                     configuration).remove(id);
-        getConfigurationHashMapField("parameterMaps",
-                                     configuration).remove(id);
-        getConfigurationHashMapField("keyGenerators",
-                                     configuration).remove(id);
+        getConfigurationMapField("mappedStatements",
+                                 configuration).remove(id);
+        getConfigurationMapField("caches",
+                                 configuration).remove(id);
+        getConfigurationMapField("resultMaps",
+                                 configuration).remove(id);
+        getConfigurationMapField("parameterMaps",
+                                 configuration).remove(id);
+        getConfigurationMapField("keyGenerators",
+                                 configuration).remove(id);
     }
 }
