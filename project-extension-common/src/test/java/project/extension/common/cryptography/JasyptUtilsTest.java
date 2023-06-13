@@ -127,8 +127,8 @@ public class JasyptUtilsTest {
     public void decryptEnv()
             throws
             Throwable {
-        String password = JasyptUtils.getPasswordFromEnv("JAVA_LOCAL_49_JASYPT_PASSWORD");
-        String text = "ENC(iXb0v7Wnr1ZgfGZ1eAyCOg==)";
+        String password = JasyptUtils.getPasswordFromEnv("JAVA_JASYPT_PASSWORD");
+        String text = "ENC(C/Fzlki1Th87eM3eGYBq+g==)";
         System.out.printf("密文：%s%n",
                           text);
         String data1 = JasyptUtils.decrypt(text,
