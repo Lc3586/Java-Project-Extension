@@ -966,12 +966,19 @@ public abstract class SqlProvider {
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("%s:%s:%s",
+        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:MTL-%s:CT-%s:WOPK-%s:WOIK:%s",
                                         this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
                                         ? ""
-                                        : dtoType.getTypeName());
+                                        : dtoType.getTypeName(),
+                                        mainTagLevel,
+                                        customTags == null
+                                        ? ""
+                                        : String.join(",",
+                                                      customTags),
+                                        withOutPrimaryKey,
+                                        withOutIdentityKey);
         Collection<String> columns = CacheExtension.getDtoTypeColumns(cacheKey);
         if (CollectionsExtension.anyPlus(columns)) return columns;
 
