@@ -470,7 +470,7 @@ public class EntityTypeHandler {
 
             if (CollectionsExtension.anyPlus(tags)) {
                 openApiFields = SchemaExtension.getFieldsWithTags(dtoType,
-                                                                  true,
+                                                                  inherit,
                                                                   false,
                                                                   tags);
 

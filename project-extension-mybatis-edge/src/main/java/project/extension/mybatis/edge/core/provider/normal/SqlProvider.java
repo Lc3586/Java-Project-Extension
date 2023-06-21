@@ -220,10 +220,8 @@ public abstract class SqlProvider {
                                     ? data
                                     : field.get(data));
         } catch (IllegalAccessException ex) {
-            throw new ModuleException(Strings.getGetObjectFieldValueFailed(data == null
-                                                                           ? "null"
-                                                                           : data.getClass()
-                                                                                 .getTypeName(),
+            throw new ModuleException(Strings.getGetObjectFieldValueFailed(data.getClass()
+                                                                               .getTypeName(),
                                                                            field.getName()));
         }
     }
@@ -953,7 +951,6 @@ public abstract class SqlProvider {
      * @param customTags         自定义标签
      * @param withOutPrimaryKey  排除主键
      * @param withOutIdentityKey 排除自增列
-     * @param inherit            仅继承成员
      * @return 列名集合
      */
     public Collection<String> getColumns(Class<?> entityType,
@@ -961,8 +958,7 @@ public abstract class SqlProvider {
                                          int mainTagLevel,
                                          Collection<String> customTags,
                                          boolean withOutPrimaryKey,
-                                         boolean withOutIdentityKey,
-                                         boolean inherit)
+                                         boolean withOutIdentityKey)
             throws
             ModuleException {
         //读取缓存
@@ -991,7 +987,7 @@ public abstract class SqlProvider {
                                                                   customTags,
                                                                   withOutPrimaryKey,
                                                                   withOutIdentityKey,
-                                                                  inherit)
+                                                                  !dtoType.equals(entityType))
                                         .stream()
                                         .map(x -> EntityTypeHandler.getColumn(x,
                                                                               config.getNameConvertType()))
@@ -1005,22 +1001,20 @@ public abstract class SqlProvider {
     }
 
     /**
-     * 获取业务模型对应的字段+列名
+     * 获取实体类对应的字段+列名
      *
      * @param entityType         实体类型
      * @param mainTagLevel       主标签等级
      * @param customTags         自定义标签
      * @param withOutPrimaryKey  排除主键
      * @param withOutIdentityKey 排除自增列
-     * @param inherit            仅继承成员
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey,
-                                                       boolean inherit) {
+                                                       boolean withOutIdentityKey) {
         return getFieldNameWithColumns(entityType,
                                        null,
                                        mainTagLevel,
@@ -1030,8 +1024,7 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
-                                       withOutIdentityKey,
-                                       inherit);
+                                       withOutIdentityKey);
     }
 
     /**
@@ -1043,7 +1036,6 @@ public abstract class SqlProvider {
      * @param customTags         自定义标签
      * @param withOutPrimaryKey  排除主键
      * @param withOutIdentityKey 排除自增列
-     * @param inherit            仅继承成员
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
@@ -1051,8 +1043,7 @@ public abstract class SqlProvider {
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey,
-                                                       boolean inherit) {
+                                                       boolean withOutIdentityKey) {
         return getFieldNameWithColumns(entityType,
                                        dtoType,
                                        mainTagLevel,
@@ -1062,8 +1053,7 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
-                                       withOutIdentityKey,
-                                       inherit);
+                                       withOutIdentityKey);
     }
 
     /**
@@ -1078,7 +1068,6 @@ public abstract class SqlProvider {
      * @param ignoreColumns       忽略的列
      * @param withOutPrimaryKey   排除主键
      * @param withOutIdentityKey  排除自增列
-     * @param inherit             仅继承成员
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
@@ -1090,8 +1079,7 @@ public abstract class SqlProvider {
                                                        Collection<String> ignoreFieldNames,
                                                        Collection<String> ignoreColumns,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey,
-                                                       boolean inherit)
+                                                       boolean withOutIdentityKey)
             throws
             ModuleException {
         //读取缓存
@@ -1117,7 +1105,8 @@ public abstract class SqlProvider {
                                                                           customTags,
                                                                           withOutPrimaryKey,
                                                                           withOutIdentityKey,
-                                                                          inherit)) {
+                                                                          dtoType != null
+                                                                                  && !dtoType.equals(entityType))) {
                 fieldWithColumns.put(field.getName(),
                                      EntityTypeHandler.getColumn(field,
                                                                  config.getNameConvertType()));
@@ -2189,7 +2178,6 @@ public abstract class SqlProvider {
                                                       executor.getMainTagLevel(),
                                                       executor.getCustomTags(),
                                                       false,
-                                                      false,
                                                       false),
                                          alias);
 
@@ -2442,7 +2430,6 @@ public abstract class SqlProvider {
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
                                                                        false,
-                                                                       true,
                                                                        true);
 
         //列
@@ -2552,7 +2539,6 @@ public abstract class SqlProvider {
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
                                                                        false,
-                                                                       true,
                                                                        true);
 
         //列
@@ -2637,7 +2623,6 @@ public abstract class SqlProvider {
                                                                                null,
                                                                                updater.getIgnoreFieldNames(),
                                                                                null,
-                                                                               true,
                                                                                true,
                                                                                true);
             set = fieldWithColumns2UpdateSql(updater.getEntityType(),
