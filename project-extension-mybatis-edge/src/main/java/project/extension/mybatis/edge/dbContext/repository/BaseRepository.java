@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import project.extension.action.IAction0;
+import project.extension.action.IAction0Throw;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
@@ -86,13 +86,13 @@ public class BaseRepository<TEntity>
     }
 
     @Override
-    public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
+    public Tuple2<Boolean, Exception> transaction(IAction0Throw handler) {
         return getOrm().transaction(handler);
     }
 
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
-                                                  IAction0 handler) {
+                                                  IAction0Throw handler) {
         return getOrm().transaction(isolationLevel,
                                     handler);
     }

@@ -327,9 +327,11 @@ public abstract class Insert<T>
         int rows = 0;
 
         //批量操作时需要启用事务
-        boolean batch = inserter.getDataList()
-                                .size() > 1;
-        if (batch)
+        boolean needTransaction = inserter.getDataList()
+                                          .size() > 1
+                && !ado.isTransactionAlreadyExisting();
+
+        if (needTransaction)
             ado.beginTransaction();
 
         try {
@@ -357,10 +359,10 @@ public abstract class Insert<T>
                 }
             }
 
-            if (batch)
+            if (needTransaction)
                 ado.transactionCommit();
         } catch (Exception ex) {
-            if (batch)
+            if (needTransaction)
                 ado.transactionRollback();
 
             throw ex;

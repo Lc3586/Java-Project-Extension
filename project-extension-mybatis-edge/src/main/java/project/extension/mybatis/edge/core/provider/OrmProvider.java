@@ -2,7 +2,8 @@ package project.extension.mybatis.edge.core.provider;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
 import org.springframework.stereotype.Component;
-import project.extension.action.IAction0;
+import org.springframework.transaction.annotation.Propagation;
+import project.extension.action.IAction0Throw;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.mapper.EntityTypeHandler;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
@@ -207,19 +208,83 @@ public class OrmProvider
     }
 
     @Override
-    public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
-        return transaction(null,
+    public Tuple2<Boolean, Exception> transaction(IAction0Throw handler) {
+        return transaction(Propagation.REQUIRED,
+                           null,
+                           handler);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                                  IAction0Throw handler) {
+        return transaction(propagation,
+                           null,
                            handler);
     }
 
     @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
-                                                  IAction0 handler) {
+                                                  IAction0Throw handler) {
+        return transaction(Propagation.REQUIRED,
+                           isolationLevel,
+                           handler);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                                  TransactionIsolationLevel isolationLevel,
+                                                  IAction0Throw handler) {
+        boolean nested = false;
+        boolean nonTransactional = false;
+
         try {
-            if (isolationLevel == null)
-                getAdo().beginTransaction();
-            else
-                getAdo().beginTransaction(isolationLevel);
+            switch (propagation) {
+                case REQUIRES_NEW:
+                    //创建一个新事务，并挂起当前事务（如果存在）。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        getAdo().transactionCommit();
+                case NESTED:
+                    //如果存在当前事务，则在嵌套事务中执行，否则按REQUIRED执行。
+                default:
+                    //默认REQUIRED
+                case REQUIRED:
+                    //支持当前事务，如果不存在则创建一个新事务。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        nested = true;
+                    else {
+                        if (isolationLevel == null)
+                            getAdo().beginTransaction();
+                        else
+                            getAdo().beginTransaction(isolationLevel);
+                    }
+                    break;
+                case SUPPORTS:
+                    //支持当前事务，如果不存在，则以非事务方式执行。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        nested = true;
+                    else
+                        nonTransactional = true;
+                    break;
+                case MANDATORY:
+                    //支持当前事务，如果不存在则抛出异常。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        nested = true;
+                    else
+                        throw new ModuleException(Strings.getTransactionNotStarted());
+                    break;
+                case NOT_SUPPORTED:
+                    //以非事务方式执行，如果存在，则挂起当前事务。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        getAdo().transactionCommit();
+                    nonTransactional = true;
+                    break;
+                case NEVER:
+                    //以非事务方式执行，如果存在事务则抛出异常。
+                    if (getAdo().isTransactionAlreadyExisting())
+                        throw new ModuleException(Strings.getTransactionHasBeenStarted());
+                    nonTransactional = true;
+                    break;
+            }
         } catch (Exception ex) {
             getAdo().triggerAfterTransactionAop(Strings.getTransactionBeginFailed(),
                                                 ex);
@@ -229,6 +294,11 @@ public class OrmProvider
 
         try {
             handler.invoke();
+
+            if (nested || nonTransactional)
+                return new Tuple2<>(true,
+                                    null);
+
             try {
                 getAdo().transactionCommit();
                 return new Tuple2<>(true,
@@ -240,6 +310,10 @@ public class OrmProvider
                                     ex);
             }
         } catch (Exception ex1) {
+            if (nested || nonTransactional)
+                return new Tuple2<>(false,
+                                    ex1);
+
             try {
                 getAdo().transactionRollback();
                 return new Tuple2<>(false,

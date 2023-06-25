@@ -1,7 +1,7 @@
 package project.extension.mybatis.edge.dbContext.repository;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import project.extension.action.IAction0;
+import project.extension.action.IAction0Throw;
 import project.extension.func.IFunc1;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.dbContext.unitOfWork.IUnitOfWork;
@@ -54,7 +54,7 @@ public interface IBaseRepositoryBase {
      * @param handler 执行函数
      * @return a：true：已提交，false：已回滚，b：异常信息
      */
-    Tuple2<Boolean, Exception> transaction(IAction0 handler);
+    Tuple2<Boolean, Exception> transaction(IAction0Throw handler);
 
     /**
      * 开启事务
@@ -66,5 +66,5 @@ public interface IBaseRepositoryBase {
      * @return a：true：已提交，false：已回滚，b：异常信息
      */
     Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
-                                           IAction0 handler);
+                                           IAction0Throw handler);
 }

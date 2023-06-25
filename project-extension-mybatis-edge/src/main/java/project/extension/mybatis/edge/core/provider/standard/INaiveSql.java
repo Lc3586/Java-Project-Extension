@@ -1,8 +1,8 @@
 package project.extension.mybatis.edge.core.provider.standard;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import org.springframework.stereotype.Repository;
-import project.extension.action.IAction0;
+import org.springframework.transaction.annotation.Propagation;
+import project.extension.action.IAction0Throw;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.core.ado.INaiveAdo;
 import project.extension.mybatis.edge.core.provider.standard.curd.IDelete;
@@ -19,8 +19,6 @@ import java.util.Map;
 
 /**
  * NaiveSql
- * <p>1、事务由springframework进行管理</p>
- * <p>2、在需要使用事务的方法上请添加注解 org.springframework.transaction.annotation.Transactional</p>
  *
  * @author LCTR
  * @date 2022-06-10
@@ -243,7 +241,17 @@ public interface INaiveSql {
      * @param handler 执行函数
      * @return a：true：已提交，false：已回滚，b：异常信息
      */
-    Tuple2<Boolean, Exception> transaction(IAction0 handler);
+    Tuple2<Boolean, Exception> transaction(IAction0Throw handler);
+
+    /**
+     * 开启事务
+     *
+     * @param propagation 事务传播方式
+     * @param handler     执行函数
+     * @return a：true：已提交，false：已回滚，b：异常信息
+     */
+    Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                           IAction0Throw handler);
 
     /**
      * 开启事务
@@ -255,7 +263,21 @@ public interface INaiveSql {
      * @return a：true：已提交，false：已回滚，b：异常信息
      */
     Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
-                                           IAction0 handler);
+                                           IAction0Throw handler);
+
+    /**
+     * 开启事务
+     * <p>使用springframework管理事务</p>
+     * <p>兼容声明式事务（方法上添加了注解 org.springframework.transaction.annotation.Transactional）</p>
+     *
+     * @param propagation    事务传播方式
+     * @param isolationLevel 事务隔离等级
+     * @param handler        执行函数
+     * @return a：true：已提交，false：已回滚，b：异常信息
+     */
+    Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                           TransactionIsolationLevel isolationLevel,
+                                           IAction0Throw handler);
 
     /**
      * 获取数据库访问对象

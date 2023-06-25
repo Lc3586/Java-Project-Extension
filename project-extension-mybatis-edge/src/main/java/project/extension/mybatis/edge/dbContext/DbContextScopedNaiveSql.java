@@ -1,7 +1,8 @@
 package project.extension.mybatis.edge.dbContext;
 
 import org.apache.ibatis.session.TransactionIsolationLevel;
-import project.extension.action.IAction0;
+import org.springframework.transaction.annotation.Propagation;
+import project.extension.action.IAction0Throw;
 import project.extension.func.IFunc0;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
@@ -276,14 +277,30 @@ public class DbContextScopedNaiveSql
     }
 
     @Override
-    public Tuple2<Boolean, Exception> transaction(IAction0 handler) {
+    public Tuple2<Boolean, Exception> transaction(IAction0Throw handler) {
         return getOriginalOrm().transaction(handler);
     }
 
     @Override
+    public Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                                  IAction0Throw handler) {
+        return getOriginalOrm().transaction(propagation,
+                                            handler);
+    }
+
+    @Override
     public Tuple2<Boolean, Exception> transaction(TransactionIsolationLevel isolationLevel,
-                                                  IAction0 handler) {
+                                                  IAction0Throw handler) {
         return getOriginalOrm().transaction(isolationLevel,
+                                            handler);
+    }
+
+    @Override
+    public Tuple2<Boolean, Exception> transaction(Propagation propagation,
+                                                  TransactionIsolationLevel isolationLevel,
+                                                  IAction0Throw handler) {
+        return getOriginalOrm().transaction(propagation,
+                                            isolationLevel,
                                             handler);
     }
 

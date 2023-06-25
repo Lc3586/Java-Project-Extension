@@ -37,6 +37,13 @@ public class TestCollectionFor1xTo5x {
     }
 
     @Nested
+    @Order(220)
+    @DisplayName("220.批量增删改查测试")
+    public class ForX220BatchCurdTest
+            extends X220BatchCurdTest {
+    }
+
+    @Nested
     @Order(300)
     @DisplayName("300.基础事务测试")
     public class ForX300BasicsOfTransactionTest

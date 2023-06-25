@@ -157,7 +157,6 @@ public class X300BasicsOfTransactionTest {
 
     /**
      * 测试编程式事务嵌套提交操作
-     * <p>应抛出异常并回滚事务</p>
      *
      * @param name 名称
      */
@@ -207,23 +206,18 @@ public class X300BasicsOfTransactionTest {
                                   dataCreate2.getId());
             });
 
-            Assertions.assertEquals(false,
+            Assertions.assertEquals(true,
                                     tranCreate2.a,
-                                    "事务2未回滚");
+                                    "事务2未提交");
 
-            System.out.println("\r\n事务2已回滚");
-
-            throw new BusinessException("事务2已回滚",
-                                        tranCreate2.b);
+            System.out.println("\r\n事务2已提交");
         });
 
-        Assertions.assertEquals(false,
+        Assertions.assertEquals(true,
                                 tranCreate1.a,
-                                "事务1未回滚");
+                                "事务1未提交");
 
-        ExceptionExtension.output(tranCreate1.b);
-
-        System.out.println("\r\n事务1已回滚");
+        System.out.println("\r\n事务1已提交");
 
         TestGeneralEntity dataCheckCreate1 = naiveSql.select(TestGeneralEntity.class)
                                                      .where(x -> x.and(TGE_Fields.id,
@@ -231,12 +225,12 @@ public class X300BasicsOfTransactionTest {
                                                                        dataCreate1.getId()))
                                                      .first();
 
-        Assertions.assertNull(dataCheckCreate1,
-                              "事务回滚后依然能查询到新增的数据1");
+        Assertions.assertNotNull(dataCheckCreate1,
+                                 "事务提交后未能查询到新增的数据1");
 
-        TempDataExtension.removeData(name,
-                                     TestGeneralEntity.class,
-                                     dataCreate1.getId());
+        TempDataExtension.cleanData(name,
+                                    TestGeneralEntity.class,
+                                    dataCreate1.getId());
 
         TestGeneralEntity dataCheckCreate2 = naiveSql.select(TestGeneralEntity.class)
                                                      .where(x -> x.and(TGE_Fields.id,
@@ -244,14 +238,14 @@ public class X300BasicsOfTransactionTest {
                                                                        dataCreate2.getId()))
                                                      .first();
 
-        Assertions.assertNull(dataCheckCreate2,
-                              "事务回滚后依然能查询到新增的数据2");
+        Assertions.assertNotNull(dataCheckCreate2,
+                                 "事务提交后未能查询到新增的数据2");
 
-        TempDataExtension.removeData(name,
-                                     TestGeneralEntity.class,
-                                     dataCreate2.getId());
+        TempDataExtension.cleanData(name,
+                                    TestGeneralEntity.class,
+                                    dataCreate2.getId());
 
-        System.out.println("\r\n事务回滚成功");
+        System.out.println("\r\n事务提交成功");
     }
 
     /**
@@ -385,8 +379,7 @@ public class X300BasicsOfTransactionTest {
     }
 
     /**
-     * 测试声明式事务嵌套编程式事务提交操作
-     * <p>应抛出异常并回滚事务</p>
+     * 测试声明式事务嵌套编程式事务提交操作（提交）
      *
      * @param name 名称
      */
@@ -394,7 +387,7 @@ public class X300BasicsOfTransactionTest {
     @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
     @Transactional
     @Commit
-    @DisplayName("330.测试声明式事务嵌套编程式事务提交操作")
+    @DisplayName("330.测试声明式事务嵌套编程式事务提交操作（提交）")
     @Order(330)
     public void _330(String name) {
         INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
@@ -419,18 +412,45 @@ public class X300BasicsOfTransactionTest {
                               dataCreate.getId());
         });
 
-        Assertions.assertEquals(false,
+        Assertions.assertEquals(true,
                                 tranCreate.a,
-                                "编程式事务未回滚");
+                                "编程式事务未提交");
 
-        ExceptionExtension.output(tranCreate.b);
-
-        System.out.println("\r\n编程式事务已回滚");
-
-        TempDataExtension.removeData(name,
-                                     TestGeneralEntity.class,
-                                     dataCreate.getId());
+        System.out.println("\r\n编程式事务已提交");
     }
+
+    /**
+     * 测试声明式事务嵌套编程式事务提交操作
+     *
+     * @param name 名称
+     */
+    @ParameterizedTest
+    @MethodSource("project.extension.mybatis.edge.configure.TestDataSourceConfigure#getMultiTestDataSourceName")
+    @DisplayName("331.测试声明式事务嵌套编程式事务提交操作")
+    @Order(331)
+    public void _331(String name) {
+        INaiveSql naiveSql = OrmObjectResolve.getOrm(TestDataSourceConfigure.getTestDataSource(name));
+
+        TestGeneralEntity tempData = TempDataExtension.getFirstData(name,
+                                                                    TestGeneralEntity.class);
+
+        TestGeneralEntity dataCheckCreate = naiveSql.select(TestGeneralEntity.class)
+                                                    .where(x -> x.and(TGE_Fields.id,
+                                                                      FilterCompare.Eq,
+                                                                      tempData.getId()))
+                                                    .first();
+
+        Assertions.assertNotNull(dataCheckCreate,
+                                 "事务提交后未能查询到新增的数据");
+
+        TempDataExtension.cleanData(name,
+                                    TestGeneralEntity.class,
+                                    tempData.getId());
+
+        System.out.printf("\r\n已查询到新增数据，Id：%s，事务提交成功\r\n",
+                          tempData.getId());
+    }
+
 //
 //    /**
 //     * 测试声明式事务嵌套编程式事务提交操作

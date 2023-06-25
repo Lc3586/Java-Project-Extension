@@ -22,8 +22,12 @@ public class Strings_en_US {
         if (values == null) {
             values = new HashMap<>();
             values.put("FunctionNotImplemented",
-                       "方法尚未实现");
+                       "Function not implemented");
+            values.put("TransactionNotStarted",
+                       "Transaction not opened");
             values.put("TransactionHasBeenStarted",
+                       "Transaction opened");
+            values.put("UOWTransactionHasBeenStarted",
                        "Transaction opened, unit of work cannot be disabled");
             values.put("TransactionAlreadyStarted",
                        "事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction，或是嵌套了多层事务");

@@ -253,9 +253,10 @@ public abstract class Delete<T>
         if (deleter.getDataList()
                    .size() > 0) {
             //批量操作时需要启用事务
-            boolean batch = deleter.getDataList()
-                                   .size() > 1;
-            if (batch)
+            boolean needTransaction = deleter.getDataList()
+                                             .size() > 1
+                    && !ado.isTransactionAlreadyExisting();
+            if (needTransaction)
                 ado.beginTransaction();
 
             try {
@@ -283,10 +284,10 @@ public abstract class Delete<T>
                     } else if (currentRows > 0) rows++;
                 }
 
-                if (batch)
+                if (needTransaction)
                     ado.transactionCommit();
             } catch (Exception ex) {
-                if (batch)
+                if (needTransaction)
                     ado.transactionRollback();
 
                 throw ex;

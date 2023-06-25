@@ -67,10 +67,24 @@ public class Strings {
     }
 
     /**
-     * 已开启事务，不能禁用工作单元
+     * 未开启事务
+     */
+    public static String getTransactionNotStarted() {
+        return getString("TransactionNotStarted");
+    }
+
+    /**
+     * 已开启事务
      */
     public static String getTransactionHasBeenStarted() {
         return getString("TransactionHasBeenStarted");
+    }
+
+    /**
+     * 已开启事务，不能禁用工作单元
+     */
+    public static String getUOWTransactionHasBeenStarted() {
+        return getString("UOWTransactionHasBeenStarted");
     }
 
     /**

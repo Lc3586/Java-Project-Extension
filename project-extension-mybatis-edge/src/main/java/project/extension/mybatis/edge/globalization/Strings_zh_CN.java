@@ -23,7 +23,11 @@ public class Strings_zh_CN {
             values = new HashMap<>();
             values.put("FunctionNotImplemented",
                        "方法尚未实现");
+            values.put("TransactionNotStarted",
+                       "未开启事务");
             values.put("TransactionHasBeenStarted",
+                       "已开启事务");
+            values.put("UOWTransactionHasBeenStarted",
                        "已开启事务，不能禁用工作单元");
             values.put("TransactionAlreadyStarted",
                        "事务早已开启，请检查是否同时使用了@Transactional和INaiveSql.transaction，或是嵌套了多层事务");

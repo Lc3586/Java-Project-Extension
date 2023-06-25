@@ -268,6 +268,29 @@ public class TempDataExtension {
      * @param name 数据源名称
      * @param type 实体类型
      */
+    public static <T> List<T> getAllData(String name,
+                                         Class<T> type) {
+        Assertions.assertTrue(tempData.containsKey(name),
+                              String.format("%s数据源下没有数据",
+                                            name));
+
+        Map<Class, Map<Object, Object>> dataOfType = tempData.get(name);
+        Assertions.assertTrue(dataOfType.containsKey(type),
+                              String.format("%s数据源下没有%s类型的数据",
+                                            name,
+                                            type.getName()));
+
+        Map<Object, Object> dataOfKey = dataOfType.get(type);
+
+        return (List<T>) new ArrayList<>(dataOfKey.values());
+    }
+
+    /**
+     * 获取第一条数据
+     *
+     * @param name 数据源名称
+     * @param type 实体类型
+     */
     public static <T> T getFirstData(String name,
                                      Class<T> type) {
         return getData(name,

@@ -352,9 +352,10 @@ public abstract class Update<T>
         if (updater.getDataList()
                    .size() > 0) {
             //批量操作时需要启用事务
-            boolean batch = updater.getDataList()
-                                   .size() > 1;
-            if (batch)
+            boolean needTransaction = updater.getDataList()
+                                             .size() > 1
+                    && !ado.isTransactionAlreadyExisting();
+            if (needTransaction)
                 ado.beginTransaction();
 
             try {
@@ -382,10 +383,10 @@ public abstract class Update<T>
                     } else if (currentRows > 0) rows++;
                 }
 
-                if (batch)
+                if (needTransaction)
                     ado.transactionCommit();
             } catch (Exception ex) {
-                if (batch)
+                if (needTransaction)
                     ado.transactionRollback();
 
                 throw ex;
