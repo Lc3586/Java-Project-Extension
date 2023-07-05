@@ -2061,7 +2061,7 @@ public abstract class SqlProvider {
     }
 
     /**
-     * 原始Sql语句转为获取首条记录的Sql语句
+     * 原始Sql语句转为获取指定位置指定数量记录的Sql语句
      *
      * @param originalSql 原始Sql语句
      * @param offset      偏移量

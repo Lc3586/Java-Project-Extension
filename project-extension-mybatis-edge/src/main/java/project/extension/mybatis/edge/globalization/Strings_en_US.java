@@ -130,7 +130,9 @@ public class Strings_en_US {
             values.put("CanNotGetDbNameFromUrl",
                        "无法从连接字符串中获取数据库名称，匹配所使用的正则表达式为：%1$2s");
             values.put("SqlServerRequireOrderBy4Paging",
-                       "在SQL Server数据库种进行分页查询时必须指定ORDER BY语句");
+                       "在SQL Server数据库中进行分页查询时必须指定ORDER BY语句");
+            values.put("SqlServerRequireSelect",
+                       "在SQL Server数据库中进行查询时必须指定SELECT子句");
         }
         return values.get(code);
     }
