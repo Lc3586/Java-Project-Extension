@@ -37,7 +37,8 @@ public class UnitOfWork
 
                                                                          "INaiveSql orm"));
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
-        this.uowBefore = new TraceBeforeEventArgs(Operation.UnitOfWork,
+        this.uowBefore = new TraceBeforeEventArgs("UOW",
+                                                  Operation.UnitOfWork,
                                                   null);
         this.aop.traceBefore(this.uowBefore);
         this.entityChangeRecord = new EntityChangeRecord();

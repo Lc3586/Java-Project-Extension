@@ -20,14 +20,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @JSONType(ignores = {"count"})
 public class Tuple8<A, B, C, D, E, F, G, H>
         implements ITuple {
-    public final A a;
-    public final B b;
-    public final C c;
-    public final D d;
-    public final E e;
-    public final F f;
-    public final G g;
-    public final H h;
+    public A a;
+    public B b;
+    public C c;
+    public D d;
+    public E e;
+    public F f;
+    public G g;
+    public H h;
 
     public Tuple8(A a,
                   B b,

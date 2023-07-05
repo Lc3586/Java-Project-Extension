@@ -451,9 +451,11 @@ public abstract class Select<T>
                                                                   false,
                                                                   true));
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -461,6 +463,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -490,8 +493,10 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
-                                                           getMSId(),
+                                                           msId,
                                                            sql,
                                                            null,
                                                            executor.getParameter(),
@@ -499,6 +504,7 @@ public abstract class Select<T>
                                                            null,
                                                            null,
                                                            config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -515,8 +521,10 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectList(getSqlSession(),
-                                                           getMSId(),
+                                                           msId,
                                                            sql,
                                                            null,
                                                            executor.getParameter(),
@@ -524,6 +532,7 @@ public abstract class Select<T>
                                                            executor.getMainTagLevel(),
                                                            executor.getCustomTags(),
                                                            config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -539,14 +548,17 @@ public abstract class Select<T>
         executor.setAllColumns(false);
         String sql = paging();
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectMapList(getSqlSession(),
-                                                              getMSId(),
+                                                              msId,
                                                               sql,
                                                               null,
                                                               executor.getParameter(),
                                                               null,
                                                               null,
                                                               config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -567,8 +579,10 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
-                                                          getMSId(),
+                                                          msId,
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
@@ -576,6 +590,7 @@ public abstract class Select<T>
                                                           null,
                                                           null,
                                                           config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -596,8 +611,10 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(getSqlSession(),
-                                                          getMSId(),
+                                                          msId,
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
@@ -605,6 +622,7 @@ public abstract class Select<T>
                                                           executor.getMainTagLevel(),
                                                           executor.getCustomTags(),
                                                           config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -629,9 +647,11 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -639,6 +659,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -658,14 +679,17 @@ public abstract class Select<T>
                                                       0,
                                                       1);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectMap(getSqlSession(),
-                                                          getMSId(),
+                                                          msId,
                                                           sql,
                                                           null,
                                                           executor.getParameter(),
                                                           null,
                                                           null,
                                                           config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -685,9 +709,11 @@ public abstract class Select<T>
                                                    false,
                                                    true);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -695,6 +721,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -720,9 +747,11 @@ public abstract class Select<T>
                                                  false,
                                                  true);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -730,6 +759,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -755,9 +785,11 @@ public abstract class Select<T>
                                                  false,
                                                  true);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -765,6 +797,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -789,9 +822,11 @@ public abstract class Select<T>
         String sql = sqlProvider.executor2AvgSql(executor,
                                                  false);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -799,6 +834,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,
@@ -823,9 +859,11 @@ public abstract class Select<T>
         String sql = sqlProvider.executor2SumSql(executor,
                                                  false);
 
+        String msId = getMSId();
+
         return aop.invokeWithAop(() -> this.ado.selectOne(
                                          getSqlSession(),
-                                         getMSId(),
+                                         msId,
                                          sql,
                                          null,
                                          executor.getParameter(),
@@ -833,6 +871,7 @@ public abstract class Select<T>
                                          null,
                                          null,
                                          config.getNameConvertType()),
+                                 msId,
                                  CurdType.查询,
                                  config.getName(),
                                  sql,

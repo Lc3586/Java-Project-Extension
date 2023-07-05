@@ -1,10 +1,10 @@
 package project.extension.mybatis.edge.aop;
 
+import lombok.Data;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 执行事务操作之前触发的事件的参数
@@ -12,22 +12,24 @@ import java.util.UUID;
  * @author LCTR
  * @date 2022-12-19
  */
+@Data
 public class TraceBeforeEventArgs {
-    public TraceBeforeEventArgs(Operation operation,
+    public TraceBeforeEventArgs(String transactionDefinitionName,
+                                Operation operation,
                                 Object value) {
-        this(UUID.randomUUID(),
+        this(transactionDefinitionName,
              new StopWatch(),
              operation,
              value,
              new HashMap<>());
     }
 
-    protected TraceBeforeEventArgs(UUID identifier,
+    protected TraceBeforeEventArgs(String transactionDefinitionName,
                                    StopWatch watch,
                                    Operation operation,
                                    Object value,
                                    Map<String, Object> states) {
-        this.identifier = identifier;
+        this.transactionDefinitionName = transactionDefinitionName;
         this.watch = watch;
         if (!this.watch.isStarted() && !this.watch.isStopped())
             this.watch.start();
@@ -37,10 +39,9 @@ public class TraceBeforeEventArgs {
     }
 
     /**
-     * 标识
-     * <p>可将 TraceBeforeEventArgs 与 TraceAfterEventArgs 进行匹配</p>
+     * 事务定义名称
      */
-    private final UUID identifier;
+    private final String transactionDefinitionName;
 
     /**
      * 计时器
@@ -61,48 +62,4 @@ public class TraceBeforeEventArgs {
      * 状态数据
      */
     public Map<String, Object> states;
-
-    /**
-     * 标识
-     * <p>可将 TraceBeforeEventArgs 与 TraceAfterEventArgs 进行匹配</p>
-     *
-     * @return 标识
-     */
-    public UUID getIdentifier() {
-        return this.identifier;
-    }
-
-    /**
-     * 计时器
-     */
-    protected StopWatch getWatch() {
-        return watch;
-    }
-
-    /**
-     * 操作
-     *
-     * @return 操作
-     */
-    public Operation getOperation() {
-        return this.operation;
-    }
-
-    /**
-     * 值
-     *
-     * @return 值
-     */
-    public Object getValue() {
-        return this.value;
-    }
-
-    /**
-     * 状态数据
-     *
-     * @return 状态数据
-     */
-    public Map<String, Object> getStates() {
-        return this.states;
-    }
 }

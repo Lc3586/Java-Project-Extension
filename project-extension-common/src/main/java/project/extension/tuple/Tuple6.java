@@ -16,15 +16,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @date 2022-03-18
  */
 @JSONType(ignores = {"count"})
-public class Tuple6<A, B, C, D, E, F> implements ITuple {
-    public final A a;
-    public final B b;
-    public final C c;
-    public final D d;
-    public final E e;
-    public final F f;
+public class Tuple6<A, B, C, D, E, F>
+        implements ITuple {
+    public A a;
+    public B b;
+    public C c;
+    public D d;
+    public E e;
+    public F f;
 
-    public Tuple6(A a, B b, C c, D d, E e, F f) {
+    public Tuple6(A a,
+                  B b,
+                  C c,
+                  D d,
+                  E e,
+                  F f) {
         this.a = a;
         this.b = b;
         this.c = c;

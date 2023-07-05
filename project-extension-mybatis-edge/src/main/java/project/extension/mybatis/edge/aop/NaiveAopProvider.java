@@ -117,6 +117,7 @@ public class NaiveAopProvider
      * @return 返回数据
      */
     public <TResult> TResult invokeWithAop(IFunc0<TResult> fun,
+                                           String msId,
                                            CurdType type,
                                            String dataSource,
                                            String sql,
@@ -124,7 +125,8 @@ public class NaiveAopProvider
                                            Class<?> entityType,
                                            Class<?> dtoType) {
         CurdBeforeEventArgs beforeEventArg =
-                this.curdBefore(new CurdBeforeEventArgs(type,
+                this.curdBefore(new CurdBeforeEventArgs(msId,
+                                                        type,
                                                         entityType,
                                                         dtoType,
                                                         dataSource,

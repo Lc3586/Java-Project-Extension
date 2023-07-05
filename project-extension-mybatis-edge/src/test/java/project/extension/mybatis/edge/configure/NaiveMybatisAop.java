@@ -2,7 +2,6 @@ package project.extension.mybatis.edge.configure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import project.extension.date.DateExtension;
 import project.extension.mybatis.edge.aop.INaiveAop;
@@ -66,8 +65,7 @@ public class NaiveMybatisAop {
                             + "\t 实体类型     : %s\r\n"
                             + "\t 业务模型类型 : %s\r\n"
                             + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n\r\n",
-                    arg.getIdentifier()
-                       .toString(),
+                    arg.getMsId(),
                     arg.getCurdType()
                        .name(),
                     arg.getDataSource(),
@@ -100,8 +98,7 @@ public class NaiveMybatisAop {
                             + "\t 实体类型     : %s\r\n"
                             + "\t 业务模型类型 : %s\r\n"
                             + "√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√\r\n\r\n",
-                    arg.getIdentifier()
-                       .toString(),
+                    arg.getMsId(),
                     arg.getCurdType()
                        .name(),
                     DateExtension.getTime(arg.getCosttime(),

@@ -1,17 +1,20 @@
 package project.extension.mybatis.edge.aop;
 
+import lombok.Data;
+
 /**
  * 执行事务操作之后触发的事件的参数
  *
  * @author LCTR
  * @date 2022-12-19
  */
+@Data
 public class TraceAfterEventArgs
         extends TraceBeforeEventArgs {
     public TraceAfterEventArgs(TraceBeforeEventArgs beforeEventData,
                                String remark,
                                Exception exception) {
-        super(beforeEventData.getIdentifier(),
+        super(beforeEventData.getTransactionDefinitionName(),
               beforeEventData.getWatch(),
               beforeEventData.getOperation(),
               beforeEventData.getValue(),
@@ -40,25 +43,4 @@ public class TraceAfterEventArgs
      * 备注
      */
     private final String remark;
-
-    /**
-     * 耗时（毫秒）
-     */
-    public Long getCosttime() {
-        return costtime;
-    }
-
-    /**
-     * 操作异常时的错误
-     */
-    public Exception getException() {
-        return exception;
-    }
-
-    /**
-     * 备注
-     */
-    public Object getRemark() {
-        return remark;
-    }
 }

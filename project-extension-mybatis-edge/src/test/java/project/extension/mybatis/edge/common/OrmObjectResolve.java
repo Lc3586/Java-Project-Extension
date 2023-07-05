@@ -1,5 +1,6 @@
 package project.extension.mybatis.edge.common;
 
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Assertions;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.provider.standard.IMultiNaiveSql;
@@ -30,6 +31,8 @@ public class OrmObjectResolve {
     public static INaiveDataSourceProvider naiveDataSourceProvider;
 
     public static Map<Object, DataSource> druidDataSourceMap;
+
+    public static SqlSessionFactory sqlSessionFactory;
 
     /**
      * 注入
@@ -78,6 +81,14 @@ public class OrmObjectResolve {
         Assertions.assertNotEquals(0,
                                    druidDataSourceMap.size(),
                                    "未获取到任何DruidDataSource");
+
+        SqlSessionFactory sqlSessionFactory = IOCExtension.applicationContext.getBean(SqlSessionFactory.class);
+
+        Assertions.assertNotNull(sqlSessionFactory,
+                                 "未获取到SqlSessionFactory");
+
+        System.out.printf("\r\n%s已注入\r\n",
+                          SqlSessionFactory.class.getName());
     }
 
     /**

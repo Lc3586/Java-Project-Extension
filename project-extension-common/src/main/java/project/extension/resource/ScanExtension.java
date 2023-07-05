@@ -204,9 +204,9 @@ public class ScanExtension {
                                                          superType -> !superType.isAssignableFrom(clazz)))
                             continue;
 
-                        //过滤匿名类
-                        if (!CollectionsExtension.allPlus(interfaceTypeList,
-                                                          interfaceType -> !interfaceType.isAssignableFrom(clazz)))
+                        //过滤未实习指定接口的类
+                        if (CollectionsExtension.allPlus(interfaceTypeList,
+                                                         interfaceType -> !interfaceType.isAssignableFrom(clazz)))
                             continue;
 
                         classList.add(clazz);

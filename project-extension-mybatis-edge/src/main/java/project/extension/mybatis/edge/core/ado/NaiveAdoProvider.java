@@ -50,7 +50,7 @@ public class NaiveAdoProvider
         this.sqlSessionFactory = naiveDataSourceProvider.getSqlSessionFactory(dataSource);
         this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class)
                                                                            .getTransactionManager(dataSource);
-        this.transactionDefinition = IOCExtension.applicationContext.getBean(TransactionDefinition.class);
+        this.transactionDefinition = IOCExtension.tryGetBean(TransactionDefinition.class);
     }
 
     /**
@@ -132,7 +132,10 @@ public class NaiveAdoProvider
         if (isTransactionAlreadyExisting())
             throw new ModuleException(Strings.getTransactionAlreadyStarted());
 
-        TraceBeforeEventArgs tranBefore = new TraceBeforeEventArgs(Operation.BeginTransaction,
+        TraceBeforeEventArgs tranBefore = new TraceBeforeEventArgs(transactionDefinition == null
+                                                                   ? ""
+                                                                   : transactionDefinition.getName(),
+                                                                   Operation.BeginTransaction,
                                                                    transactionDefinition == null
                                                                    ? null
                                                                    : transactionDefinition.getIsolationLevel());

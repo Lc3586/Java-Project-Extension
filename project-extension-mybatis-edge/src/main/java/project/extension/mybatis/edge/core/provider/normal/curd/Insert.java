@@ -343,6 +343,7 @@ public abstract class Insert<T>
                 //批量插入
                 int currentRows = aop.invokeWithAop(() -> insert(msId,
                                                                  script),
+                                                    msId,
                                                     CurdType.插入,
                                                     config.getName(),
                                                     script,

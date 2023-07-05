@@ -14,7 +14,7 @@ project:
       scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
       # 默认的实体类表名/列名命名规则
       nameConvertType: CamelCaseToPascalCase
-      # 多数据源配置（单数据库时无需配置此项）
+      # 数据源配置
       multiDataSource:
         #主库-MySql数据库
         mysql:

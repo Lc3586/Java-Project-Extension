@@ -14,7 +14,7 @@ project:
       scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
       # 默认的实体类表名/列名命名规则
       nameConvertType: CamelCaseToPascalCase
-      # 多数据源配置（单数据库时无需配置此项）
+      # 数据源配置
       multiDataSource:
         #主库-MySql数据库
         mysql:
@@ -25,7 +25,7 @@ project:
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
-            url: jdbc:mysql://192.168.1.44:3307/test4java?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&allowMultiQueries=true
+            url: jdbc:mysql://192.168.1.201:3307/test4java?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&allowMultiQueries=true
             # 用户名
             username: test
             # 密码
@@ -36,7 +36,7 @@ project:
           dbType: JdbcMariaDB10
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
-            url: jdbc:mariadb://192.168.1.44:3306/test4java?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
+            url: jdbc:mariadb://192.168.1.201:3306/test4java?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8&allowMultiQueries=true
             username: test
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-SqlServer数据库
@@ -44,7 +44,7 @@ project:
           enable: true
           dbType: JdbcSqlServer
           properties:
-            url: jdbc:sqlserver://192.168.1.44:1433;databaseName=Test4Java;trustServerCertificate=true;
+            url: jdbc:sqlserver://192.168.1.201:1433;databaseName=Test4Java;trustServerCertificate=true;
             username: test
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-SqlServer数据库2012及以上版本
@@ -52,7 +52,7 @@ project:
           enable: true
           dbType: JdbcSqlServer_2012_plus
           properties:
-            url: jdbc:sqlserver://192.168.1.44:1433;databaseName=Test4Java;trustServerCertificate=true;
+            url: jdbc:sqlserver://192.168.1.201:1433;databaseName=Test4Java;trustServerCertificate=true;
             username: test
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-达梦数据库
@@ -61,7 +61,7 @@ project:
           dbType: JdbcDameng8
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:
-            url: jdbc:dm://192.168.1.44:5236/TEST4JAVA
+            url: jdbc:dm://192.168.1.201:5236/TEST4JAVA
             username: TEST4JAVA
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-Oracle数据库
@@ -70,7 +70,7 @@ project:
           dbType: JdbcOracle19c
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:
-            url: jdbc:oracle:thin:@//192.168.1.44:1521/ORCLPDB
+            url: jdbc:oracle:thin:@//192.168.1.201:1521/ORCLPDB
             username: test4java
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-PostgreSQL数据库
@@ -78,7 +78,7 @@ project:
           enable: true
           dbType: JdbcPostgreSQL15
           properties:
-            url: jdbc:postgresql://192.168.1.44:5432/test
+            url: jdbc:postgresql://192.168.1.201:5432/test
             username: test4java
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
 

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.util.StringUtils;
 import project.extension.collections.CollectionsExtension;
 import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
@@ -107,9 +108,9 @@ public class NaiveDataSourceProvider
                     getDataSourceBeanName(null),
                     druidDataSource);
 
-        getBeanFactory().registerSingleton(
-                getDataSourceBeanName(dataSourceConfig.getName()),
-                druidDataSource);
+//        getBeanFactory().registerSingleton(
+//                getDataSourceBeanName(dataSourceConfig.getName()),
+//                druidDataSource);
 
         //事务管理器
         loadAndRegisterTransactionManager(dataSourceConfig,
@@ -122,7 +123,8 @@ public class NaiveDataSourceProvider
         //Mapper扫描器注册类
         if (dataSourceConfig.getName()
                             .equals(defaultDataSource()))
-            registerMapperScannerRegistrar(dataSourceConfig);
+            registerMapperScannerRegistrar(dataSourceConfig,
+                                           getSqlSessionFactoryBeanName(null));
         //TODO 注入多数据源的Mapper扫描器注册类
 
     }
@@ -146,9 +148,9 @@ public class NaiveDataSourceProvider
                     getTransactionManagerBeanName(null),
                     dataSourceTransactionManager);
 
-        getBeanFactory().registerSingleton(
-                getTransactionManagerBeanName(dataSourceConfig.getName()),
-                dataSourceTransactionManager);
+//        getBeanFactory().registerSingleton(
+//                getTransactionManagerBeanName(dataSourceConfig.getName()),
+//                dataSourceTransactionManager);
     }
 
     /**
@@ -179,8 +181,12 @@ public class NaiveDataSourceProvider
 
             try {
                 if (CollectionsExtension.anyPlus(dataSourceConfig.getScanEntitiesPackages()))
-                    sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
-                                                                      .toArray(new Class[0]));
+//                    sqlSessionFactoryBean.setTypeAliases(ScanExtension.scanClassFromPackage(dataSourceConfig.getScanEntitiesPackages())
+//                                                                      .stream()
+//                                                                      .distinct()
+//                                                                      .toArray(Class<?>[]::new));
+                    sqlSessionFactoryBean.setTypeAliasesPackage(StringUtils.collectionToDelimitedString(dataSourceConfig.getScanEntitiesPackages(),
+                                                                                                        ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS));
             } catch (Exception ex) {
                 throw new ModuleException(Strings.getConfigDataSourceOptionInvalid(dataSourceConfig.getName(),
                                                                                    "scanEntitiesPackages",
@@ -225,9 +231,9 @@ public class NaiveDataSourceProvider
                     getSqlSessionFactoryBeanName(null),
                     sqlSessionFactory);
 
-        getBeanFactory().registerSingleton(
-                getSqlSessionFactoryBeanName(dataSourceConfig.getName()),
-                sqlSessionFactory);
+//        getBeanFactory().registerSingleton(
+//                getSqlSessionFactoryBeanName(dataSourceConfig.getName()),
+//                sqlSessionFactory);
     }
 
     /**
@@ -235,11 +241,12 @@ public class NaiveDataSourceProvider
      *
      * @param dataSourceConfig 数据源配置
      */
-    private void registerMapperScannerRegistrar(DataSourceConfig dataSourceConfig) {
+    private void registerMapperScannerRegistrar(DataSourceConfig dataSourceConfig,
+                                                String sqlSessionFactoryBeanName) {
         if (!CollectionsExtension.anyPlus(dataSourceConfig.getScanMapperPackages()))
             return;
 
-        NaiveMapperScanner scanner = new NaiveMapperScanner(getSqlSessionFactoryBeanName(dataSourceConfig.getName()),
+        NaiveMapperScanner scanner = new NaiveMapperScanner(sqlSessionFactoryBeanName,
                                                             getBeanFactory());
         scanner.doScan(dataSourceConfig.getScanMapperPackages()
                                        .toArray(new String[0]));

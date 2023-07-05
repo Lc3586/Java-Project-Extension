@@ -74,7 +74,7 @@ public class CollectionsExtension {
     }
 
     /**
-     * 集合是否存在符合要求的元素
+     * 集合中的元素是否全部符合要求
      *
      * @param list      集合数据
      * @param predicate 条件表达式
