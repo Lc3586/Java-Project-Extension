@@ -434,24 +434,20 @@ public class EntityTypeHandler {
                                                        boolean inherit) {
         List<Field> fields = new ArrayList<>();
 
-        EntityMapping entityMappingAttribute = null;
-
-        if (!inherit) {
-            entityMappingAttribute = AnnotationUtils.findAnnotation(dtoType,
-                                                                    EntityMapping.class);
-            if (entityMappingAttribute != null) {
-                //映射到实体的业务模型
-                for (Field field : dtoType.getDeclaredFields()) {
-                    getColumnField(field,
-                                   entityMappingAttribute,
-                                   withOutPrimaryKey,
-                                   withOutIdentityKey).ifPresent(x -> {
-                        //是否忽略列
-                        if (!isIgnoreColumn(field,
-                                            withOutPrimaryKey,
-                                            withOutIdentityKey)) fields.add(x);
-                    });
-                }
+        EntityMapping entityMappingAttribute = AnnotationUtils.findAnnotation(dtoType,
+                                                                              EntityMapping.class);
+        if (entityMappingAttribute != null) {
+            //映射到实体的业务模型
+            for (Field field : dtoType.getDeclaredFields()) {
+                getColumnField(field,
+                               entityMappingAttribute,
+                               withOutPrimaryKey,
+                               withOutIdentityKey).ifPresent(x -> {
+                    //是否忽略列
+                    if (!isIgnoreColumn(field,
+                                        withOutPrimaryKey,
+                                        withOutIdentityKey)) fields.add(x);
+                });
             }
         }
 
@@ -470,7 +466,7 @@ public class EntityTypeHandler {
 
             if (CollectionsExtension.anyPlus(tags)) {
                 openApiFields = SchemaExtension.getFieldsWithTags(dtoType,
-                                                                  inherit,
+                                                                  true,
                                                                   false,
                                                                   tags);
 

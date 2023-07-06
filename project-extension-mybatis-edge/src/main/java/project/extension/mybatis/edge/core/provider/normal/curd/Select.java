@@ -237,7 +237,7 @@ public abstract class Select<T>
     @Override
     public ISelect<T> withSql(String sql,
                               DbType... dbTypes) {
-        if (dbTypes == null)
+        if (dbTypes == null || dbTypes.length == 0)
             dbTypes = new DbType[]{config.getDbType()};
         for (DbType dbType : dbTypes)
             executor.getWithSQL()

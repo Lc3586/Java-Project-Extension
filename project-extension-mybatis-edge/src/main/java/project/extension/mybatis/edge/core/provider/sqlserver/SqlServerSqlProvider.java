@@ -99,7 +99,7 @@ public class SqlServerSqlProvider
 
             //替换为查询全部列
             String newSelectForSql;
-            Matcher selectForAliasMatcher = Pattern.compile("\\[(.*?)]",
+            Matcher selectForAliasMatcher = Pattern.compile("\\[(.*?)]\\.",
                                                             Pattern.CASE_INSENSITIVE)
                                                    .matcher(selectForSql);
             //获取Select子句中的别名
@@ -114,9 +114,9 @@ public class SqlServerSqlProvider
                                                                  newSelectForSql));
 
             //重新设置别名
-            selectForSql = selectForSql.replaceAll("\\[(.*?)]\\.",
-                                                   String.format("%s.",
-                                                                 alias2));
+            selectForSql = selectForSql.replace(selectForAliasMatcher.group(0),
+                                                String.format("%s.",
+                                                              alias2));
 
             return String.format("SELECT \r\n\t%s.* \r\nFROM (\r\n\tSELECT \r\n\t\t%s, \r\n\t\tROW_NUMBER() OVER (\r\n\t\t\t%s\r\n\t\t) AS ROWID \r\n\tFROM (\r\n\t\t%s\r\n\t) AS %s) AS %s \r\nWHERE ROWID BETWEEN %s AND %s",
                                  alias1,
