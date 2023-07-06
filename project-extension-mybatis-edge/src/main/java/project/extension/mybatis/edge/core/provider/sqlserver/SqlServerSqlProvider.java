@@ -87,7 +87,7 @@ public class SqlServerSqlProvider
             //TODO 如果order by子句的列未包含在select子句中，则此处自动添加，目前先通过查询全部列解决此问题
             //获取最外层的select子句
             String selectForSql;
-            Matcher selectForMatcher = Pattern.compile("SELECT (.*?) FROM",
+            Matcher selectForMatcher = Pattern.compile("SELECT (.*?)[\r|\n]+FROM",
                                                        Pattern.CASE_INSENSITIVE)
                                               .matcher(originalSql);
 
@@ -109,8 +109,8 @@ public class SqlServerSqlProvider
             else
                 newSelectForSql = "*";
 
-            originalSql = originalSql.replaceFirst("SELECT (.*?) FROM",
-                                                   String.format("SELECT %s FROM",
+            originalSql = originalSql.replaceFirst("SELECT (.*?)[\r|\n]+FROM",
+                                                   String.format("SELECT %s \r\nFROM",
                                                                  newSelectForSql));
 
             //重新设置别名
