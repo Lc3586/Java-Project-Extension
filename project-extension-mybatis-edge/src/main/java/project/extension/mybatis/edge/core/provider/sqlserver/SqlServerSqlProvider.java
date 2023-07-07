@@ -125,7 +125,7 @@ public class SqlServerSqlProvider
                                  originalSql,
                                  alias2,
                                  alias1,
-                                 offset,
+                                 offset + 1,
                                  offset + count);
         }
     }
