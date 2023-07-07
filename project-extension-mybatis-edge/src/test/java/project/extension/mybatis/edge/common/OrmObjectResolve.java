@@ -7,7 +7,7 @@ import project.extension.mybatis.edge.core.provider.standard.IMultiNaiveSql;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.config.MyBatisEdgeBaseConfig;
 import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
-import project.extension.mybatis.edge.core.ado.NaiveDataSource;
+import project.extension.mybatis.edge.core.ado.NaiveDynamicDataSource;
 import project.extension.mybatis.edge.core.provider.standard.ICodeFirst;
 import project.extension.mybatis.edge.core.provider.standard.IDbFirst;
 
@@ -68,15 +68,15 @@ public class OrmObjectResolve {
         naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
 
 
-        NaiveDataSource naiveDataSource = IOCExtension.applicationContext.getBean(NaiveDataSource.class);
+        NaiveDynamicDataSource naiveDynamicDataSource = IOCExtension.applicationContext.getBean(NaiveDynamicDataSource.class);
 
-        Assertions.assertNotNull(naiveDataSource,
+        Assertions.assertNotNull(naiveDynamicDataSource,
                                  "未获取到NaiveDataSource");
 
         System.out.printf("\r\n%s已注入\r\n",
-                          NaiveDataSource.class.getName());
+                          NaiveDynamicDataSource.class.getName());
 
-        druidDataSourceMap = naiveDataSource.getResolvedDataSources();
+        druidDataSourceMap = naiveDynamicDataSource.getResolvedDataSources();
 
         Assertions.assertNotEquals(0,
                                    druidDataSourceMap.size(),

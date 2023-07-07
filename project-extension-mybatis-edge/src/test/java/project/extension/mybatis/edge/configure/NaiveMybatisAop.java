@@ -51,7 +51,7 @@ public class NaiveMybatisAop {
      */
 //    @Autowired
     public void addListener(INaiveAop aop) {
-        aop.curdBeforeAddListener(arg -> {
+        aop.addListenerBeforeCurd(arg -> {
             //CURD操作执行之前触发
             logger.debug(String.format(
                     "\r\n\r\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\r\n"
@@ -83,7 +83,7 @@ public class NaiveMybatisAop {
                        .getTypeName()));
         });
 
-        aop.curdAfterAddListener(arg -> {
+        aop.addListenerAfterCurd(arg -> {
             //CURD操作执行之后触发
             logger.debug(String.format(
                     "\r\n\r\n√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√√\r\n"
@@ -118,7 +118,7 @@ public class NaiveMybatisAop {
                        .getTypeName()));
         });
 
-        aop.mappedStatementAddListener(arg -> {
+        aop.addListenerMappedStatement(arg -> {
             //获取映射对象之后触发
 
         });

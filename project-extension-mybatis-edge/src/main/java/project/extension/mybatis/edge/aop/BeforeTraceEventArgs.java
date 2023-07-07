@@ -13,8 +13,8 @@ import java.util.Map;
  * @date 2022-12-19
  */
 @Data
-public class TraceBeforeEventArgs {
-    public TraceBeforeEventArgs(String transactionDefinitionName,
+public class BeforeTraceEventArgs {
+    public BeforeTraceEventArgs(String transactionDefinitionName,
                                 Operation operation,
                                 Object value) {
         this(transactionDefinitionName,
@@ -24,7 +24,7 @@ public class TraceBeforeEventArgs {
              new HashMap<>());
     }
 
-    protected TraceBeforeEventArgs(String transactionDefinitionName,
+    protected BeforeTraceEventArgs(String transactionDefinitionName,
                                    StopWatch watch,
                                    Operation operation,
                                    Object value,

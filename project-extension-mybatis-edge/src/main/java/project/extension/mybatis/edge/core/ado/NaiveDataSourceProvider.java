@@ -109,9 +109,9 @@ public class NaiveDataSourceProvider
                     getDataSourceBeanName(null),
                     druidDataSource);
 
-//        getBeanFactory().registerSingleton(
-//                getDataSourceBeanName(dataSourceConfig.getName()),
-//                druidDataSource);
+        getBeanFactory().registerSingleton(
+                getDataSourceBeanName(dataSourceConfig.getName()),
+                druidDataSource);
 
         //事务管理器
         loadAndRegisterTransactionManager(dataSourceConfig,
@@ -149,9 +149,9 @@ public class NaiveDataSourceProvider
                     getTransactionManagerBeanName(null),
                     dataSourceTransactionManager);
 
-//        getBeanFactory().registerSingleton(
-//                getTransactionManagerBeanName(dataSourceConfig.getName()),
-//                dataSourceTransactionManager);
+        getBeanFactory().registerSingleton(
+                getTransactionManagerBeanName(dataSourceConfig.getName()),
+                dataSourceTransactionManager);
     }
 
     /**

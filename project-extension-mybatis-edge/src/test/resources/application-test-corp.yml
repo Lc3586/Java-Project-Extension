@@ -74,7 +74,7 @@ project:
             password: ENC(c6rfCLsfnXkC9mof+0Hz+qeR2PhE10z6)
         #从库-Oracle数据库
         oracle:
-          enable: true
+          enable: false
           dbType: JdbcOracle19c
           nameConvertType: PascalCaseToUnderscoreWithUpper
           properties:

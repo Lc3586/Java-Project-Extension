@@ -6,7 +6,6 @@ import project.extension.mybatis.edge.model.CurdType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 执行增删改查操作的命令之前触发的事件的参数
@@ -15,8 +14,8 @@ import java.util.UUID;
  * @date 2022-07-14
  */
 @Data
-public class CurdBeforeEventArgs {
-    public CurdBeforeEventArgs(String msId,
+public class BeforeCurdEventArgs {
+    public BeforeCurdEventArgs(String msId,
                                CurdType curdType,
                                Class<?> entityType,
                                Class<?> dtoType,
@@ -34,7 +33,7 @@ public class CurdBeforeEventArgs {
              new HashMap<>());
     }
 
-    protected CurdBeforeEventArgs(String msId,
+    protected BeforeCurdEventArgs(String msId,
                                   StopWatch watch,
                                   CurdType curdType,
                                   Class<?> entityType,

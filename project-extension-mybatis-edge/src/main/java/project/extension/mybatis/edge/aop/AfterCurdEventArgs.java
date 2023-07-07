@@ -9,9 +9,9 @@ import lombok.Data;
  * @date 2022-07-14
  */
 @Data
-public class CurdAfterEventArgs
-        extends CurdBeforeEventArgs {
-    public CurdAfterEventArgs(CurdBeforeEventArgs beforeEventData,
+public class AfterCurdEventArgs
+        extends BeforeCurdEventArgs {
+    public AfterCurdEventArgs(BeforeCurdEventArgs beforeEventData,
                               Exception exception,
                               Object executeResult) {
         super(beforeEventData.getMsId(),

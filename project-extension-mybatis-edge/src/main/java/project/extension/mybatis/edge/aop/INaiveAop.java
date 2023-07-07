@@ -16,68 +16,82 @@ public interface INaiveAop {
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop curdBeforeAddListener(IAction1<CurdBeforeEventArgs> action);
+    INaiveAop addListenerBeforeCurd(IAction1<BeforeCurdEventArgs> action);
 
     /**
      * 取消监听执行增删改查操作的命令之前触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop curdBeforeRemoveListener(IAction1<CurdBeforeEventArgs> action);
+    INaiveAop removeListenerBeforeCurd(IAction1<BeforeCurdEventArgs> action);
 
     /**
      * 监听执行增删改查操作的命令之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop curdAfterAddListener(IAction1<CurdAfterEventArgs> action);
+    INaiveAop addListenerAfterCurd(IAction1<AfterCurdEventArgs> action);
 
     /**
      * 取消监听执行增删改查操作的命令之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop curdAfterRemoveListener(IAction1<CurdAfterEventArgs> action);
+    INaiveAop removeListenerAfterCurd(IAction1<AfterCurdEventArgs> action);
 
     /**
      * 监听获取映射对象之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop mappedStatementAddListener(IAction1<MappedStatementArgs> action);
+    INaiveAop addListenerMappedStatement(IAction1<MappedStatementArgs> action);
 
     /**
      * 取消监听获取映射对象之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop mappedStatementRemoveListener(IAction1<MappedStatementArgs> action);
+    INaiveAop removeListenerMappedStatement(IAction1<MappedStatementArgs> action);
 
     /**
      * 监听执行事务操作之前触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop traceBeforeAddListener(IAction1<TraceBeforeEventArgs> action);
+    INaiveAop addListenerBeforeTrace(IAction1<BeforeTraceEventArgs> action);
 
     /**
      * 取消监听执行事务操作之前触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop traceBeforeRemoveListener(IAction1<TraceBeforeEventArgs> action);
+    INaiveAop removeListenerBeforeTrace(IAction1<BeforeTraceEventArgs> action);
 
     /**
      * 监听执行事务操作之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop traceAfterAddListener(IAction1<TraceAfterEventArgs> action);
+    INaiveAop addListenerAfterTrace(IAction1<AfterTraceEventArgs> action);
 
     /**
      * 取消监听执行事务操作之后触发的事件
      *
      * @param action 事件处理逻辑
      */
-    INaiveAop traceAfterRemoveListener(IAction1<TraceAfterEventArgs> action);
+    INaiveAop removeListenerAfterTrace(IAction1<AfterTraceEventArgs> action);
+
+    /**
+     * 监听数据源切换之后触发的事件
+     *
+     * @param action 事件处理逻辑
+     */
+    INaiveAop addListenerDataSourceChanged(IAction1<DataSourceChangedEventArgs> action);
+
+    /**
+     * 取消监听数据源切换之后触发的事件
+     *
+     * @param action 事件处理逻辑
+     */
+    INaiveAop removeListenerDataSourceChanged(IAction1<DataSourceChangedEventArgs> action);
 }

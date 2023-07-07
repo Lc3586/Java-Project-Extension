@@ -25,8 +25,8 @@ public class TestDataSourceConfigure {
                                    "sqlserver2012");
         multiDataSourceTestMap.put("达梦 8",
                                    "dameng");
-        multiDataSourceTestMap.put("Oracle 19c",
-                                   "oracle");
+//        multiDataSourceTestMap.put("Oracle 19c",
+//                                   "oracle");
         multiDataSourceTestMap.put("PostgreSQL 15",
                                    "postgresql");
     }

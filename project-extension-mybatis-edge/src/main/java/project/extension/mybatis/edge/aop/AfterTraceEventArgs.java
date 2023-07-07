@@ -9,9 +9,9 @@ import lombok.Data;
  * @date 2022-12-19
  */
 @Data
-public class TraceAfterEventArgs
-        extends TraceBeforeEventArgs {
-    public TraceAfterEventArgs(TraceBeforeEventArgs beforeEventData,
+public class AfterTraceEventArgs
+        extends BeforeTraceEventArgs {
+    public AfterTraceEventArgs(BeforeTraceEventArgs beforeEventData,
                                String remark,
                                Exception exception) {
         super(beforeEventData.getTransactionDefinitionName(),

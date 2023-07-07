@@ -23,6 +23,13 @@ public class TestCollectionFor1xTo5x {
     }
 
     @Nested
+    @Order(110)
+    @DisplayName("110.基础动态数据源测试")
+    public class ForX110BasicsOfDynamicDataSourceTest
+            extends X110BasicsOfDynamicDataSourceTest {
+    }
+
+    @Nested
     @Order(200)
     @DisplayName("200.基础增删改查测试")
     public class ForX200BasicsOfCurdTest

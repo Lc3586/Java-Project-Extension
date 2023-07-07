@@ -7,7 +7,7 @@ import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.core.provider.standard.INaiveSql;
 import project.extension.mybatis.edge.aop.INaiveAop;
 import project.extension.mybatis.edge.aop.Operation;
-import project.extension.mybatis.edge.aop.TraceBeforeEventArgs;
+import project.extension.mybatis.edge.aop.BeforeTraceEventArgs;
 import project.extension.mybatis.edge.aop.NaiveAopProvider;
 import project.extension.mybatis.edge.dbContext.DbContextScopedNaiveSql;
 import project.extension.mybatis.edge.globalization.Strings;
@@ -37,10 +37,10 @@ public class UnitOfWork
 
                                                                          "INaiveSql orm"));
         this.aop = (NaiveAopProvider) IOCExtension.applicationContext.getBean(INaiveAop.class);
-        this.uowBefore = new TraceBeforeEventArgs("UOW",
+        this.uowBefore = new BeforeTraceEventArgs("UOW",
                                                   Operation.UnitOfWork,
                                                   null);
-        this.aop.traceBefore(this.uowBefore);
+        this.aop.beforeTrace(this.uowBefore);
         this.entityChangeRecord = new EntityChangeRecord();
         this.enable = true;
     }
@@ -107,7 +107,7 @@ public class UnitOfWork
     /**
      * 执行工作单元前
      */
-    protected TraceBeforeEventArgs uowBefore;
+    protected BeforeTraceEventArgs uowBefore;
 
     /**
      * 还原点

@@ -16,32 +16,17 @@ import java.util.Map;
  */
 @Primary
 @Component
-public class NaiveDataSource
+public class NaiveDynamicDataSource
         extends AbstractRoutingDataSource {
-    public NaiveDataSource(INaiveDataSourceProvider naiveDataSourceProvider) {
+    public NaiveDynamicDataSource(INaiveDataSourceProvider naiveDataSourceProvider) {
         Map<String, DataSource> dataSourceMap = naiveDataSourceProvider.loadAllDataSources();
+        super.setDefaultTargetDataSource(dataSourceMap.get(naiveDataSourceProvider.defaultDataSource()));
         super.setTargetDataSources(new HashMap<>(dataSourceMap));
-        this.dataSource = naiveDataSourceProvider.defaultDataSource();
-        super.setDefaultTargetDataSource(dataSourceMap.get(this.dataSource));
         super.afterPropertiesSet();
-    }
-
-    /**
-     * 数据源
-     */
-    private String dataSource;
-
-    /**
-     * 设置数据源
-     *
-     * @param dataSource 数据源（必须先使用NaiveDataSourceProvider.getName()进行处理)
-     */
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
     }
 
     @Override
     protected Object determineCurrentLookupKey() {
-        return this.dataSource;
+        return NaiveDataSourceContextHolder.getDataSource();
     }
 }

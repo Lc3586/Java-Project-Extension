@@ -58,7 +58,7 @@ public class NaiveAdoProvider
      */
     protected final NaiveAopProvider aop;
 
-    private static final ThreadLocal<Tuple2<TraceBeforeEventArgs, TransactionStatus>> transactionalResources =
+    private static final ThreadLocal<Tuple2<BeforeTraceEventArgs, TransactionStatus>> transactionalResources =
             new NamedThreadLocal<>("AOP Transactional Before resources");
 
     /**
@@ -132,14 +132,14 @@ public class NaiveAdoProvider
         if (isTransactionAlreadyExisting())
             throw new ModuleException(Strings.getTransactionAlreadyStarted());
 
-        TraceBeforeEventArgs tranBefore = new TraceBeforeEventArgs(transactionDefinition == null
+        BeforeTraceEventArgs tranBefore = new BeforeTraceEventArgs(transactionDefinition == null
                                                                    ? ""
                                                                    : transactionDefinition.getName(),
                                                                    Operation.BeginTransaction,
                                                                    transactionDefinition == null
                                                                    ? null
                                                                    : transactionDefinition.getIsolationLevel());
-        this.aop.traceBefore(tranBefore);
+        this.aop.beforeTrace(tranBefore);
 
         TransactionStatus transactionStatus = this.dataSourceTransactionManager.getTransaction(transactionDefinition);
 
@@ -265,7 +265,7 @@ public class NaiveAdoProvider
             ModuleException {
         if (!isTransactionAlreadyExisting())
             return null;
-        Tuple2<TraceBeforeEventArgs, TransactionStatus> transactionalResource = transactionalResources.get();
+        Tuple2<BeforeTraceEventArgs, TransactionStatus> transactionalResource = transactionalResources.get();
         return transactionalResource == null
                ? null
                : transactionalResource.b;
@@ -337,11 +337,11 @@ public class NaiveAdoProvider
                                            Exception ex)
             throws
             ModuleException {
-        Tuple2<TraceBeforeEventArgs, TransactionStatus> tranResource = transactionalResources.get();
+        Tuple2<BeforeTraceEventArgs, TransactionStatus> tranResource = transactionalResources.get();
         if (tranResource == null)
             return;
 
-        this.aop.traceAfter(new TraceAfterEventArgs(tranResource.a,
+        this.aop.afterTrace(new AfterTraceEventArgs(tranResource.a,
                                                     remark,
                                                     ex));
     }
