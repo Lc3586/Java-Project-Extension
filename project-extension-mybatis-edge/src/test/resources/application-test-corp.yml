@@ -14,6 +14,14 @@ project:
       scanMapperXmlLocations: classpath:mybatis/mapper/**/*Mapper.xml
       # 默认的实体类表名/列名命名规则
       nameConvertType: CamelCaseToPascalCase
+      # 分页插件
+      enablePageHelper: false
+      # 分页插件配置
+      pageHelperProperties:
+        offsetAsPageNum: true
+        rowBoundsWithCount: true
+        reasonable: true
+        params: count=countSql
       # 数据源配置
       multiDataSource:
         #主库-MySql数据库

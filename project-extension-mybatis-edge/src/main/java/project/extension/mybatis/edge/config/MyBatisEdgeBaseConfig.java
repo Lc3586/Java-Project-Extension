@@ -62,6 +62,16 @@ public class MyBatisEdgeBaseConfig {
     private Map<String, DataSourceConfig> multiDataSource;
 
     /**
+     * 启用分页插件
+     */
+    private boolean enablePageHelper;
+
+    /**
+     * 分页插件配置
+     */
+    public Properties pageHelperProperties;
+
+    /**
      * 是否为多数据源
      */
     public boolean isMultiDataSource() {

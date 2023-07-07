@@ -2,6 +2,7 @@ package project.extension.mybatis.edge.core.ado;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
+import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -212,6 +213,15 @@ public class NaiveDataSourceProvider
                                                                                                  dataSourceConfig.getScanMapperXmlLocations())),
                                           ex);
             }
+
+            //分页插件
+            if (myBatisEdgeBaseConfig.isEnablePageHelper()) {
+                PageInterceptor pageInterceptor = new PageInterceptor();
+                if (myBatisEdgeBaseConfig.pageHelperProperties != null)
+                    pageInterceptor.setProperties(myBatisEdgeBaseConfig.getPageHelperProperties());
+                sqlSessionFactoryBean.setPlugins(pageInterceptor);
+            }
+
             sqlSessionFactory = sqlSessionFactoryBean.getObject();
             if (sqlSessionFactory == null)
                 throw new Exception("method SqlSessionFactoryBean.getObject() result null");
