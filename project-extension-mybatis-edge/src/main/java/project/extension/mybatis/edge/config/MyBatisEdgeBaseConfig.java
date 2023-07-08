@@ -206,9 +206,6 @@ public class MyBatisEdgeBaseConfig {
             throw new ModuleException(Strings.getConfigDataSourceOptionUndefined(dataSource,
                                                                                  "scanEntitiesPackages"));
 
-        if (!CollectionsExtension.anyPlus(config.getScanMapperPackages()))
-            config.setScanMapperPackages(this.getScanMapperPackages());
-
         if (!CollectionsExtension.anyPlus(config.getScanMapperXmlLocations()))
             config.setScanMapperXmlLocations(this.getScanMapperXmlLocations());
 

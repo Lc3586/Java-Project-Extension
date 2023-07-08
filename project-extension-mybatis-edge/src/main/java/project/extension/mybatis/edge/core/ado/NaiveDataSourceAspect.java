@@ -18,16 +18,16 @@ import project.extension.mybatis.edge.annotations.NaiveDataSource;
  * @see project.extension.mybatis.edge.annotations.NaiveDataSource 将当前线程所使用的数据源切换至此注解所配置的数据源
  */
 @Aspect
-@Order(1)
+@Order(Integer.MAX_VALUE - 10)
 @Component
 public class NaiveDataSourceAspect {
     @Pointcut("@annotation(project.extension.mybatis.edge.annotations.NaiveDataSource)"
             + "|| @within(project.extension.mybatis.edge.annotations.NaiveDataSource)")
-    public void dsPointCut() {
+    public void rPointCut() {
 
     }
 
-    @Around("dsPointCut()")
+    @Around("rPointCut()")
     public Object around(ProceedingJoinPoint point)
             throws
             Throwable {

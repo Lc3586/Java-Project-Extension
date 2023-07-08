@@ -548,11 +548,11 @@ public class PostgreSQLDbFirst
     /**
      * 查询表信息
      *
-     * @param tbname     表名
+     * @param tbName     表名
      * @param ignoreCase 忽略大小写
      * @return 表信息
      */
-    private List<Map<String, Object>> selectTableInfo(String[] tbname,
+    private List<Map<String, Object>> selectTableInfo(String[] tbName,
                                                       boolean ignoreCase)
             throws
             ModuleException {
@@ -581,25 +581,25 @@ public class PostgreSQLDbFirst
                                            + "where b.nspname not in ('pg_catalog', 'information_schema') and a.relkind in ('m','v')  \r\n"
                                            + "and b.nspname || '.' || a.relname not in ('public.geography_columns','public.geometry_columns','public.raster_columns','public.raster_overviews') \r\n"
                                            + "%s \r\n",
-                                   tbname == null
+                                   tbName == null
                                    ? ""
                                    : "select * from (",
-                                   tbname == null
+                                   tbName == null
                                    ? ""
                                    : String.format(") ft_dbf where %s%s and %s%s",
                                                    ignoreCase
                                                    ? "lower(schemaname) "
                                                    : "schemaname ",
-                                                   StringUtils.hasText(tbname[0])
+                                                   StringUtils.hasText(tbName[0])
                                                    ? String.format("='%s'",
-                                                                   tbname[0])
+                                                                   tbName[0])
                                                    : " is null",
                                                    ignoreCase
                                                    ? "lower(tablename) "
                                                    : "tablename ",
-                                                   StringUtils.hasText(tbname[1])
+                                                   StringUtils.hasText(tbName[1])
                                                    ? String.format("='%s'",
-                                                                   tbname[1])
+                                                                   tbName[1])
                                                    : " is null"));
 
         return this.ado.selectMapList(getSqlSession(),
@@ -705,13 +705,11 @@ public class PostgreSQLDbFirst
     /**
      * 查询外键信息
      *
-     * @param inDatabase    用来筛选数据库的sql语句
      * @param tablesMatcher 用来匹配表名的sql语句
      * @param ignoreCase    忽略大小写
      * @return 外键信息
      */
-    private List<Map<String, Object>> selectForeignInfo(String inDatabase,
-                                                        String tablesMatcher,
+    private List<Map<String, Object>> selectForeignInfo(String tablesMatcher,
                                                         boolean ignoreCase)
             throws
             ModuleException {
@@ -740,22 +738,22 @@ public class PostgreSQLDbFirst
                                       config.getNameConvertType());
     }
 
-    /**
-     * 获取用户标识
-     *
-     * @param lower 转小写
-     * @return 用户标识
-     */
-    private String getUserId(boolean lower)
-            throws
-            ModuleException {
-        String userId = this.config.getProperties()
-                                   .getProperty(DruidDataSourceFactory.PROP_USERNAME);
-        if (lower)
-            return userId.toLowerCase(Locale.ROOT);
-        else
-            return userId;
-    }
+//    /**
+//     * 获取用户标识
+//     *
+//     * @param lower 转小写
+//     * @return 用户标识
+//     */
+//    private String getUserId(boolean lower)
+//            throws
+//            ModuleException {
+//        String userId = this.config.getProperties()
+//                                   .getProperty(DruidDataSourceFactory.PROP_USERNAME);
+//        if (lower)
+//            return userId.toLowerCase(Locale.ROOT);
+//        else
+//            return userId;
+//    }
 
     /**
      * 从数据库查询模式名
@@ -906,19 +904,19 @@ public class PostgreSQLDbFirst
     @Override
     protected String[] splitTableName(String name,
                                       boolean lower) {
-        String[] tbname = getSplitTableNames(name,
+        String[] tbName = getSplitTableNames(name,
                                              '\"',
                                              '\"',
                                              2);
 
-        if (tbname == null)
+        if (tbName == null)
             return null;
 
         if (lower)
-            for (int i = 0; i < tbname.length; i++)
-                tbname[i] = tbname[i].toLowerCase(Locale.ROOT);
+            for (int i = 0; i < tbName.length; i++)
+                tbName[i] = tbName[i].toLowerCase(Locale.ROOT);
 
-        return tbname;
+        return tbName;
     }
 
     /**
@@ -929,6 +927,7 @@ public class PostgreSQLDbFirst
      * @param ignoreCase 忽略大小写
      * @return 数据库表结构信息集合
      */
+    @SuppressWarnings("DuplicatedCode")
     private List<DbTableInfo> getTables(String[] database,
                                         String tablename,
                                         boolean ignoreCase)
@@ -944,25 +943,25 @@ public class PostgreSQLDbFirst
 
         //尝试获取模式名+表名
         //模式名即为数据库名
-        String[] tbname = null;
+        String[] tbName = null;
 
         //当前数据库
         String currentDatabase = getDatabaseFromConnectionString(ignoreCase);
 
         if (StringUtils.hasText(tablename)) {
-            tbname = splitTableName(tablename,
+            tbName = splitTableName(tablename,
                                     ignoreCase);
-            if (tbname == null)
+            if (tbName == null)
                 throw new ModuleException(Strings.getUnknownValue("tablename",
                                                                   tablename));
-            if (tbname.length == 1) {
+            if (tbName.length == 1) {
                 String schemaName = getSchemaNameFromDatabase(false);
-                tbname = new String[]{schemaName,
-                                      tbname[0]};
+                tbName = new String[]{schemaName,
+                                      tbName[0]};
             }
             if (ignoreCase)
-                tbname = new String[]{tbname[0].toLowerCase(Locale.ROOT),
-                                      tbname[1].toLowerCase(Locale.ROOT)};
+                tbName = new String[]{tbName[0].toLowerCase(Locale.ROOT),
+                                      tbName[1].toLowerCase(Locale.ROOT)};
             database = new String[]{currentDatabase};
         }
         //如果没有指定数据库，则获取当前数据库为指定数据库
@@ -977,7 +976,7 @@ public class PostgreSQLDbFirst
                                   .collect(Collectors.joining(","));
 
         //查询表结构信息
-        List<Map<String, Object>> dataMap = selectTableInfo(tbname,
+        List<Map<String, Object>> dataMap = selectTableInfo(tbName,
                                                             ignoreCase);
 
         if (dataMap == null || dataMap.size() == 0)
@@ -1203,12 +1202,12 @@ public class PostgreSQLDbFirst
             boolean is_desc = String.valueOf(d.get("F7"))
                                     .equals("1");
 //            //索引
-//            String[] indkeys = String.valueOf(d.get("F8"))
+//            String[] indKeys = String.valueOf(d.get("F8"))
 //                                     .split(" ");
 //            Tuple2<Boolean, Integer> attnum_result = NumericExtension.tryParseInt(String.valueOf(d.get("F9")));
 //            int indkey = 0;
 //            if (attnum_result.a) {
-//                Tuple2<Boolean, Integer> indkey_result = NumericExtension.tryParseInt(indkeys[attnum_result.b - 1]);
+//                Tuple2<Boolean, Integer> indkey_result = NumericExtension.tryParseInt(indKeys[attnum_result.b - 1]);
 //                if (indkey_result.a)
 //                    indkey = indkey_result.b;
 //            }
@@ -1303,9 +1302,8 @@ public class PostgreSQLDbFirst
         }
 
         //如果未指定数据库，则查询外键信息
-        if (tbname == null) {
-            dataMap = selectForeignInfo(inDatabase,
-                                        tablesMatcher,
+        if (tbName == null) {
+            dataMap = selectForeignInfo(tablesMatcher,
                                         ignoreCase);
 
             if (dataMap == null)
@@ -1356,24 +1354,24 @@ public class PostgreSQLDbFirst
                                                                     .get(ref_column);
 
                 //添加外键信息
-                Map<String, DbForeignInfo> foreigns = new HashMap<>();
-                DbForeignInfo foreign = new DbForeignInfo(tableWithIds_cache.get(table_id),
-                                                          ref_table);
+                Map<String, DbForeignInfo> foreign = new HashMap<>();
+                DbForeignInfo foreignInfo = new DbForeignInfo(tableWithIds_cache.get(table_id),
+                                                              ref_table);
                 if (!fkColumns.containsKey(table_id))
                     fkColumns.put(table_id,
-                                  foreigns);
+                                  foreign);
                 else
-                    foreigns = fkColumns.get(table_id);
+                    foreign = fkColumns.get(table_id);
 
-                if (!foreigns.containsKey(fk_id))
-                    foreigns.put(fk_id,
-                                 foreign);
+                if (!foreign.containsKey(fk_id))
+                    foreign.put(fk_id,
+                                foreignInfo);
 
                 //添加外键相关的列信息
-                foreign.getColumns()
-                       .add(columnInfo);
-                foreign.getReferencedColumns()
-                       .add(ref_columnInfo);
+                foreignInfo.getColumns()
+                           .add(columnInfo);
+                foreignInfo.getReferencedColumns()
+                           .add(ref_columnInfo);
             }
 
             for (String table_id : fkColumns.keySet()) {
@@ -1461,33 +1459,33 @@ public class PostgreSQLDbFirst
                                boolean ignoreCase)
             throws
             ModuleException {
-        String[] tbname = splitTableName(name,
+        String[] tbName = splitTableName(name,
                                          ignoreCase);
-        if (tbname == null)
+        if (tbName == null)
             throw new ModuleException(Strings.getUnknownValue("name",
                                                               name));
 
         //获取当前模式名，也就是用户标识
-        if (tbname.length == 1) {
+        if (tbName.length == 1) {
             String schemaName = getSchemaNameFromDatabase(ignoreCase);
-            tbname = new String[]{schemaName,
-                                  tbname[0]};
+            tbName = new String[]{schemaName,
+                                  tbName[0]};
         }
 
         String sql = String.format(" select case when count(1) > 0 then 1 else 0 end from pg_tables a inner join pg_namespace b on b.nspname = a.schemaname where %s%s and %s%s",
                                    ignoreCase
                                    ? "lower(b.nspname)"
                                    : "b.nspname",
-                                   StringUtils.hasText(tbname[0])
+                                   StringUtils.hasText(tbName[0])
                                    ? String.format("='%s'",
-                                                   tbname[0])
+                                                   tbName[0])
                                    : " is null",
                                    ignoreCase
                                    ? "lower(a.tablename)"
                                    : "a.tablename",
-                                   StringUtils.hasText(tbname[1])
+                                   StringUtils.hasText(tbName[1])
                                    ? String.format("='%s'",
-                                                   tbname[1])
+                                                   tbName[1])
                                    : " is null");
 
         return this.ado.selectOne(getSqlSession(),

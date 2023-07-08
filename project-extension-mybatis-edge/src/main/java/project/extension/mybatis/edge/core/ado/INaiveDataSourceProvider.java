@@ -2,7 +2,6 @@ package project.extension.mybatis.edge.core.ado;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.List;

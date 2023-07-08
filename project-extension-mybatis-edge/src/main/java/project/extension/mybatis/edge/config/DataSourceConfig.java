@@ -32,11 +32,6 @@ public class DataSourceConfig {
     private List<String> scanEntitiesPackages;
 
     /**
-     * 需要扫描的存放Mapper接口类的包（可选）
-     */
-    private List<String> scanMapperPackages;
-
-    /**
      * 需要扫描的存放Mapper配置文件的目录
      */
     private List<String> scanMapperXmlLocations;

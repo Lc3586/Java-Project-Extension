@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.util.StringUtils;
@@ -42,6 +43,7 @@ import java.util.Map;
 @EnableConfigurationProperties({MyBatisEdgeBaseConfig.class,
                                 DruidConfig.class})
 @DependsOn("iocExtension")
+@EnableAspectJAutoProxy(proxyTargetClass = true)
 public class NaiveDataSourceProvider
         implements INaiveDataSourceProvider {
     public NaiveDataSourceProvider(MyBatisEdgeBaseConfig myBatisEdgeBaseConfig,
@@ -85,10 +87,10 @@ public class NaiveDataSourceProvider
      *
      * @param dataSource 数据源名称
      */
-    private void loadAndRegisterDataSource(String dataSource) {
+    private DataSource loadAndRegisterDataSource(String dataSource) {
         DataSourceConfig dataSourceConfig = myBatisEdgeBaseConfig.getDataSourceConfig(dataSource);
         if (!dataSourceConfig.isEnable())
-            return;
+            return null;
 
         DruidDataSource druidDataSource;
         try {
@@ -103,55 +105,28 @@ public class NaiveDataSourceProvider
                 dataSourceConfig.getName(),
                 druidDataSource);
 
-        if (dataSourceConfig.getName()
-                            .equals(defaultDataSource()))
-            getBeanFactory().registerSingleton(
-                    getDataSourceBeanName(null),
-                    druidDataSource);
-
-        getBeanFactory().registerSingleton(
-                getDataSourceBeanName(dataSourceConfig.getName()),
-                druidDataSource);
+        //Sql会话工厂
+        sqlSessionFactoryMap.put(dataSourceConfig.getName(),
+                                 loadSqlSessionFactory(dataSourceConfig,
+                                                       druidDataSource));
 
         //事务管理器
-        loadAndRegisterTransactionManager(dataSourceConfig,
-                                          druidDataSource);
 
-        //Sql会话工厂
-        loadAndRegisterSqlSessionFactory(dataSourceConfig,
-                                         druidDataSource);
+        transactionManagerMap.put(dataSourceConfig.getName(),
+                                  loadTransactionManager(druidDataSource));
 
-        //Mapper扫描器注册类
-        if (dataSourceConfig.getName()
-                            .equals(defaultDataSource()))
-            registerMapperScannerRegistrar(dataSourceConfig,
-                                           getSqlSessionFactoryBeanName(null));
-        //TODO 注入多数据源的Mapper扫描器注册类
-
+        return druidDataSource;
     }
 
     /**
      * 加载并注册事务管理器
      *
-     * @param dataSourceConfig 数据源配置
-     * @param dataSource       数据源
+     * @param dataSource 数据源
      */
-    private void loadAndRegisterTransactionManager(DataSourceConfig dataSourceConfig,
-                                                   DataSource dataSource) {
+    private DataSourceTransactionManager loadTransactionManager(DataSource dataSource) {
         final DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
         dataSourceTransactionManager.setDataSource(dataSource);
-        transactionManagerMap.put(dataSourceConfig.getName(),
-                                  dataSourceTransactionManager);
-
-        if (dataSourceConfig.getName()
-                            .equals(defaultDataSource()))
-            getBeanFactory().registerSingleton(
-                    getTransactionManagerBeanName(null),
-                    dataSourceTransactionManager);
-
-        getBeanFactory().registerSingleton(
-                getTransactionManagerBeanName(dataSourceConfig.getName()),
-                dataSourceTransactionManager);
+        return dataSourceTransactionManager;
     }
 
     /**
@@ -160,8 +135,8 @@ public class NaiveDataSourceProvider
      * @param dataSourceConfig 数据源配置
      * @param dataSource       数据源
      */
-    private void loadAndRegisterSqlSessionFactory(DataSourceConfig dataSourceConfig,
-                                                  DataSource dataSource) {
+    private SqlSessionFactory loadSqlSessionFactory(DataSourceConfig dataSourceConfig,
+                                                    DataSource dataSource) {
         SqlSessionFactory sqlSessionFactory;
         try {
             //VFS.addImplClass(SpringBootVFS.class);
@@ -232,34 +207,22 @@ public class NaiveDataSourceProvider
                                       ex);
         }
 
-        sqlSessionFactoryMap.put(dataSourceConfig.getName(),
-                                 sqlSessionFactory);
-
-        if (dataSourceConfig.getName()
-                            .equals(defaultDataSource()))
-            getBeanFactory().registerSingleton(
-                    getSqlSessionFactoryBeanName(null),
-                    sqlSessionFactory);
-
-//        getBeanFactory().registerSingleton(
-//                getSqlSessionFactoryBeanName(dataSourceConfig.getName()),
-//                sqlSessionFactory);
+        return sqlSessionFactory;
     }
 
     /**
      * 注册Mapper扫描器注册类
      *
-     * @param dataSourceConfig 数据源配置
+     * @param sqlSessionFactoryBeanName 使用的数据源
      */
-    private void registerMapperScannerRegistrar(DataSourceConfig dataSourceConfig,
-                                                String sqlSessionFactoryBeanName) {
-        if (!CollectionsExtension.anyPlus(dataSourceConfig.getScanMapperPackages()))
+    private void registerMapperScannerRegistrar(String sqlSessionFactoryBeanName) {
+        if (!CollectionsExtension.anyPlus(this.myBatisEdgeBaseConfig.getScanMapperPackages()))
             return;
 
         NaiveMapperScanner scanner = new NaiveMapperScanner(sqlSessionFactoryBeanName,
                                                             getBeanFactory());
-        scanner.doScan(dataSourceConfig.getScanMapperPackages()
-                                       .toArray(new String[0]));
+        scanner.doScan(this.myBatisEdgeBaseConfig.getScanMapperPackages()
+                                                 .toArray(new String[0]));
     }
 
     /**
@@ -366,6 +329,28 @@ public class NaiveDataSourceProvider
             for (String dataSource : allDataSources(true)) {
                 loadAndRegisterDataSource(dataSource);
             }
+
+            //注册使用主库配置和动态数据源生成的会话工厂
+            NaiveDynamicDataSource dynamicDataSource = new NaiveDynamicDataSource(dataSourceMap,
+                                                                                  defaultDataSource());
+            getBeanFactory().registerSingleton(
+                    getDataSourceBeanName(null),
+                    dynamicDataSource);
+            DataSourceConfig dynamicDataSourceConfig = myBatisEdgeBaseConfig.getDataSourceConfig(defaultDataSource());
+            dynamicDataSourceConfig.setName("$dynamic$");
+            getBeanFactory().registerSingleton(
+                    getSqlSessionFactoryBeanName(null),
+                    loadSqlSessionFactory(dynamicDataSourceConfig,
+                                          dynamicDataSource));
+
+            //注册使用动态数据源的事务管理器
+            getBeanFactory().registerSingleton(
+                    getTransactionManagerBeanName(null),
+                    loadTransactionManager(dynamicDataSource));
+
+            //扫描并注册Mapper
+            //注意，这些Mapper的_databaseId值固定为主库的数据库类型id，所以跨库情况下应该使用INaiveSql来获取Mapper
+            registerMapperScannerRegistrar(getSqlSessionFactoryBeanName(null));
         }
 
         return dataSourceMap;

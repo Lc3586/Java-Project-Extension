@@ -33,7 +33,7 @@ project:
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
             # 连接字符串
-            url: ENC(n6bQBumKHQd03g9JO6UiZaGwH711mXUI0+ud2b3yFdFCM8isW3XZAL6bYidbcNKU/tTjR7qmiHy9RYP9YiDEyOeUYB0NpVlolZAyfxNoyqEccCJwR0ZGfnT0LVp5aGwVYYKhGwey4/uTD7iLUFTL8Z84JrQhsVAUJfkPFBfnB6gSbZRRfNCtciUb+7WVXhTpTk3lGmBJ4FNcfIdCiHSnV7n/r20Pxk9VnL2Pwmx1P/0UnnDq8N+VyghqDI/ay99i)
+            url: ENC(BEh5i8pMRp69aw879gijZlHNGkLe+IjTGjfdDf6GdCLVGO3gJSbY0NYBeuBFdSJNR/TEQNxjQ4I=)
             # 用户名
             username: ENC(LWfGadRuyaYT3ZIEFoEs/w==)
             # 密码
@@ -44,7 +44,7 @@ project:
           dbType: JdbcMariaDB10
           nameConvertType: PascalCaseToUnderscoreWithLower
           properties:
-            url: ENC(n6bQBumKHQd03g9JO6UiZaGwH711mXUI0+ud2b3yFdFCM8isW3XZAL6bYidbcNKU/tTjR7qmiHy9RYP9YiDEyOeUYB0NpVlolZAyfxNoyqEccCJwR0ZGfnT0LVp5aGwVYYKhGwey4/uTD7iLUFTL8Z84JrQhsVAUJfkPFBfnB6gSbZRRfNCtciUb+7WVXhTpTk3lGmBJ4FNcfIdCiHSnV7n/r20Pxk9VnL2Pwmx1P/0UnnDq8N+VyghqDI/ay99i)
+            url: ENC(AdtpmeLL5Rz8McuPAzspOkUhB3PFUnlET2NPAHo7BPlPuxzPbzSQ5usi6E9zvfTLh1AHS8kLYgY=)
             username: ENC(LWfGadRuyaYT3ZIEFoEs/w==)
             password: ENC(Q88XTJSttazzBLg5bVN32Oyn0e5CagP/+MXtmSUYGxc=)
         #从库-SqlServer数据库
@@ -77,9 +77,9 @@ project:
           enable: true
           dbType: JdbcPostgreSQL15
           properties:
-            url: ENC(jLVeoBUA0yt6Q4Cu2imtopygTSymhvo06g/1HSXB0oZ6QyIwE2QxnKcTchy8yyy5GvV79RdVTAUZenrKVtqzeQ==)
-            username: ENC(ZIboxBXpEJwq+P31GtHPgKY1ODE1wx3b)
-            password: ENC(I32k3anXaRqqCfXw0rI68t1+8zP+1WPNU7n/giflEvE=)
+            url: ENC(qL5dGm1Lv72lORZcZjQeqN75Ya7sb6Ml2IWubPyjT2gM+ofCYKX5/mK2Pn5SoWQ553YLMlxyB0k=)
+            username: ENC(kvPacUFD/zddX9kbQ20D+8j8CFcIVFoV)
+            password: ENC(GE7liDSCKb6GmgaPGEzI6HTE76gDwD6dgNmO3vO7tsg=)
 
 jasypt:
   encryptor:

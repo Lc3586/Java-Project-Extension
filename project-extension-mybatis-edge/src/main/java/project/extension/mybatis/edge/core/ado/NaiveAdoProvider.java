@@ -48,8 +48,7 @@ public class NaiveAdoProvider
         final INaiveDataSourceProvider naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
         this.dataSource = naiveDataSourceProvider.getDataSources(dataSource);
         this.sqlSessionFactory = naiveDataSourceProvider.getSqlSessionFactory(dataSource);
-        this.dataSourceTransactionManager = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class)
-                                                                           .getTransactionManager(dataSource);
+        this.dataSourceTransactionManager = naiveDataSourceProvider.getTransactionManager(dataSource);
         this.transactionDefinition = IOCExtension.tryGetBean(TransactionDefinition.class);
     }
 

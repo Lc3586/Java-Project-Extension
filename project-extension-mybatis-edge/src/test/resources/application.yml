@@ -7,6 +7,8 @@ logging:
 spring:
   profiles:
     active: ${env}
+#  aop:
+#    proxy-target-class: true
   datasource:
     # 切换Druid数据源
     type: com.alibaba.druid.pool.DruidDataSource

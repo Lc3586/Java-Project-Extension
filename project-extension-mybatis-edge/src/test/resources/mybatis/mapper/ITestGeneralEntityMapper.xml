@@ -370,4 +370,98 @@
             #{id}
         </foreach>
     </delete>
+
+    <insert id="insert2MariaDB"
+            parameterType="TestGeneralEntity">
+        insert into `test_general_entity`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            `id`,
+            <if test="char_ != null">`char`,</if>
+            <if test="string != null">`string`,</if>
+            <if test="byte_ != null">`byte`,</if>
+            <if test="short_ != null">`short`,</if>
+            <if test="integer != null">`integer`,</if>
+            <if test="long_ != null">`long`,</if>
+            <if test="float_ != null">`float`,</if>
+            <if test="double_ != null">`double`,</if>
+            <if test="decimal != null">`decimal`,</if>
+            <if test="boolean_ != null">`boolean`,</if>
+            <if test="date != null">`date`,</if>
+            <if test="time != null">`time`,</if>
+            <if test="datetime != null">`datetime`,</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="char_ != null">#{char_},</if>
+            <if test="string != null">#{string},</if>
+            <if test="byte_ != null">#{byte_},</if>
+            <if test="short_ != null">#{short_},</if>
+            <if test="integer != null">#{integer},</if>
+            <if test="long_ != null">#{long_},</if>
+            <if test="float_ != null">#{float_},</if>
+            <if test="double_ != null">#{double_},</if>
+            <if test="decimal != null">#{decimal},</if>
+            <if test="boolean_ != null">#{boolean_},</if>
+            <if test="date != null">#{date},</if>
+            <if test="time != null">#{time},</if>
+            <if test="datetime != null">#{datetime},</if>
+        </trim>
+    </insert>
+
+    <insert id="insert2Postgresql"
+            parameterType="TestGeneralEntity">
+        insert into "TestGeneralEntity"
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            "Id",
+            <if test="char_ != null">"Char",</if>
+            <if test="string != null">"String",</if>
+            <if test="byte_ != null">"Byte",</if>
+            <if test="short_ != null">"Short",</if>
+            <if test="integer != null">"Integer",</if>
+            <if test="long_ != null">"Long",</if>
+            <if test="float_ != null">"Float",</if>
+            <if test="double_ != null">"Double",</if>
+            <if test="decimal != null">"Decimal",</if>
+            <if test="boolean_ != null">"Boolean",</if>
+            <if test="date != null">"Date",</if>
+            <if test="time != null">"Time",</if>
+            <if test="datetime != null">"Datetime",</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            #{id},
+            <if test="char_ != null">#{char_},</if>
+            <if test="string != null">#{string},</if>
+            <if test="byte_ != null">#{byte_},</if>
+            <if test="short_ != null">#{short_},</if>
+            <if test="integer != null">#{integer},</if>
+            <if test="long_ != null">#{long_},</if>
+            <if test="float_ != null">#{float_},</if>
+            <if test="double_ != null">#{double_},</if>
+            <if test="decimal != null">#{decimal},</if>
+            <if test="boolean_ != null">#{boolean_},</if>
+            <if test="date != null">#{date},</if>
+            <if test="time != null">#{time},</if>
+            <if test="datetime != null">#{datetime},</if>
+        </trim>
+    </insert>
+
+    <select id="getByIdFromMariaDB"
+            parameterType="String"
+            resultMap="TestGeneralEntityResult">
+        select *
+        from `test_general_entity`
+        where 1 = 1
+          AND `id` = #{id}
+    </select>
+
+    <select id="getByIdFromPostgresql"
+            parameterType="String"
+            resultMap="TestGeneralEntityResult">
+        select *
+        from "TestGeneralEntity"
+        where 1 = 1
+          AND "Id" = #{id}
+    </select>
 </mapper>

@@ -5,9 +5,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.transaction.PlatformTransactionManager;
+import project.extension.ioc.IOCExtension;
 import project.extension.mybatis.edge.annotations.NaiveDataSource;
 import project.extension.mybatis.edge.configure.TestDataSourceConfigure;
-import project.extension.mybatis.edge.core.ado.NaiveDataSourceProvider;
+import project.extension.mybatis.edge.core.ado.INaiveDataSourceProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class NaiveTransactionalTestExecutionListener
         extends TransactionalTestExecutionListener {
-    private static final String[] names;
-
     static {
         names = TestDataSourceConfigure.getMultiTestDataSourceName();
     }
@@ -32,6 +31,16 @@ public class NaiveTransactionalTestExecutionListener
      * 方法所接受的数据源
      */
     public static final ConcurrentHashMap<String, List<String>> testName4Method = new ConcurrentHashMap<>();
+
+    private static final String[] names;
+
+    private static INaiveDataSourceProvider naiveDataSourceProvider;
+
+    private static INaiveDataSourceProvider getNaiveDataSourceProvider() {
+        if (naiveDataSourceProvider == null)
+            naiveDataSourceProvider = IOCExtension.applicationContext.getBean(INaiveDataSourceProvider.class);
+        return naiveDataSourceProvider;
+    }
 
     /**
      * 获取事务管理器
@@ -51,8 +60,9 @@ public class NaiveTransactionalTestExecutionListener
         }
 
         if (naiveDataSource != null)
-            return super.getTransactionManager(testContext,
-                                               NaiveDataSourceProvider.getTransactionManagerBeanName(naiveDataSource.dataSource()));
+            return getNaiveDataSourceProvider().getTransactionManager(naiveDataSource.dataSource());
+//            return super.getTransactionManager(testContext,
+//                                               NaiveDataSourceProvider.getTransactionManagerBeanName(naiveDataSource.dataSource()));
 
         String key = testContext.getTestClass()
                                 .getName() + testMethod.getName();
@@ -76,8 +86,9 @@ public class NaiveTransactionalTestExecutionListener
 
         if (nameList.size() > 0) {
             String dataSource = TestDataSourceConfigure.getTestDataSource(nameList.get(nameList.size() - 1));
-            return super.getTransactionManager(testContext,
-                                               NaiveDataSourceProvider.getTransactionManagerBeanName(dataSource));
+            return getNaiveDataSourceProvider().getTransactionManager(dataSource);
+//            return super.getTransactionManager(testContext,
+//                                               NaiveDataSourceProvider.getTransactionManagerBeanName(dataSource));
         }
 
         return super.getTransactionManager(testContext,

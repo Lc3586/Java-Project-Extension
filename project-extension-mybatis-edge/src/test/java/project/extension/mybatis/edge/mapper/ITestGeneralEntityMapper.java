@@ -51,4 +51,28 @@ public interface ITestGeneralEntityMapper {
      * @param ids 主键集合
      */
     int deleteByIds(Collection<String> ids);
+
+    /**
+     * 新增数据至MariaDB
+     */
+    int insert2MariaDB(TestGeneralEntity data);
+
+    /**
+     * 新增数据至Postgresql
+     */
+    int insert2Postgresql(TestGeneralEntity data);
+
+    /**
+     * 从MariaDB获取数据
+     *
+     * @param id 主键
+     */
+    TestGeneralEntity getByIdFromMariaDB(String id);
+
+    /**
+     * 从Postgresql获取数据
+     *
+     * @param id 主键
+     */
+    TestGeneralEntity getByIdFromPostgresql(String id);
 }
