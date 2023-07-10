@@ -175,7 +175,7 @@ public abstract class SqlProvider {
         return columns.stream()
                       .map(c -> getNameWithAlias(c,
                                                  alias))
-                      .collect(Collectors.joining(", "));
+                      .collect(Collectors.joining(", \r\n\t"));
     }
 
     /**
@@ -2165,7 +2165,7 @@ public abstract class SqlProvider {
         String columns = StringUtils.hasText(customColumnsSql)
                          ? customColumnsSql
                          : executor.getAllColumns()
-                           ? " * "
+                           ? "* "
                            : columns2Sql(CollectionsExtension.anyPlus(executor.getCustomFieldNames())
                                          ? executor.getCustomFieldNames()
                                                    .stream()
@@ -2254,11 +2254,11 @@ public abstract class SqlProvider {
         if (!StringUtils.hasText(orderBy))
             orderBy = "";
 
-        String sql = String.format("SELECT %s \r\n"
-                                           + "FROM %s \r\n"
-                                           + "%s \r\n"
-                                           + "%s \r\n"
-                                           + "%s",
+        String sql = String.format("SELECT \r\n\t%s "
+                                           + "\r\nFROM \r\n\t%s "
+                                           + "\r\n%s "
+                                           + "\r\n%s "
+                                           + "\r\n%s ",
                                    columns,
                                    from,
                                    where,
