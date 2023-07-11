@@ -61,6 +61,7 @@ public class SqlServerSqlProvider
             //获取sql语句的排序部分
             String orderBySql = null;
             StringBuilder orderBySqlSB = new StringBuilder();
+            main:
             for (int i = 0; i < chars.length; i++) {
                 if (begin != -1) {
                     if (chars[i] == 'A'
@@ -83,6 +84,16 @@ public class SqlServerSqlProvider
                         continue;
                     }
 
+                    for (int j = i + 1; j < chars.length; j++) {
+                        if (chars[j] == ',')
+                            continue main;
+                        else if (chars[j] != ' '
+                                && chars[j] != '\r'
+                                && chars[j] != '\n'
+                                & chars[j] != '\t')
+                            break;
+                    }
+
                     //清理查询中所有的Order By子句（不清理则会有语法错误：除非同时指定了TOP、OFFSET或FOR XML，否则ORDER BY子句在检视表、内嵌函数、衍生数据表、子查询及通用数据表表达式中均为无效。）
                     Arrays.fill(chars,
                                 begin,
@@ -90,22 +101,21 @@ public class SqlServerSqlProvider
                                 ' ');
                     begin = -1;
 
-                    orderBySql = orderBySqlSB.toString();
-                } else {
-                    if (i + 8 < chars.length) {
-                        if (chars[i] == 'O'
-                                && chars[i + 1] == 'R'
-                                && chars[i + 2] == 'D'
-                                && chars[i + 3] == 'E'
-                                && chars[i + 4] == 'R'
-                                && chars[i + 5] == ' '
-                                && chars[i + 6] == 'B'
-                                && chars[i + 7] == 'Y') {
-                            if (orderBySql == null)
-                                orderBySqlSB.append("ORDER BY");
-                            begin = i;
-                            i += 7;
-                        }
+                    if (orderBySql == null)
+                        orderBySql = orderBySqlSB.toString();
+                } else if (i + 8 < chars.length) {
+                    if (chars[i] == 'O'
+                            && chars[i + 1] == 'R'
+                            && chars[i + 2] == 'D'
+                            && chars[i + 3] == 'E'
+                            && chars[i + 4] == 'R'
+                            && chars[i + 5] == ' '
+                            && chars[i + 6] == 'B'
+                            && chars[i + 7] == 'Y') {
+                        if (orderBySql == null)
+                            orderBySqlSB.append("ORDER BY");
+                        begin = i;
+                        i += 7;
                     }
                 }
             }
