@@ -29,7 +29,7 @@ public class NaiveAopProvider
     private final List<IAction1<AfterCurdEventArgs>> afterCurdActions = new ArrayList<>();
 
     /**
-     * 监听获取映射对象之后触发的事件集合
+     * 监听创建映射对象之后触发的事件集合
      */
     private final List<IAction1<MappedStatementArgs>> mappedStatementActions = new ArrayList<>();
 
@@ -199,7 +199,7 @@ public class NaiveAopProvider
     }
 
     /**
-     * 获取映射对象之后
+     * 创建映射对象之后
      *
      * @param arg 参数
      */

@@ -59,6 +59,8 @@ public class MappedStatementHandler {
      * @param resultMap        返回数据映射表
      * @param <TParameter>     参数类型
      */
+    @SuppressWarnings({"GrazieInspection",
+                       "CommentedOutCode"})
     public <TParameter> MappedStatement create(Configuration configuration,
                                                String msId,
                                                String script,

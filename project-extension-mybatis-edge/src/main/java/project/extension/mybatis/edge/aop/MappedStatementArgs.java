@@ -4,7 +4,7 @@ import lombok.Data;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
- * 获取映射对象之后触发的事件的参数
+ * 创建映射对象之后触发的事件的参数
  *
  * @author LCTR
  * @date 2022-07-14
