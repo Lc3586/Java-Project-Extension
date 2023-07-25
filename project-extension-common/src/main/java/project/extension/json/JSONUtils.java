@@ -177,15 +177,15 @@ public class JSONUtils {
     /**
      * 反序列化
      */
-    public static <T> T parseObject(JsonNode node,
+    public static <T> T parseObject(Object object,
                                     Class<T> type) {
         try {
-            if (node == null)
+            if (object == null)
                 return null;
-            return JSONUtils.objectMapper.convertValue(node,
+            return JSONUtils.objectMapper.convertValue(object,
                                                        type);
         } catch (Exception ignore) {
-            return JSON.parseObject(node.toString(),
+            return JSON.parseObject(object.toString(),
                                     type);
         }
     }
@@ -193,15 +193,15 @@ public class JSONUtils {
     /**
      * 反序列化
      */
-    public static <T> T parseObject(JsonNode node,
+    public static <T> T parseObject(Object object,
                                     TypeReference<T> type) {
         try {
-            if (node == null)
+            if (object == null)
                 return null;
-            return JSONUtils.objectMapper.convertValue(node,
+            return JSONUtils.objectMapper.convertValue(object,
                                                        type);
         } catch (Exception ignore) {
-            return JSON.parseObject(node.toString(),
+            return JSON.parseObject(object.toString(),
                                     type.getType());
         }
     }

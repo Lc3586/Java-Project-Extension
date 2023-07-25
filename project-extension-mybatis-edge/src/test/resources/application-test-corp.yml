@@ -1,3 +1,9 @@
+# 日志配置
+logging:
+  level:
+    project.extension.mybatis.edge: debug
+    org.springframework: info
+
 #项目拓展
 project:
   extension:
