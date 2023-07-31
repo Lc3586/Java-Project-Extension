@@ -135,19 +135,12 @@
             <version>3.1.2</version>
         </dependency>
 
-        <!-- 达梦8驱动
-             此驱动也可以连接dm7服务，但是最好使用dm7的驱动-->
+        <!-- 达梦7/8驱动-->
         <dependency>
             <groupId>com.dameng</groupId>
-            <artifactId>Dm8JdbcDriver18</artifactId>
-            <version>8.1.1.49</version>
+            <artifactId>DmJdbcDriver18</artifactId>
+            <version>8.1.2.192</version>
         </dependency>
-        <!--        &lt;!&ndash; 达梦7驱动 &ndash;&gt;-->
-        <!--        <dependency>-->
-        <!--            <groupId>com.dameng</groupId>-->
-        <!--            <artifactId>Dm7JdbcDriver18</artifactId>-->
-        <!--            <version>7.6.0.165</version>-->
-        <!--        </dependency>-->
         <!-- 达梦6驱动 -->
         <dependency>
             <groupId>com.github.tianjing</groupId>
