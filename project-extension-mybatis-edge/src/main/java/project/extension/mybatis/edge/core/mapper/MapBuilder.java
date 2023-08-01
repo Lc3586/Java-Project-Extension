@@ -228,7 +228,8 @@ public class MapBuilder {
                                                                             customTags,
                                                                             withOutPrimaryKey,
                                                                             withOutIdentityKey,
-                                                                            false);
+                                                                            false,
+                                                                            true);
             for (Field field : fields) {
                 TypeHandler<?> typeHandler = null;
                 MappingSetting mappingSettingAttribute = AnnotationUtils.findAnnotation(field,

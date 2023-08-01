@@ -12,7 +12,9 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.TYPE,
+         ElementType.FIELD,
+         ElementType.PARAMETER})
 public @interface EntityMapping {
     /**
      * 实体类型
@@ -23,4 +25,14 @@ public @interface EntityMapping {
      * 实体类型
      */
     @AliasFor("value") Class<?> entityType() default Object.class;
+
+    /**
+     * 写入查询结果时使用此配置
+     */
+    boolean enableSetter() default true;
+
+    /**
+     * 读取数据时使用此配置
+     */
+    boolean enableGetter() default true;
 }

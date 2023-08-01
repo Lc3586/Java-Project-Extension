@@ -50,4 +50,14 @@ public @interface EntityMappingSetting {
      * 忽略
      */
     boolean ignore() default false;
+
+    /**
+     * 写入查询结果时使用此配置
+     */
+    boolean enableSetter() default true;
+
+    /**
+     * 读取数据时使用此配置
+     */
+    boolean enableGetter() default true;
 }

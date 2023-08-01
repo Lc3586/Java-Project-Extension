@@ -945,12 +945,14 @@ public abstract class SqlProvider {
     /**
      * 获取业务模型对应的列名
      *
-     * @param entityType         实体类型
-     * @param dtoType            业务模型类型
-     * @param mainTagLevel       主标签等级
-     * @param customTags         自定义标签
-     * @param withOutPrimaryKey  排除主键
-     * @param withOutIdentityKey 排除自增列
+     * @param entityType                        实体类型
+     * @param dtoType                           业务模型类型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      * @return 列名集合
      */
     public Collection<String> getColumns(Class<?> entityType,
@@ -958,7 +960,9 @@ public abstract class SqlProvider {
                                          int mainTagLevel,
                                          Collection<String> customTags,
                                          boolean withOutPrimaryKey,
-                                         boolean withOutIdentityKey)
+                                         boolean withOutIdentityKey,
+                                         boolean includeEntityMappingSettingGetter,
+                                         boolean includeEntityMappingSettingSetter)
             throws
             ModuleException {
         //读取缓存
@@ -987,7 +991,8 @@ public abstract class SqlProvider {
                                                                   customTags,
                                                                   withOutPrimaryKey,
                                                                   withOutIdentityKey,
-                                                                  !dtoType.equals(entityType))
+                                                                  includeEntityMappingSettingGetter,
+                                                                  includeEntityMappingSettingSetter)
                                         .stream()
                                         .map(x -> EntityTypeHandler.getColumn(x,
                                                                               config.getNameConvertType()))
@@ -1003,18 +1008,22 @@ public abstract class SqlProvider {
     /**
      * 获取实体类对应的字段+列名
      *
-     * @param entityType         实体类型
-     * @param mainTagLevel       主标签等级
-     * @param customTags         自定义标签
-     * @param withOutPrimaryKey  排除主键
-     * @param withOutIdentityKey 排除自增列
+     * @param entityType                        实体类型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey) {
+                                                       boolean withOutIdentityKey,
+                                                       boolean includeEntityMappingSettingGetter,
+                                                       boolean includeEntityMappingSettingSetter) {
         return getFieldNameWithColumns(entityType,
                                        null,
                                        mainTagLevel,
@@ -1024,18 +1033,22 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
-                                       withOutIdentityKey);
+                                       withOutIdentityKey,
+                                       includeEntityMappingSettingGetter,
+                                       includeEntityMappingSettingSetter);
     }
 
     /**
      * 获取业务模型对应的字段+列名
      *
-     * @param entityType         实体类型
-     * @param dtoType            业务模型类型
-     * @param mainTagLevel       主标签等级
-     * @param customTags         自定义标签
-     * @param withOutPrimaryKey  排除主键
-     * @param withOutIdentityKey 排除自增列
+     * @param entityType                        实体类型
+     * @param dtoType                           业务模型类型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
@@ -1043,7 +1056,9 @@ public abstract class SqlProvider {
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey) {
+                                                       boolean withOutIdentityKey,
+                                                       boolean includeEntityMappingSettingGetter,
+                                                       boolean includeEntityMappingSettingSetter) {
         return getFieldNameWithColumns(entityType,
                                        dtoType,
                                        mainTagLevel,
@@ -1053,21 +1068,26 @@ public abstract class SqlProvider {
                                        null,
                                        null,
                                        withOutPrimaryKey,
-                                       withOutIdentityKey);
+                                       withOutIdentityKey,
+                                       includeEntityMappingSettingGetter,
+                                       includeEntityMappingSettingSetter);
     }
 
     /**
      * 获取业务模型对应的字段+列名
      *
-     * @param entityType          实体类型
-     * @param dtoType             业务模型类型
-     * @param customTags          自定义标签
-     * @param exceptionFieldNames 包括的字段
-     * @param exceptionColumns    包括的列
-     * @param ignoreFieldNames    忽略的字段
-     * @param ignoreColumns       忽略的列
-     * @param withOutPrimaryKey   排除主键
-     * @param withOutIdentityKey  排除自增列
+     * @param entityType                        实体类型
+     * @param dtoType                           业务模型类型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param exceptionFieldNames               包括的字段
+     * @param exceptionColumns                  包括的列
+     * @param ignoreFieldNames                  忽略的字段
+     * @param ignoreColumns                     忽略的列
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      * @return 字段+列名集合
      */
     public Map<String, String> getFieldNameWithColumns(Class<?> entityType,
@@ -1079,11 +1099,13 @@ public abstract class SqlProvider {
                                                        Collection<String> ignoreFieldNames,
                                                        Collection<String> ignoreColumns,
                                                        boolean withOutPrimaryKey,
-                                                       boolean withOutIdentityKey)
+                                                       boolean withOutIdentityKey,
+                                                       boolean includeEntityMappingSettingGetter,
+                                                       boolean includeEntityMappingSettingSetter)
             throws
             ModuleException {
         //读取缓存
-        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:MTL-%s:CT-%s:WOPK-%s:WOIK:%s",
+        String cacheKey = String.format("DS-%s:ET-%s:DT-%s:MTL-%s:CT-%s:WOPK-%s:WOIK:%s:IEMSG:%s:IEMSS:%s",
                                         this.config.getName(),
                                         entityType.getTypeName(),
                                         dtoType == null
@@ -1095,7 +1117,9 @@ public abstract class SqlProvider {
                                         : String.join(",",
                                                       customTags),
                                         withOutPrimaryKey,
-                                        withOutIdentityKey);
+                                        withOutIdentityKey,
+                                        includeEntityMappingSettingGetter,
+                                        includeEntityMappingSettingSetter);
         Map<String, String> fieldWithColumns = CacheExtension.getFieldWithColumns(cacheKey);
         if (!CollectionsExtension.anyPlus(fieldWithColumns)) {
             fieldWithColumns = new HashMap<>();
@@ -1105,8 +1129,8 @@ public abstract class SqlProvider {
                                                                           customTags,
                                                                           withOutPrimaryKey,
                                                                           withOutIdentityKey,
-                                                                          dtoType != null
-                                                                                  && !dtoType.equals(entityType))) {
+                                                                          includeEntityMappingSettingGetter,
+                                                                          includeEntityMappingSettingSetter)) {
                 fieldWithColumns.put(field.getName(),
                                      EntityTypeHandler.getColumn(field,
                                                                  config.getNameConvertType()));
@@ -2178,7 +2202,9 @@ public abstract class SqlProvider {
                                                       executor.getMainTagLevel(),
                                                       executor.getCustomTags(),
                                                       false,
-                                                      false),
+                                                      false,
+                                                      false,
+                                                      true),
                                          alias);
 
         //FROM部分
@@ -2430,7 +2456,9 @@ public abstract class SqlProvider {
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
                                                                        false,
-                                                                       true);
+                                                                       true,
+                                                                       true,
+                                                                       false);
 
         //列
         String columns = columns2Sql(fieldWithColumns.values());
@@ -2539,7 +2567,9 @@ public abstract class SqlProvider {
                                                                        inserter.getIgnoreFieldNames(),
                                                                        null,
                                                                        false,
-                                                                       true);
+                                                                       true,
+                                                                       true,
+                                                                       false);
 
         //列
         String columns = columns2Sql(fieldWithColumns.values());
@@ -2624,7 +2654,9 @@ public abstract class SqlProvider {
                                                                                updater.getIgnoreFieldNames(),
                                                                                null,
                                                                                true,
-                                                                               true);
+                                                                               true,
+                                                                               true,
+                                                                               false);
             set = fieldWithColumns2UpdateSql(updater.getEntityType(),
                                              fieldNameWithColumns,
                                              alias,

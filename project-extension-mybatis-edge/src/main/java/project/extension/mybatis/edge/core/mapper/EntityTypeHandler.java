@@ -391,13 +391,14 @@ public class EntityTypeHandler {
     /**
      * 获取业务模型列相关的字段
      *
-     * @param dtoType            业务模型
-     * @param mainTagLevel       主标签等级
-     * @param customTags         自定义标签
-     * @param withOutPrimaryKey  排除主键
-     * @param withOutIdentityKey 排除自增列
-     * @param inherit            仅继承成员
-     * @param nameConvertType    命名规则
+     * @param dtoType                           业务模型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
+     * @param nameConvertType                   命名规则
      * @return 列名集合
      */
     public static List<String> getColumnsByDtoType(Class<?> dtoType,
@@ -405,44 +406,52 @@ public class EntityTypeHandler {
                                                    Collection<String> customTags,
                                                    boolean withOutPrimaryKey,
                                                    boolean withOutIdentityKey,
-                                                   boolean inherit,
+                                                   boolean includeEntityMappingSettingGetter,
+                                                   boolean includeEntityMappingSettingSetter,
                                                    NameConvertType nameConvertType) {
         return getColumns(getColumnFieldsByDtoType(dtoType,
                                                    mainTagLevel,
                                                    customTags,
                                                    withOutPrimaryKey,
                                                    withOutIdentityKey,
-                                                   inherit),
+                                                   includeEntityMappingSettingGetter,
+                                                   includeEntityMappingSettingSetter),
                           nameConvertType);
     }
 
     /**
      * 获取业务模型列字段集合
      *
-     * @param dtoType            业务模型
-     * @param mainTagLevel       主标签等级
-     * @param customTags         自定义标签
-     * @param withOutPrimaryKey  排除主键
-     * @param withOutIdentityKey 排除自增列
-     * @param inherit            仅继承成员
+     * @param dtoType                           业务模型
+     * @param mainTagLevel                      主标签等级
+     * @param customTags                        自定义标签
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      */
     public static List<Field> getColumnFieldsByDtoType(Class<?> dtoType,
                                                        int mainTagLevel,
                                                        Collection<String> customTags,
                                                        boolean withOutPrimaryKey,
                                                        boolean withOutIdentityKey,
-                                                       boolean inherit) {
+                                                       boolean includeEntityMappingSettingGetter,
+                                                       boolean includeEntityMappingSettingSetter) {
         List<Field> fields = new ArrayList<>();
 
         EntityMapping entityMappingAttribute = AnnotationUtils.findAnnotation(dtoType,
                                                                               EntityMapping.class);
-        if (entityMappingAttribute != null) {
+        if (entityMappingAttribute != null && (
+                (entityMappingAttribute.enableGetter() && includeEntityMappingSettingGetter) || (
+                        entityMappingAttribute.enableSetter() && includeEntityMappingSettingSetter))) {
             //映射到实体的业务模型
             for (Field field : dtoType.getDeclaredFields()) {
                 getColumnField(field,
                                entityMappingAttribute,
                                withOutPrimaryKey,
-                               withOutIdentityKey).ifPresent(x -> {
+                               withOutIdentityKey,
+                               includeEntityMappingSettingGetter,
+                               includeEntityMappingSettingSetter).ifPresent(x -> {
                     //是否忽略列
                     if (!isIgnoreColumn(field,
                                         withOutPrimaryKey,
@@ -483,9 +492,12 @@ public class EntityTypeHandler {
                                                             withOutIdentityKey);
 
             if (CollectionsExtension.anyPlus(openApiFields)) fields.addAll(openApiFields);
-        } else if (entityMappingAttribute == null) fields.addAll(getColumnFieldsByEntityType(getEntityType(dtoType),
-                                                                                             withOutPrimaryKey,
-                                                                                             withOutIdentityKey));
+        } else if (entityMappingAttribute == null) fields.addAll(
+
+                getColumnFieldsByEntityType(getEntityType(dtoType),
+
+                                            withOutPrimaryKey,
+                                            withOutIdentityKey));
 
         return fields;
     }
@@ -493,15 +505,19 @@ public class EntityTypeHandler {
     /**
      * 获取列字段
      *
-     * @param field                  字段
-     * @param entityMappingAttribute 实体映射设置
-     * @param withOutPrimaryKey      排除主键
-     * @param withOutIdentityKey     排除自增列
+     * @param field                             字段
+     * @param entityMappingAttribute            实体映射设置
+     * @param withOutPrimaryKey                 排除主键
+     * @param withOutIdentityKey                排除自增列
+     * @param includeEntityMappingSettingGetter 包括映射配置中用于读取数据的字段
+     * @param includeEntityMappingSettingSetter 包括映射配置中用于写入数据的字段
      */
     public static Optional<Field> getColumnField(Field field,
                                                  EntityMapping entityMappingAttribute,
                                                  boolean withOutPrimaryKey,
-                                                 boolean withOutIdentityKey) {
+                                                 boolean withOutIdentityKey,
+                                                 boolean includeEntityMappingSettingGetter,
+                                                 boolean includeEntityMappingSettingSetter) {
         if (isIgnoreField(field)) return Optional.empty();
 
         EntityMappingSetting entityMappingSettingAttribute = AnnotationUtils.findAnnotation(field,
@@ -510,37 +526,41 @@ public class EntityTypeHandler {
         Field entityField;
 
         if (entityMappingSettingAttribute != null) {
-            //忽略字段或者忽略主键
-            if (entityMappingSettingAttribute.ignore()
-                    || (withOutPrimaryKey && entityMappingSettingAttribute.isPrimaryKey())
-                    || (withOutIdentityKey && entityMappingSettingAttribute.isIdentity()))
-                return Optional.empty();
-
-            //列名来自字段本身
-            if (entityMappingSettingAttribute.self()) {
-                return Optional.of(field);
-            } else {
-                Class<?> entityType = entityMappingSettingAttribute.entityType()
-                                                                   .equals(Void.class)
-                                      ? entityMappingAttribute.entityType()
-                                      : entityMappingSettingAttribute.entityType();
-                entityFieldName = StringUtils.hasText(entityMappingSettingAttribute.entityFieldName())
-                                  ? entityMappingSettingAttribute.entityFieldName()
-                                  : entityFieldName;
-
-                try {
-                    entityField = entityType.getDeclaredField(entityFieldName);
-                } catch (NoSuchFieldException ex) {
-                    throw new ModuleException(Strings.getEntityFieldUndefined(entityType.getTypeName(),
-                                                                              entityFieldName),
-                                              ex);
-                }
-
-                if (entityField != null
-                        && ((withOutPrimaryKey && isPrimaryKey(entityField))
-                        || (withOutIdentityKey && isIgnoreField(entityField))))
+            if ((includeEntityMappingSettingGetter && entityMappingSettingAttribute.enableGetter())
+                    || (includeEntityMappingSettingSetter && entityMappingSettingAttribute.enableSetter())) {
+                //忽略字段或者忽略主键
+                if (entityMappingSettingAttribute.ignore()
+                        || (withOutPrimaryKey && entityMappingSettingAttribute.isPrimaryKey())
+                        || (withOutIdentityKey && entityMappingSettingAttribute.isIdentity()))
                     return Optional.empty();
+
+                //列名来自字段本身
+                if (entityMappingSettingAttribute.self()) {
+                    return Optional.of(field);
+                } else {
+                    Class<?> entityType = entityMappingSettingAttribute.entityType()
+                                                                       .equals(Void.class)
+                                          ? entityMappingAttribute.entityType()
+                                          : entityMappingSettingAttribute.entityType();
+                    entityFieldName = StringUtils.hasText(entityMappingSettingAttribute.entityFieldName())
+                                      ? entityMappingSettingAttribute.entityFieldName()
+                                      : entityFieldName;
+
+                    try {
+                        entityField = entityType.getDeclaredField(entityFieldName);
+                    } catch (NoSuchFieldException ex) {
+                        throw new ModuleException(Strings.getEntityFieldUndefined(entityType.getTypeName(),
+                                                                                  entityFieldName),
+                                                  ex);
+                    }
+
+                    if (withOutPrimaryKey && isPrimaryKey(entityField)
+                            || withOutIdentityKey && isIgnoreField(entityField))
+                        return Optional.empty();
+                }
             }
+
+            return Optional.empty();
         } else {
             Class<?> entityType = entityMappingAttribute.entityType();
             try {
@@ -625,11 +645,14 @@ public class EntityTypeHandler {
                                                                               fieldName),
                                               ex2);
                 }
+                EntityMapping entityMapping = AnnotationUtils.findAnnotation(entityMappingType,
+                                                                             EntityMapping.class);
                 Optional<Field> optionalField = getColumnField(mappingField,
-                                                               AnnotationUtils.findAnnotation(entityMappingType,
-                                                                                              EntityMapping.class),
+                                                               entityMapping,
                                                                false,
-                                                               false);
+                                                               false,
+                                                               entityMapping != null && entityMapping.enableGetter(),
+                                                               entityMapping != null && entityMapping.enableSetter());
                 if (optionalField.isPresent()) return optionalField.get();
             }
 
