@@ -30,15 +30,26 @@ public class AssertExtension {
             Exception {
         Class<?> type = data1.getClass();
 
-        for (String fieldName : fieldNames) {
-            Field field = type.getDeclaredField(fieldName);
+        Field[] fields;
+
+        if (fieldNames == null || fieldNames.length == 0)
+            fields = type.getDeclaredFields();
+        else {
+            fields = new Field[fieldNames.length];
+            for (int i = 0; i < fieldNames.length; i++) {
+                Field field = type.getDeclaredField(fieldNames[i]);
+                fields[i] = field;
+            }
+        }
+
+        for (Field field : fields) {
             field.setAccessible(true);
 
             Assertions.assertNotEquals(null,
                                        field,
                                        String.format("%s中未找到%s字段",
                                                      type.getName(),
-                                                     fieldName));
+                                                     field.getName()));
 
             Object value1 = field.get(data1);
             Object value2 = field.get(data2);
@@ -62,7 +73,7 @@ public class AssertExtension {
                                     value2,
                                     String.format("两个%s类型的数据对象中%s字段的值不相等：%s ≠ %s",
                                                   type.getName(),
-                                                  fieldName,
+                                                  field.getName(),
                                                   value1,
                                                   value2));
 
@@ -87,7 +98,7 @@ public class AssertExtension {
 
             System.out.printf("\r\n两个%s类型的数据对象中%s字段的值相等：%s = %s\r\n",
                               type.getName(),
-                              fieldName,
+                              field.getName(),
                               value1Output,
                               value2Output);
         }
