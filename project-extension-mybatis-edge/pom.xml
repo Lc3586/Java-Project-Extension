@@ -5,12 +5,12 @@
     <parent>
         <artifactId>project-extension</artifactId>
         <groupId>top.lctr</groupId>
-        <version>1.0.6-SNAPSHOT</version>
+        <version>1.0.7</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>project-extension-mybatis-edge</artifactId>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7</version>
 
     <name>top.lctr:project-extension-mybatis-edge</name>
     <description>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-standard</artifactId>
-            <version>1.0.6-SNAPSHOT</version>
+            <version>1.0.7</version>
         </dependency>
 
         <dependency>
@@ -233,7 +233,7 @@
         <dependency>
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-console</artifactId>
-            <version>1.0.6-SNAPSHOT</version>
+            <version>1.0.7</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -13,6 +13,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestRateLimiter {
     /**
+     * redis帮助类在容器中的名称
+     */
+    String beanName() default "redisTemplate";
+
+    /**
      * Spell表达式
      * <p>用于Redis锁的键</p>
      */

@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import project.extension.cryptography.MD5Utils;
+import project.extension.ioc.IOCExtension;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -26,16 +27,12 @@ import java.util.List;
 @Aspect
 public class RequestRateLimiterAspectHandler {
     public RequestRateLimiterAspectHandler(RedisScript<Boolean> redisScript,
-                                           RedisTemplate redisTemplate,
                                            RequestRateLimiterKeyProvider keyProvider) {
         this.redisScript = redisScript;
-        this.redisTemplate = redisTemplate;
         this.keyProvider = keyProvider;
     }
 
     private final RedisScript<Boolean> redisScript;
-
-    private final RedisTemplate redisTemplate;
 
     public final RequestRateLimiterKeyProvider keyProvider;
 
@@ -83,13 +80,15 @@ public class RequestRateLimiterAspectHandler {
         // 拼接成最后的Redis的键,传入需要操作的key到lua脚本中
         List<String> operateKeys = getOperateKeys(key);
         // 执行lua脚本
-        Boolean allowed = (Boolean) this.redisTemplate.execute(redisScript,
-                                                               operateKeys,
-                                                               rateLimiter.capacity(),
-                                                               rateLimiter.rate(),
-                                                               Instant.now()
-                                                                      .getEpochSecond(),
-                                                               1);
+        Boolean allowed = (Boolean) IOCExtension.applicationContext.getBean(rateLimiter.beanName(),
+                                                                            RedisTemplate.class)
+                                                                   .execute(redisScript,
+                                                                            operateKeys,
+                                                                            rateLimiter.capacity(),
+                                                                            rateLimiter.rate(),
+                                                                            Instant.now()
+                                                                                   .getEpochSecond(),
+                                                                            1);
         logger.info("rateLimiter {}, result is {}",
                     key,
                     allowed);
