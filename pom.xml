@@ -6,7 +6,13 @@
 
     <groupId>top.lctr</groupId>
     <artifactId>project-extension</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
+
+    <name>top.lctr:project-extension</name>
+    <description>
+        项目拓展
+    </description>
+    <url>https://github.com/Lc3586/Java-Project-Extension</url>
 
     <licenses>
         <license>
@@ -62,7 +68,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <maven.test.skip>true</maven.test.skip>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
         <!-- Maven中心库 -->
         <server.id>ossrh</server.id>
         <!-- 阿里云私有云 -->
@@ -92,30 +98,27 @@
 
     <build>
         <plugins>
+            <!-- compiler插件,Maven 编译插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.9.0</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-plugin</artifactId>
-                <version>1.12.2</version>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
-                <extensions>true</extensions>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <serverId>${server.id}</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <archive>
+                        <addMavenDescriptor>false</addMavenDescriptor>
+                    </archive>
                 </configuration>
             </plugin>
+            <!-- Java源码 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -133,24 +136,72 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Java文档 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.11.0</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <charset>${project.build.sourceEncoding}</charset>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <docencoding>${project.build.sourceEncoding}</docencoding>
+                    <!-- 临时解决不规范的Javadoc生成报错 -->
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
+                    <show>none</show>
+                    <nohelp>true</nohelp>
+                    <failOnError>false</failOnError>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
+                        <id>attach-javadocs</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>deploy</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.12.2</version>
+            </plugin>
+            <!-- GPG签名 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--staging插件,用于自动执行发布阶段(免手动)-->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>${server.id}</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <!-- release插件,用于发布到release仓库部署插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
@@ -180,95 +231,24 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.9.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.11.0</version>
             </plugin>
-            <!-- GPG签名 -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Java文档 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
+                <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.7</version>
-                <configuration>
-                    <javadocExecutable>D:/Java/jdk1.8.0_191/bin/javadoc</javadocExecutable>
-                    <aggregate>true</aggregate>
-                    <charset>${project.build.sourceEncoding}</charset>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <docencoding>${project.build.sourceEncoding}</docencoding>
-                    <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
-                        <phase>package</phase>
+                        <id>default-deploy</id>
+                        <phase>deploy</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>deploy</goal>
                         </goals>
-                        <configuration>
-                            <failOnError>false</failOnError>
-                            <encoding>${project.build.sourceEncoding}</encoding>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>ossrh</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <!--            <build>-->
-            <!--                <plugins>-->
-            <!--                    <plugin>-->
-            <!--                        <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                        <artifactId>maven-source-plugin</artifactId>-->
-            <!--                        <version>3.2.1</version>-->
-            <!--                        <executions>-->
-            <!--                            <execution>-->
-            <!--                                <phase>package</phase>-->
-            <!--                                <goals>-->
-            <!--                                    <goal>jar-no-fork</goal>-->
-            <!--                                </goals>-->
-            <!--                            </execution>-->
-            <!--                        </executions>-->
-            <!--                    </plugin>-->
-            <!--                </plugins>-->
-            <!--            </build>-->
-        </profile>
-        <profile>
-            <id>rdc</id>
-            <properties>
-                <altReleaseDeploymentRepository>
-                    rdc-releases::default::https://packages.aliyun.com/maven/repository/2306545-release-DI7rwN/
-                </altReleaseDeploymentRepository>
-                <altSnapshotDeploymentRepository>
-                    rdc-snapshots::default::https://packages.aliyun.com/maven/repository/2306545-snapshot-esInnb/
-                </altSnapshotDeploymentRepository>
-            </properties>
-        </profile>
-    </profiles>
 
     <dependencies>
 

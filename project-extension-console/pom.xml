@@ -5,17 +5,18 @@
     <parent>
         <artifactId>project-extension</artifactId>
         <groupId>top.lctr</groupId>
-        <version>1.0.7</version>
+        <version>1.0.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>project-extension-console</artifactId>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
 
-    <name>top.lctr:project-extension-document</name>
+    <name>top.lctr:project-extension-console</name>
     <description>
         项目拓展 控制台工具
     </description>
+    <url>https://github.com/Lc3586/Java-Project-Extension/tree/main/project-extension-console</url>
 
     <licenses>
         <license>
@@ -48,7 +49,7 @@
         <dependency>
             <groupId>top.lctr</groupId>
             <artifactId>project-extension-common</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.8</version>
         </dependency>
 
         <!-- 测试工具 -->
